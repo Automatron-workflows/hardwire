@@ -1,0 +1,42 @@
+{
+  "name": "hardwire",
+  "version": "0.1.0",
+  "description": "Sites expose ports. Agents plug in. An open panel format for agent-operable software.",
+  "type": "module",
+  "private": true,
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=24.16.0"
+  },
+  "bin": {
+    "hardwire": "./src/cli.mjs"
+  },
+  "exports": {
+    ".": "./src/index.mjs",
+    "./panel": "./src/panel.mjs",
+    "./probe": "./src/probe.mjs",
+    "./mcp": "./src/mcp.mjs",
+    "./trace": "./src/trace.mjs",
+    "./infer": "./src/infer.mjs"
+  },
+  "files": [
+    "src",
+    "examples",
+    "docs",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test test/*.test.mjs",
+    "validate": "node src/cli.mjs validate examples/example-panel.json",
+    "audit": "node src/cli.mjs audit examples/example-panel.json",
+    "compile": "node src/cli.mjs compile examples/example-panel.json"
+  },
+  "keywords": [
+    "agents",
+    "mcp",
+    "webmcp",
+    "browser-automation",
+    "accessibility",
+    "tool-calling"
+  ]
+}

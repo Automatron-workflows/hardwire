@@ -1,0 +1,11 @@
+Copyright (c) 2026 Automatron.
+
+Licence not yet chosen.
+
+This file exists so the absence is explicit rather than accidental. Until a
+licence is added here and in package.json, no permission to copy, modify or
+redistribute is granted, and `package.json` stays `"private": true` so the
+package cannot be published to npm by mistake.
+
+The owner of this repository must pick a licence before any release, any
+publication, or any invitation for outside contributions.

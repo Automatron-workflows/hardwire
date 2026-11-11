@@ -1,0 +1,161 @@
+{
+  "panel": "hardwire.panel/1",
+  "origin": "https://shop.example.com",
+  "title": "Example storefront",
+  "revision": "2026-11-11T00:00:00Z",
+  "auth": {
+    "loginPort": "sign-in",
+    "note": "Credentials come from the caller's own store. A panel never contains them."
+  },
+  "ports": [
+    {
+      "id": "search-catalogue",
+      "kind": "read",
+      "summary": "Search products by free-text query and return up to 50 matches.",
+      "parameters": {
+        "properties": {
+          "query": {
+            "type": "string",
+            "description": "Full-text search terms."
+          },
+          "limit": {
+            "type": "integer",
+            "description": "Maximum results, 1-50."
+          },
+          "inStockOnly": {
+            "type": "boolean",
+            "description": "Exclude unavailable items."
+          }
+        },
+        "required": [
+          "query"
+        ]
+      },
+      "expects": {
+        "type": "object",
+        "properties": {
+          "items": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "sku": {
+                  "type": "string"
+                },
+                "title": {
+                  "type": "string"
+                },
+                "priceCents": {
+                  "type": "integer"
+                }
+              },
+              "required": [
+                "sku",
+                "title",
+                "priceCents"
+              ]
+            }
+          }
+        },
+        "required": [
+          "items"
+        ]
+      },
+      "endpoint": "/api/search"
+    },
+    {
+      "id": "sign-in",
+      "kind": "write",
+      "summary": "Exchange stored credentials for a session. Replaces any existing session.",
+      "reversible": true,
+      "parameters": {
+        "properties": {
+          "email": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string",
+            "description": "Read from the caller's keychain, never logged.",
+            "writeOnly": true
+          }
+        },
+        "required": [
+          "email",
+          "password"
+        ]
+      },
+      "endpoint": "/api/session",
+      "confirmation": "none"
+    },
+    {
+      "id": "add-to-cart",
+      "kind": "write",
+      "summary": "Add one SKU to the current cart. Removable, so no human confirmation is required.",
+      "reversible": true,
+      "preconditions": [
+        "authenticated"
+      ],
+      "parameters": {
+        "properties": {
+          "sku": {
+            "type": "string"
+          },
+          "quantity": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "sku",
+          "quantity"
+        ]
+      },
+      "endpoint": "/api/cart/items",
+      "confirmation": "none"
+    },
+    {
+      "id": "place-order",
+      "kind": "payment",
+      "summary": "Convert the current cart into a paid order.",
+      "preconditions": [
+        "authenticated",
+        "cart-not-empty"
+      ],
+      "parameters": {
+        "properties": {
+          "shippingAddressId": {
+            "type": "string"
+          },
+          "idempotencyKey": {
+            "type": "string",
+            "description": "Caller-generated; prevents a second charge."
+          }
+        },
+        "required": [
+          "shippingAddressId",
+          "idempotencyKey"
+        ]
+      },
+      "endpoint": "/api/orders"
+    },
+    {
+      "id": "delete-account",
+      "kind": "destructive",
+      "summary": "Permanently remove the account and all order history.",
+      "parameters": {
+        "properties": {
+          "confirmationPhrase": {
+            "type": "string",
+            "enum": [
+              "DELETE"
+            ],
+            "description": "Literal phrase typed by the human approving the action."
+          }
+        },
+        "required": [
+          "confirmationPhrase"
+        ]
+      },
+      "endpoint": "/api/account"
+    }
+  ]
+}
