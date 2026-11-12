@@ -1,14 +1,17 @@
 # Experiment with Hardwire
 
 Run every command below from the repository root with Node 24.16+.
+For an agent-connected experience, start with [the standalone MCP toolkit](MCP.md).
+Install dependencies with `npm ci --ignore-scripts` for MCP checks.
 `npm run walkthrough` is the fastest complete offline tour. It makes no network
 requests and needs no model or credentials.
 
 To see a tool actually call an application function, run `npm run consumer`.
 It calls `search_catalogue` with `{ "query": "lamp" }`, returns the fake
 `Desk lamp` product and records a checked success. Read `examples/consumer.mjs`
-to replace the fixed handler with your own authorized service. A model client
-still needs a transport adapter; merely publishing a panel cannot make calls.
+to replace the fixed handler with your own authorized service. The standalone MCP toolkit inspects supplied data; calling this catalogue function
+from a model still needs a separate application adapter. Publishing a panel alone
+cannot make its operations executable.
 
 ## 1. Inspect an explicit contract
 

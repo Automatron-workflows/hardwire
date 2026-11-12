@@ -1,6 +1,6 @@
 # Foundation and next gates
 
-## Foundation: implemented in 0.4.1
+## Foundation: implemented in 0.5.0
 
 - Strict panel and schema validation, argument checks and normalized digests.
 - MCP tool descriptions with the same closed-object semantics as validation.
@@ -10,6 +10,8 @@
 - Trace creation, redaction, verification and exact panel binding.
 - Offline walkthrough, local HTTP demo, CLI/API guides and automated checks.
 - An application-owned read-handler example and automated packed-install checks.
+- A standalone offline MCP toolkit with five fixed tools, official SDK transport,
+  actual client calls, installed-command tests and generated client configuration.
 
 The library is ready for controlled experiments by the owner. It is not a
 production executor or an open-source release. License selection is still open.
@@ -44,7 +46,7 @@ The synthetic baseline must stay separate from a real-site evaluation.
 
 ## Gate 2: controlled traversal — open
 
-On one application we own, complete login, read, one reversible write, and
+With a consenting application partner, complete login, read, one reversible write, and
 read-back without UI navigation. Every action must have a known handler,
 authorization, explicit approval policy, idempotency behavior, a checked result
 and a trace bound to the reviewed panel. Inject failures and retry scenarios.
@@ -59,7 +61,8 @@ allowlist of local handlers for the first experiment.
 
 ## Gate 3: demand — open
 
-Find one external team with a real application that wants to publish a panel or
+First recruit users for the standalone toolkit; no app ownership is required.
+Separately, find one consenting application team that wants to publish a panel or
 consume one. Measure the integration work and task reliability. Stars and
 synthetic examples do not satisfy this gate. Resolve the license before inviting
 external implementation contributions or promoting reusable packages.
@@ -67,7 +70,8 @@ external implementation contributions or promoting reusable packages.
 ## Release decisions still open
 
 Follow [distribution and first deployment](DISTRIBUTION.md) for the ordered pilot,
-package and client-adapter rollout. Publishing the panel alone cannot connect a client.
+package and client rollout. The toolkit can connect now; submitted panel operations
+remain data until an application integration supplies trusted handlers.
 
 - Choose a license; `UNLICENSED` and `private: true` remain unchanged.
 - Decide whether npm distribution is useful and check/reserve an appropriate name.

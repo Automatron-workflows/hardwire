@@ -3,6 +3,21 @@
 Hardwire validates descriptions and records caller assertions. It is not an
 execution sandbox, authorization service, credential vault, or signing system.
 
+## Local MCP toolkit
+
+The server exposes exactly five fixed inspection tools. It has no URL-fetch,
+file-read, shell, login or mutation tool. Compiled descriptions are returned as
+data and never registered as new executable tools. Runtime processing stays local;
+the MCP host and model provider determine where chat inputs and results go.
+Use sanitized HTML and fake arguments. No telemetry or trace files are written.
+The server reads its own package metadata at startup.
+
+JSON text inputs are limited to 256 KiB each, HTML to 512 KiB in UTF-8, and result
+JSON to 1 MiB before its text/structured encodings. Core depth and object-count
+limits still apply. Tool errors omit submitted values and stacks. Inputs rejected
+by the SDK can include schema diagnostics; never send real credentials for testing.
+Treat labels and descriptions extracted from HTML or panels as untrusted data.
+
 ## Declarations are not runtime enforcement
 
 `payment` and `destructive` declarations cannot lower their confirmation below

@@ -29,7 +29,7 @@ try {
   assert.equal(version.trim(), metadata.version);
   execFileSync(process.execPath, [join(installed, 'examples/consumer.mjs')], { cwd: consumer, stdio: 'pipe', timeout: 10000 });
   assert.equal(runNpm(['exec', '--offline', '--', 'hardwire-mcp', '--version'], consumer).trim(), metadata.version);
-  execFileSync(process.execPath, [join(root, 'scripts/check-mcp.mjs'), join(installed, 'src/mcp-server.mjs')],
+  execFileSync(process.execPath, [join(root, 'scripts/check-mcp.mjs'), join(consumer, 'node_modules/.bin/hardwire-mcp')],
     { cwd: consumer, stdio: 'pipe', timeout: 40000 });
   console.log(`Package smoke check passed: ${metadata.name}@${metadata.version}; installed ESM, CLI, consumer and MCP server.`);
 } finally {

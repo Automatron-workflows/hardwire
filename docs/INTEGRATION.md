@@ -1,5 +1,8 @@
 # Add a panel to an application
 
+No application to integrate yet? Use [the standalone MCP toolkit](MCP.md).
+This guide covers the later, separate step of operating an application.
+
 Hardwire's useful boundary is the application's real operations. Start with one
 read operation on a site you control. Do not tag every button or infer that an
 inferred draft is permission to call a third party.
@@ -62,7 +65,7 @@ Checked against primary sources on 2026-11-12:
 
 | System | Relationship |
 | --- | --- |
-| [MCP tools](https://modelcontextprotocol.io/specification/2025-11-25/server/tools) | Hardwire produces the tool-list result shape. It implements no transport, initialization or `tools/call` handler. |
+| [MCP tools](https://modelcontextprotocol.io/specification/2025-11-25/server/tools) | The core compiles tool descriptions. The standalone toolkit implements stdio initialization and calls through the official SDK for five fixed inspection tools; it never executes submitted panel ports. |
 | [MCP annotation guidance](https://blog.modelcontextprotocol.io/posts/2026-03-16-tool-annotations/) | Annotations are untrusted hints unless backed by a trusted publisher and enforcement. They do not prove safety. |
 | [WebMCP draft](https://webmachinelearning.github.io/webmcp/) | Browser-side JavaScript tool registration. The 2026-11-11 draft uses `document.modelContext`; older proposals used `navigator.modelContext`. No adapter is implemented here. |
 | OpenAPI | Existing HTTP interface descriptions. Hardwire does not convert OpenAPI documents; the probe only checks a conventional discovery path. |

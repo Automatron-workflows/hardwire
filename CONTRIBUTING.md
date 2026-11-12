@@ -4,16 +4,19 @@ The repository's license has not been chosen. These instructions describe the
 owner's development workflow; they do not grant outside reuse rights or invite
 code contributions under an unspecified license.
 
-Use Node 24.16+ (`nvm use`). There are no dependencies or generated build files.
+Use Node 24.16+ (`nvm use`). The MCP transport uses the pinned official SDK.
+The core format modules still use only Node built-ins; no build step is needed.
 
 ```sh
+npm ci --ignore-scripts
 npm run check
 ```
 
 This runs unit/CLI tests, real loopback HTTP integration tests, panel validation
-and the offline API walkthrough, runnable consumer and package smoke check. The
+and the offline API walkthrough, runnable consumer, MCP transport and package checks. The
 package check builds a tarball, installs it offline in a temporary project, then
-checks its ESM exports, CLI binary and included consumer example. CI runs the
+checks its ESM exports, CLI binaries, consumer and actual MCP calls through the
+installed symlink. The official SDK client is a development dependency. CI runs the
 same command on the exact `.nvmrc` version. All checks must pass before merging.
 The standalone `npm run corpus`
 command intentionally exits 1 on the current baseline; its expected scores and
