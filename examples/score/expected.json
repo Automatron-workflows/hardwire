@@ -1,0 +1,55 @@
+{
+  "panel": "hardwire.panel/1",
+  "origin": "https://shop.example.com",
+  "title": "What a careful engineer would publish for examples/score/page.html",
+  "ports": [
+    {
+      "id": "search",
+      "kind": "read",
+      "summary": "Search products by free-text query.",
+      "parameters": {
+        "properties": { "q": { "type": "string" } }
+      },
+      "endpoint": "/search"
+    },
+    {
+      "id": "newsletter",
+      "kind": "write",
+      "summary": "Subscribe an email address to the newsletter.",
+      "confirmation": "user",
+      "parameters": {
+        "properties": { "email": { "type": "string" } },
+        "required": ["email"]
+      },
+      "endpoint": "/subscribe"
+    },
+    {
+      "id": "place-order",
+      "kind": "payment",
+      "summary": "Create a paid order for the current cart.",
+      "parameters": {
+        "properties": {
+          "shippingAddressId": { "type": "string" },
+          "idempotencyKey": { "type": "string" }
+        },
+        "required": ["idempotencyKey", "shippingAddressId"]
+      },
+      "endpoint": "/api/orders"
+    },
+    {
+      "id": "sign-in",
+      "kind": "write",
+      "summary": "Exchange stored credentials for a session.",
+      "reversible": true,
+      "confirmation": "none",
+      "parameters": {
+        "properties": {
+          "email": { "type": "string" },
+          "password": { "type": "string", "writeOnly": true }
+        },
+        "required": ["email", "password"]
+      },
+      "endpoint": "/api/session"
+    }
+  ]
+}

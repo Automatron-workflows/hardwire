@@ -7,14 +7,18 @@
 //   hardwire probe    <origin> [--json] [--allow-private] [--timeout <ms>]
 //   hardwire infer    <origin> [--draft] [--json] [--allow-private] [--timeout <ms>]
 //   hardwire trace    <panel.json> <port-id> [--params <json>] [--status <state>] [--json]
+//   hardwire score    --expected <panel.json> (--actual <panel.json> | --infer <page.html>)
+//                     [--fail-under <n>] [--json]
 //
-// Exit codes: 0 ok, 1 invalid input or a probed origin below the threshold, 2 usage or I/O.
+// Exit codes: 0 ok, 1 invalid input, a probe below the threshold, or a score
+// below the threshold, 2 usage or I/O.
 import { readFile } from "node:fs/promises";
 
-import { inferFromUrl, toPanelDraft } from "./infer.mjs";
+import { inferFromHtml, inferFromUrl, toPanelDraft } from "./infer.mjs";
 import { compilePanel } from "./mcp.mjs";
 import { auditPanel, HardwireError, normalizePanel } from "./panel.mjs";
 import { probeOrigin } from "./probe.mjs";
+import { comparePanels, DEFAULT_THRESHOLD } from "./score.mjs";
 import { buildTrace } from "./trace.mjs";
 
 const USAGE = `usage:
@@ -23,9 +27,12 @@ const USAGE = `usage:
   hardwire audit    <panel.json> [--json]
   hardwire probe    <origin> [--json] [--allow-private] [--timeout <ms>]
   hardwire infer    <origin> [--draft] [--json] [--allow-private] [--timeout <ms>]
-  hardwire trace    <panel.json> <port-id> [--params <json>] [--status <state>] [--json]`;
+  hardwire trace    <panel.json> <port-id> [--params <json>] [--status <state>] [--json]
+  hardwire score    --expected <panel.json> (--actual <panel.json> | --infer <page.html>)
+                    [--fail-under <n>] [--json]`;
 
 const STATUSES = new Set(["succeeded", "failed", "unknown", "refused"]);
+const VALUE_FLAGS = new Set(["--timeout", "--params", "--status", "--expected", "--actual", "--infer", "--fail-under"]);
 
 class UsageError extends Error {}
 
@@ -37,22 +44,30 @@ function parse(argv) {
     if (item === "--json") flags.json = true;
     else if (item === "--allow-private") flags.allowPrivate = true;
     else if (item === "--draft") flags.draft = true;
-    else if (item === "--timeout" || item === "--params" || item === "--status") {
+    else if (VALUE_FLAGS.has(item)) {
       const value = argv[++index];
       if (value === undefined) throw new UsageError(`${item} needs a value`);
       if (item === "--timeout") {
         const ms = Number(value);
         if (!Number.isFinite(ms) || ms <= 0) throw new UsageError("--timeout needs a positive number");
         flags.timeoutMs = ms;
+      } else if (item === "--fail-under") {
+        const threshold = Number(value);
+        if (!Number.isFinite(threshold) || threshold < 0 || threshold > 100) {
+          throw new UsageError("--fail-under needs a number between 0 and 100");
+        }
+        flags.failUnder = threshold;
       } else if (item === "--status") {
         if (!STATUSES.has(value)) throw new UsageError(`--status must be one of ${[...STATUSES].join(", ")}`);
         flags.status = value;
-      } else {
+      } else if (item === "--params") {
         try {
           flags.params = JSON.parse(value);
         } catch (error) {
           throw new UsageError(`--params is not JSON: ${error.message}`);
         }
+      } else {
+        flags[item.slice(2)] = value;
       }
     } else if (item.startsWith("--")) throw new UsageError(`unknown flag ${item}`);
     else positional.push(item);
@@ -60,31 +75,74 @@ function parse(argv) {
   return { positional, flags };
 }
 
-async function loadPanel(path) {
-  let text;
+async function readText(path, label) {
+  if (typeof path !== "string" || path.length === 0) throw new UsageError(`${label} is required`);
   try {
-    text = await readFile(path, "utf8");
+    return await readFile(path, "utf8");
   } catch {
     throw new UsageError(`cannot read ${path}`);
   }
-  let parsed;
+}
+
+async function loadJson(path, label) {
+  const text = await readText(path, label);
   try {
-    parsed = JSON.parse(text);
+    return JSON.parse(text);
   } catch (error) {
     throw new UsageError(`${path} is not JSON: ${error.message}`);
   }
-  return normalizePanel(parsed);
+}
+
+async function score(flags, out) {
+  const expected = await loadJson(flags.expected, "--expected");
+  if (!flags.actual && !flags.infer) throw new UsageError("score needs --actual or --infer");
+  if (flags.actual && flags.infer) throw new UsageError("use either --actual or --infer, not both");
+
+  let actual;
+  if (flags.infer) {
+    const html = await readText(flags.infer, "--infer");
+    actual = toPanelDraft(inferFromHtml(html, { origin: expected.origin }));
+  } else {
+    actual = await loadJson(flags.actual, "--actual");
+  }
+
+  const result = comparePanels(expected, actual);
+  const threshold = flags.failUnder ?? DEFAULT_THRESHOLD;
+  const pass = result.score >= threshold;
+
+  if (flags.json) {
+    out(JSON.stringify({ ...result, threshold, pass }, null, 2));
+    return pass ? 0 : 1;
+  }
+
+  out(`score ${result.score}/100${result.penalty ? ` (${result.base} - ${result.penalty} for invented ports)` : ""}`);
+  out(`  expected ${result.expected} ports, inferred ${result.actual}, identical ${result.matched}`);
+  if (result.missing.length) out(`  missing:  ${result.missing.join(", ")}`);
+  if (result.extra.length) out(`  invented: ${result.extra.join(", ")}`);
+  for (const port of result.ports) {
+    if (port.similarity === 1) continue;
+    // Missing ports are already listed above; repeating them adds noise.
+    if (port.differences.length === 1 && port.differences[0].field === "port") continue;
+    out(`  ${port.id.padEnd(20)} ${port.differences.map((difference) => difference.field).join(", ")}`);
+  }
+  if (!result.originMatch) out("  warning: the two panels declare different origins");
+  out(`\n${pass ? "pass" : "fail"} (threshold ${threshold})`);
+  return pass ? 0 : 1;
 }
 
 async function run(argv) {
   const { positional, flags } = parse(argv);
   const [command, target, extra] = positional;
-  if (!command || !target) throw new UsageError("missing command or target");
+  if (!command) throw new UsageError("missing command");
   const out = (text = "") => process.stdout.write(`${text}\n`);
   const network = {
     allowPrivate: flags.allowPrivate,
     ...(flags.timeoutMs ? { timeoutMs: flags.timeoutMs } : {}),
   };
+
+  if (command === "score") return score(flags, out);
+
+  if (!target) throw new UsageError("missing target");
 
   if (command === "probe") {
     const report = await probeOrigin(target, network);
@@ -105,8 +163,7 @@ async function run(argv) {
   if (command === "infer") {
     const inference = await inferFromUrl(target, network);
     if (flags.draft) {
-      const draft = normalizePanel(toPanelDraft(inference));
-      out(JSON.stringify(draft, null, 2));
+      out(JSON.stringify(normalizePanel(toPanelDraft(inference)), null, 2));
       return 0;
     }
     if (flags.json) {
@@ -121,7 +178,7 @@ async function run(argv) {
     return inference.candidates.length > 0 ? 0 : 1;
   }
 
-  const panel = await loadPanel(target);
+  const panel = normalizePanel(await loadJson(target, "panel"));
 
   if (command === "validate") {
     if (flags.json) out(JSON.stringify(panel, null, 2));

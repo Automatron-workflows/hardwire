@@ -144,12 +144,21 @@ function inspectPanel(body, origin) {
   }
   try {
     const panel = normalizePanel(parsed);
+    // A panel that describes a different origin is not this site's surface,
+    // even if it is well formed. Awarding it points would be misleading.
+    if (panel.origin !== origin) {
+      return {
+        valid: false,
+        code: "hardwire_origin_mismatch",
+        origin: panel.origin,
+        reason: `panel declares ${panel.origin}, served from ${origin}`,
+      };
+    }
     return {
       valid: true,
       ports: panel.ports.length,
       origin: panel.origin,
       ...(panel.revision ? { revision: panel.revision } : {}),
-      ...(panel.origin !== origin ? { originMismatch: true } : {}),
     };
   } catch (error) {
     return { valid: false, code: error.code ?? "hardwire_panel_invalid", reason: error.detail || error.message };

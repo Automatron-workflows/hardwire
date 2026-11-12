@@ -80,6 +80,7 @@ node src/cli.mjs infer    https://shop.example.com --draft
 | `probe <origin>` | Score an origin's agent-readiness from public endpoints. |
 | `infer <origin>` | Derive candidate ports from forms and structured data. |
 | `trace <panel.json> <port>` | Validate arguments and emit a digested record. |
+| `score --expected … --infer …` | Measure how far an inference is from a hand-written panel. |
 
 Exit codes: `0` ok, `1` invalid input or an origin below the probe threshold,
 `2` usage or I/O.
@@ -126,6 +127,24 @@ conservative:
 A candidate is a starting point for a reviewer, not a contract. The point is
 that an agent gets something useful on day one and a publisher gets a concrete
 thing to correct.
+
+### Measuring inference instead of asserting it
+
+`score` compares an inferred panel with the panel a careful engineer would have
+published. Differences are named by field, invented ports cost points, and an
+invented **mutating** port fails outright regardless of score.
+
+```sh
+npm run score
+# score 45/100 (50 - 5 for invented ports)
+#   expected 4 ports, inferred 3, identical 2
+#   missing:  place-order, sign-in
+#   invented: checkout
+```
+
+The number is the product. Gate 1 in [docs/ROADMAP.md](docs/ROADMAP.md) asks for
+an error rate across a corpus; one recorded fixture is a smoke test, not a
+result.
 
 ## Probe scoring
 

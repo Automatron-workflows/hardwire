@@ -1,10 +1,18 @@
 {
   "name": "hardwire",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Sites expose ports. Agents plug in. An open panel format for agent-operable software.",
   "type": "module",
   "private": true,
   "license": "UNLICENSED",
+  "homepage": "https://github.com/Automatron-workflows/hardwire#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Automatron-workflows/hardwire.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Automatron-workflows/hardwire/issues"
+  },
   "engines": {
     "node": ">=24.16.0"
   },
@@ -29,7 +37,8 @@
     "test": "node --test test/*.test.mjs",
     "validate": "node src/cli.mjs validate examples/example-panel.json",
     "audit": "node src/cli.mjs audit examples/example-panel.json",
-    "compile": "node src/cli.mjs compile examples/example-panel.json"
+    "compile": "node src/cli.mjs compile examples/example-panel.json",
+    "score": "node src/cli.mjs score --expected examples/score/expected.json --infer examples/score/page.html"
   },
   "keywords": [
     "agents",

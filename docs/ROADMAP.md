@@ -18,7 +18,8 @@ ports invented, wrong effect class, wrong parameter type, wrong required set.
 sample (guaranteed by construction), and under 20% structural error on `read`
 ports.
 
-**State:** not started. `infer` exists but has only been exercised on fixtures.
+**State:** harness built (`hardwire score`), one recorded fixture at **45/100**.
+The corpus does not exist yet, so there is no error rate to report.
 
 ## Gate 2 — One real traversal
 
@@ -64,8 +65,10 @@ neutral with respect to access permission.
 
 Cheap work that reduces uncertainty without committing to a direction:
 
-- [ ] A corpus loader for Gate 1: record pages, run `infer`, diff against
-      hand-written panels, emit a scorecard.
+- [x] A scoring harness: run `infer` on a captured page, diff it against a
+      hand-written panel, emit a score. `hardwire score --expected … --infer …`.
+- [ ] A corpus loader: capture pages, hold the expected panel next to each, and
+      aggregate the scores into one report.
 - [ ] A `probe --batch` mode over a list of origins, producing one JSON report.
 - [ ] Publish a panel for one surface we control and serve it at the discovery
       path, so `probe` can be validated against something real.

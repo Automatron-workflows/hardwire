@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Example shop</title></head>
+<body>
+  <h1>Example shop</h1>
+
+  <form action="/search" method="get" role="search">
+    <label>Search <input name="q" type="search"></label>
+    <button type="submit">Go</button>
+  </form>
+
+  <form id="newsletter" action="/subscribe" method="post">
+    <label>Email <input name="email" type="email" required></label>
+    <button type="submit">Subscribe</button>
+  </form>
+
+  <form id="checkout" action="/api/orders" method="post">
+    <input name="sku[]" type="hidden" value="demo-1">
+    <label>Quantity <input name="qty" type="number" required></label>
+    <button type="submit">Buy</button>
+  </form>
+</body>
+</html>

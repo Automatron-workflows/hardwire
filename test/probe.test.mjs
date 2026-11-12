@@ -46,10 +46,14 @@ test("a panel that does not validate is not a surface", async () => {
   assert.ok(report.missing.includes("hardwire"));
 });
 
-test("a panel published for another origin is flagged", async () => {
+test("a panel published for another origin does not count as this site's surface", async () => {
   const report = await probeOrigin("https://other.example.com", { fetchImpl: site(cooperative(example)) });
   const hardwire = report.probes.find((probe) => probe.id === "hardwire");
-  assert.equal(hardwire.panel.originMismatch, true);
+
+  assert.equal(hardwire.ok, false);
+  assert.equal(hardwire.panel.valid, false);
+  assert.equal(hardwire.panel.code, "hardwire_origin_mismatch");
+  assert.equal(report.score, 70);
 });
 
 test("a blanket robots disallow caps the score and is reported as a gate", async () => {

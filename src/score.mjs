@@ -1,0 +1,83 @@
+// Score an inferred panel against the panel a human would have published.
+//
+// This exists because "inference works" is not a claim anyone can check. Gate 1
+// in docs/ROADMAP.md asks for a number: how far is the guess from the truth,
+// and which kind of mistake dominates. The function is deliberately boring and
+// explainable rather than clever, so two people scoring the same pair of panels
+// get the same result.
+import { canonicalJson } from "./canonical.mjs";
+import { normalizePanel } from "./panel.mjs";
+
+// Fields compared per port. `summary` is excluded on purpose: two people will
+// never word it identically, and a wording difference is not an inference bug.
+const FIELDS = Object.freeze(["kind", "confirmation", "reversible", "endpoint", "parameters"]);
+
+const EXTRA_PORT_PENALTY = 5;
+const DEFAULT_THRESHOLD = 80;
+
+/**
+ * Compare an expected panel with an inferred one.
+ * Returns a score in 0..100 plus the specific differences that produced it.
+ */
+export function comparePanels(expectedInput, actualInput) {
+  const expected = normalizePanel(expectedInput);
+  const actual = normalizePanel(actualInput);
+
+  const actualById = new Map(actual.ports.map((port) => [port.id, port]));
+  const expectedIds = new Set(expected.ports.map((port) => port.id));
+
+  const ports = expected.ports.map((wanted) => {
+    const found = actualById.get(wanted.id);
+    if (!found) {
+      return {
+        id: wanted.id,
+        similarity: 0,
+        differences: [{ field: "port", expected: wanted.kind, actual: "missing" }],
+      };
+    }
+
+    const differences = [];
+    for (const field of FIELDS) {
+      const left = canonicalJson(wanted[field] ?? null);
+      const right = canonicalJson(found[field] ?? null);
+      if (left !== right) differences.push({ field, expected: wanted[field], actual: found[field] });
+    }
+
+    return {
+      id: wanted.id,
+      similarity: (FIELDS.length - differences.length) / FIELDS.length,
+      differences,
+    };
+  });
+
+  const missing = expected.ports.filter((port) => !actualById.has(port.id)).map((port) => port.id).sort();
+  const extra = actual.ports.filter((port) => !expectedIds.has(port.id)).map((port) => port.id).sort();
+  const mean = ports.length === 0
+    ? 0
+    : ports.reduce((total, port) => total + port.similarity, 0) / ports.length;
+
+  const base = Math.round(mean * 100);
+  const penalty = extra.length * EXTRA_PORT_PENALTY;
+
+  return {
+    score: Math.max(0, Math.min(100, base - penalty)),
+    base,
+    penalty,
+    originMatch: expected.origin === actual.origin,
+    expected: expected.ports.length,
+    actual: actual.ports.length,
+    matched: ports.filter((port) => port.similarity === 1).length,
+    missing,
+    extra,
+    // An invented mutating port is worse than an invented read.
+    inventedMutations: extra.filter((id) => actualById.get(id).kind !== "read").length,
+    ports,
+  };
+}
+
+/** True when a score passes the adoption threshold. */
+export function passes(result, threshold = DEFAULT_THRESHOLD) {
+  return result.score >= threshold && result.inventedMutations === 0;
+}
+
+export { DEFAULT_THRESHOLD };

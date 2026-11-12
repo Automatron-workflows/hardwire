@@ -21,4 +21,6 @@ export { buildTrace, redactParams, TRACE_VERSION, traceDigest, verifyTrace } fro
 
 export { inferFromHtml, inferFromUrl, INFERENCE_VERSION, toPanelDraft } from "./infer.mjs";
 
+export { comparePanels, DEFAULT_THRESHOLD, passes } from "./score.mjs";
+
 export { canonicalJson } from "./canonical.mjs";

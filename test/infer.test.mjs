@@ -77,6 +77,20 @@ test("structured data alone still yields a read port", () => {
   assert.equal(candidates.length, 1);
   assert.equal(candidates[0].kind, "read");
   assert.deepEqual(candidates[0].parameters.required, ["query"]);
+  assert.equal(candidates[0].endpoint, undefined, "a URL template is not a callable endpoint");
+  assert.match(candidates[0].evidence.join(" "), /templated/);
+});
+
+test("field names that cannot be represented are reported, not dropped silently", () => {
+  const html = `<form id="profile" action="/profile" method="post">
+    <input name="user[name]" type="text">
+    <input name="email" type="email" required>
+  </form>`;
+  const inference = infer(html);
+
+  assert.deepEqual(inference.candidates[0].parameters.properties, { email: { type: "string" } });
+  assert.deepEqual(inference.candidates[0].unsupported, ["user[name]"]);
+  assert.match(inference.notes.join(" "), /could not be represented/);
 });
 
 test("the draft is a valid panel and keeps writes behind user confirmation", () => {

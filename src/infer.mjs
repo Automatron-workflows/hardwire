@@ -61,16 +61,24 @@ function fieldSchema(tag, attrs) {
 function collectFields(body) {
   const properties = {};
   const required = [];
+  const unsupported = [];
   for (const match of body.matchAll(/<(input|select|textarea)\b([^>]*)>/gi)) {
     const tag = match[1].toLowerCase();
     const attrs = attributes(match[2]);
     const name = attrs.name;
-    if (!name || !/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)) continue;
+    if (!name) continue;
     if (tag === "input" && IGNORED_INPUTS.has((attrs.type ?? "").toLowerCase())) continue;
+    // Bracket and dashed names (`user[name]`, `search-term`) are valid HTML and
+    // common. They are rejected here because accepting arbitrary keys invites
+    // prototype pollution, so the omission is reported instead of hidden.
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)) {
+      unsupported.push(name);
+      continue;
+    }
     properties[name] = fieldSchema(tag, attrs);
     if ("required" in attrs) required.push(name);
   }
-  return { type: "object", properties, required: required.sort() };
+  return { schema: { type: "object", properties, required: required.sort() }, unsupported };
 }
 
 function walk(node, visit, depth = 0) {
@@ -110,13 +118,14 @@ function structuredActions(html) {
     }
     walk(parsed, (node) => {
       if (!hasActionType(node)) return;
+      const raw = node["@type"];
+      const type = Array.isArray(raw)
+        ? raw.find((entry) => typeof entry === "string" && entry.endsWith("Action"))
+        : raw;
+      if (typeof type !== "string") return;
       const target = actionTarget(node);
       if (!target) return;
-      found.push({
-        type: node["@type"],
-        target,
-        queryInput: node["query-input"],
-      });
+      found.push({ type, target, templated: target.includes("{") });
     });
   }
   return found;
@@ -134,6 +143,7 @@ export function inferFromHtml(html, { origin }) {
   const candidates = [];
   const used = new Map();
   const taken = new Set();
+  const unsupportedNames = new Set();
   const unique = (base) => {
     const count = (used.get(base) ?? 0) + 1;
     used.set(base, count);
@@ -149,15 +159,21 @@ export function inferFromHtml(html, { origin }) {
     const label = attrs["aria-label"] || attrs.name || attrs.id || lastSegment(action) || "form";
     const idBase = attrs.id || attrs.name || lastSegment(action) || "form";
     const id = unique(slug(idBase, "submit"));
-    const fields = collectFields(match[2]);
+    const { schema: fields, unsupported } = collectFields(match[2]);
     const kind = method === "get" ? "read" : "write";
+    for (const name of unsupported) unsupportedNames.add(name);
 
     candidates.push({
       id,
       kind,
       summary: `Submit the ${label} form.`,
       confidence: action ? "low" : "very-low",
-      evidence: [`form method=${method}${action ? ` action=${action}` : ""}`, `fields=${Object.keys(fields.properties).length}`],
+      evidence: [
+        `form method=${method}${action ? ` action=${action}` : ""}`,
+        `fields=${Object.keys(fields.properties).length}`,
+        ...(unsupported.length ? [`unsupported=${unsupported.join(",")}`] : []),
+      ],
+      ...(unsupported.length ? { unsupported } : {}),
       parameters: fields,
       ...(action ? { endpoint: action } : {}),
     });
@@ -171,15 +187,20 @@ export function inferFromHtml(html, { origin }) {
     candidates.push({
       id,
       kind: "read",
-      summary: `Run the site's ${String(action.type).replace(/Action$/, "").toLowerCase()} action.`,
+      summary: `Run the site's ${action.type.replace(/Action$/, "").toLowerCase()} action.`,
       confidence: "low",
-      evidence: [`json-ld ${action.type}`, `target=${action.target}`],
+      evidence: [
+        `json-ld ${action.type}`,
+        `target=${action.target}`,
+        ...(action.templated ? ["templated target; endpoint omitted"] : []),
+      ],
       parameters: {
         type: "object",
         properties: { query: { type: "string", description: "Search terms." } },
         required: ["query"],
       },
-      ...(action.target ? { endpoint: action.target } : {}),
+      // A URL template is not callable as written, so it is not offered as one.
+      ...(!action.templated ? { endpoint: action.target } : {}),
     });
   }
 
@@ -191,6 +212,9 @@ export function inferFromHtml(html, { origin }) {
       "Candidates are low-confidence guesses from markup, not a published contract.",
       "Inference never proposes payment or destructive operations.",
       "Every candidate must be confirmed by the publisher before it is trusted.",
+      ...(unsupportedNames.size
+        ? [`${unsupportedNames.size} field name(s) could not be represented: ${[...unsupportedNames].sort().join(", ")}`]
+        : []),
     ],
   };
 }
