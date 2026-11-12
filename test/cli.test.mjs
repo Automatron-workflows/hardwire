@@ -72,3 +72,50 @@ test("misuse exits 2, distinct from a measured failure", async () => {
   assert.equal((await hardwire(["corpus", "examples/does-not-exist"])).code, 2);
   assert.equal((await hardwire(["nonsense", "examples/example-panel.json"])).code, 2);
 });
+
+test("--help exits 0 and points at the spec", async () => {
+  const { code, stdout } = await hardwire(["--help"]);
+
+  assert.equal(code, 0);
+  assert.match(stdout, /hardwire corpus/);
+  assert.match(stdout, /docs\/SPEC\.md/);
+});
+
+test("--version prints the package version", async () => {
+  const { code, stdout } = await hardwire(["--version"]);
+  const pkg = JSON.parse(await readFile(join(ROOT, "package.json"), "utf8"));
+
+  assert.equal(code, 0);
+  assert.equal(stdout.trim(), pkg.version);
+});
+
+test('flags and extra arguments cannot silently change user intent', async () => {
+  for (const args of [
+    ['validate', 'examples/example-panel.json', 'extra'],
+    ['validate', 'examples/example-panel.json', '--draft'],
+    ['trace', 'examples/example-panel.json', 'search-catalogue', '--params', '{}', '--params-file', 'x'],
+    ['infer', 'https://example.com', '--html', '--draft'],
+    ['probe', 'https://example.com', '--timeout', '2147483648'],
+    ['validate', 'examples/example-panel.json', '--json', '--json'],
+  ]) assert.equal((await hardwire(args)).code, 2, args.join(' '));
+});
+
+test('offline inference and trace verification work through the documented CLI', async () => {
+  const inferred = await hardwire(['infer', 'https://blog.example.com', '--html', 'examples/corpus/blog/page.html', '--draft']);
+  assert.equal(inferred.code, 0);
+  assert.equal(JSON.parse(inferred.stdout).panel, 'hardwire.panel/1');
+  const dir = await mkdtemp(join(tmpdir(), 'hardwire-verify-'));
+  try {
+    const paramsFile = join(dir, 'params.json');
+    await writeFile(paramsFile, '{"query":"lamp"}');
+    const trace = await hardwire(['trace', 'examples/example-panel.json', 'search-catalogue', '--params-file', paramsFile, '--json']);
+    assert.equal(trace.code, 0);
+    const traceFile = join(dir, 'trace.json');
+    await writeFile(traceFile, trace.stdout);
+    const verified = await hardwire(['verify', traceFile, '--panel', 'examples/example-panel.json', '--json']);
+    assert.equal(verified.code, 0);
+    assert.deepEqual(JSON.parse(verified.stdout), { valid: true, panelChecked: true });
+    await writeFile(traceFile, trace.stdout.replace('lamp', 'changed'));
+    assert.equal((await hardwire(['verify', traceFile])).code, 1);
+  } finally { await rm(dir, { recursive: true, force: true }); }
+});

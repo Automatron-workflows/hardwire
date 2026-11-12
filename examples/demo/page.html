@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Hardwire demo shop</title>
+</head>
+<body>
+  <h1>Hardwire demo shop</h1>
+  <p>Search returns a demo response. Sign-in and subscription are schema examples only;
+    all POST requests are refused. Do not enter real credentials.</p>
+  <p>
+    This page exists so <code>infer</code> has markup to read. The panel at
+    <code>/.well-known/hardwire.json</code> is what <code>probe</code> checks.
+  </p>
+
+  <form action="/search" method="get" role="search">
+    <label>Search <input name="q" type="search" required></label>
+    <button type="submit">Search</button>
+  </form>
+
+  <form id="subscribe" action="/subscribe" method="post">
+    <label>Email <input name="email" type="email" required></label>
+    <button type="submit">Subscribe</button>
+  </form>
+
+  <form id="sign-in" action="/api/session" method="post">
+    <label>Email <input name="email" type="email" required></label>
+    <label>Password <input name="password" type="password" required></label>
+    <button type="submit">Sign in</button>
+  </form>
+</body>
+</html>

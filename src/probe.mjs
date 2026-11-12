@@ -4,7 +4,8 @@
 // project's own proposal. That is why each signal carries a status and the
 // result is described as a diagnostic rather than a grade. The probe never
 // throws on network failure: a blocked or missing endpoint is data.
-import { DISCOVERY_PATH, HardwireError, normalizePanel } from "./panel.mjs";
+import { isIP } from "node:net";
+import { DISCOVERY_PATH, HardwireError, normalizePanel, normalizeOrigin } from "./panel.mjs";
 
 const DEFAULT_TIMEOUT_MS = 6000;
 const MAX_BODY_BYTES = 512 * 1024;
@@ -31,30 +32,28 @@ export const SIGNALS = Object.freeze([
 ]);
 
 function isPrivateHostname(hostname) {
-  const host = hostname.toLowerCase().replace(/^\[|\]$/g, "");
+  const host = hostname.toLowerCase().replace(/^\[|\]$/g, "").replace(/\.$/, "");
   if (host === "localhost" || host.endsWith(".localhost")) return true;
   if (host.endsWith(".local") || host.endsWith(".internal")) return true;
-  if (host === "::1" || host.startsWith("fc") || host.startsWith("fd") || host.startsWith("fe80:")) return true;
+  if (isIP(host) === 6) {
+    // URL has already canonicalised IPv4-mapped IPv6 to hexadecimal groups.
+    const mapped = /^::ffff:([a-f0-9]{1,4}):([a-f0-9]{1,4})$/.exec(host);
+    if (mapped) {
+      const high = parseInt(mapped[1], 16), low = parseInt(mapped[2], 16);
+      return isPrivateHostname(`${high >> 8}.${high & 255}.${low >> 8}.${low & 255}`);
+    }
+    return host === "::" || host === "::1" || /^(fc|fd|fe[89ab]|ff)/.test(host);
+  }
   const v4 = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(host);
   if (!v4) return false;
   const [a, b] = [Number(v4[1]), Number(v4[2])];
   return a === 0 || a === 10 || a === 127 ||
+    a >= 224 || (a === 100 && b >= 64 && b <= 127) ||
     (a === 169 && b === 254) || (a === 192 && b === 168) || (a === 172 && b >= 16 && b <= 31);
 }
 
 export function assertPublicOrigin(origin, { allowPrivate = false } = {}) {
-  let url;
-  try {
-    url = new URL(origin);
-  } catch {
-    throw new HardwireError("hardwire_origin_invalid", "origin", "not an absolute URL");
-  }
-  if (url.protocol !== "https:" && url.protocol !== "http:") {
-    throw new HardwireError("hardwire_origin_invalid", "origin", "http or https only");
-  }
-  if (url.protocol === "http:" && url.hostname !== "localhost" && url.hostname !== "127.0.0.1") {
-    throw new HardwireError("hardwire_origin_invalid", "origin", "https is required outside local development");
-  }
+  const url = new URL(normalizeOrigin(origin));
   if (!allowPrivate && isPrivateHostname(url.hostname)) {
     throw new HardwireError("hardwire_origin_private", "origin", "refusing to probe a private host without --allow-private");
   }
@@ -67,21 +66,23 @@ async function readBounded(response) {
   const chunks = [];
   let total = 0;
   try {
-    while (total < MAX_BODY_BYTES) {
+    while (true) {
       const { done, value } = await reader.read();
       if (done) break;
-      chunks.push(value);
       total += value.byteLength;
+      if (total > MAX_BODY_BYTES) throw new RangeError("body_too_large");
+      chunks.push(value);
     }
   } finally {
     await reader.cancel().catch(() => {});
   }
-  return Buffer.concat(chunks.map((chunk) => Buffer.from(chunk))).subarray(0, MAX_BODY_BYTES).toString("utf8");
+  return Buffer.concat(chunks.map((chunk) => Buffer.from(chunk))).toString("utf8");
 }
 
 /** One bounded GET. Redirects are not followed so a probe cannot be walked elsewhere. */
 export async function fetchPage(url, { fetchImpl = globalThis.fetch, timeoutMs = DEFAULT_TIMEOUT_MS } = {}) {
   if (typeof fetchImpl !== "function") throw new HardwireError("hardwire_panel_invalid", "fetch", "no fetch available");
+  if (!Number.isInteger(timeoutMs) || timeoutMs < 1 || timeoutMs > 120000) throw new HardwireError("hardwire_probe_invalid", "timeoutMs", "expected an integer from 1 to 120000");
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   try {
@@ -104,7 +105,7 @@ export async function fetchPage(url, { fetchImpl = globalThis.fetch, timeoutMs =
       redirect: response.headers.get("location") ?? null,
     };
   } catch (error) {
-    return { status: 0, contentType: "", body: "", error: error.name === "AbortError" ? "timeout" : "network" };
+    return { status: 0, contentType: "", body: "", error: error.message === "body_too_large" ? "body_too_large" : controller.signal.aborted ? "timeout" : "network" };
   } finally {
     clearTimeout(timer);
   }
@@ -114,12 +115,18 @@ function robotsBlocksAllAgents(body) {
   const lines = body.split(/\r?\n/).map((line) => line.replace(/#.*$/, "").trim());
   let inAll = false;
   let disallowsRoot = false;
+  let seenRule = false;
   for (const line of lines) {
     const [rawKey, ...rest] = line.split(":");
     const key = rawKey?.trim().toLowerCase();
     const value = rest.join(":").trim();
-    if (key === "user-agent") inAll = value === "*";
-    else if (inAll && key === "disallow" && (value === "/" || value === "/*")) disallowsRoot = true;
+    if (key === "user-agent") {
+      inAll = (seenRule ? false : inAll) || value === "*";
+      seenRule = false;
+    } else if (key === "allow" || key === "disallow") {
+      seenRule = true;
+      if (inAll && key === "disallow" && (value === "/" || value === "/*")) disallowsRoot = true;
+    }
   }
   return disallowsRoot;
 }
@@ -130,7 +137,7 @@ function htmlSignals(body) {
   return {
     declaresMcpLink: links.some((tag) => /rel=["']?alternate/.test(tag) && /mcp/.test(tag)),
     declaresWebMcpMeta: /<meta\b[^>]*name=["']?webmcp/.test(lower),
-    referencesModelContext: /navigator\.modelcontext|providecontext\s*\(/.test(lower),
+    referencesModelContext: /(?:navigator|document)\.modelcontext|providecontext\s*\(/.test(lower),
   };
 }
 
@@ -181,7 +188,15 @@ export async function probeOrigin(origin, options = {}) {
 
   const probes = SIGNALS.map((signal) => {
     const response = byPath.get(signal.path);
-    const ok = response.status === 200 && !response.error;
+    let ok = response.status === 200 && !response.error && response.body.trim().length > 0;
+    if (signal.id === "llms") ok = ok && /text\/plain/i.test(response.contentType);
+    if (ok && signal.id !== "llms") {
+      // Avoid scoring a successful SPA fallback or a binary response as an API.
+      try {
+        const value = JSON.parse(response.body);
+        ok = /json/i.test(response.contentType) && value !== null && typeof value === "object" && !Array.isArray(value);
+      } catch { ok = false; }
+    }
     return {
       id: signal.id,
       path: signal.path,

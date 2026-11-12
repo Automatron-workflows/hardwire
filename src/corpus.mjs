@@ -3,7 +3,7 @@
 // One fixture tells you nothing. Gate 1 in docs/ROADMAP.md asks for an error
 // rate, which means many pages, each with the panel a human would have
 // published next to it, scored the same way every time.
-import { HardwireError } from "./panel.mjs";
+import { HardwireError, normalizePanel } from "./panel.mjs";
 import { inferFromHtml, toPanelDraft } from "./infer.mjs";
 import { comparePanels, DEFAULT_THRESHOLD, passes } from "./score.mjs";
 
@@ -18,6 +18,7 @@ const round1 = (value) => Math.round(value * 10) / 10;
  * hide the other twenty.
  */
 export function scoreCorpus(cases, { threshold = DEFAULT_THRESHOLD } = {}) {
+  if (!Number.isFinite(threshold) || threshold < 0 || threshold > 100) throw new HardwireError("hardwire_corpus_invalid", "threshold", "expected 0–100");
   if (!Array.isArray(cases) || cases.length === 0) {
     throw new HardwireError("hardwire_corpus_invalid", "cases", "expected a non-empty array");
   }
@@ -39,13 +40,13 @@ export function scoreCorpus(cases, { threshold = DEFAULT_THRESHOLD } = {}) {
       throw new HardwireError("hardwire_corpus_invalid", `cases.${name}.expected`, "expected a panel document");
     }
 
-    const expectedIds = Array.isArray(entry.expected.ports)
-      ? entry.expected.ports.map((port) => port.id).sort()
-      : [];
+    // Bad ground truth is misuse, never a zero-scoring capture.
+    const expected = normalizePanel(entry.expected);
+    const expectedIds = expected.ports.map((port) => port.id);
 
     let actual;
     try {
-      actual = toPanelDraft(inferFromHtml(entry.html, { origin: entry.expected.origin }));
+      actual = toPanelDraft(inferFromHtml(entry.html, { origin: expected.origin }));
     } catch (error) {
       if (!(error instanceof HardwireError)) throw error;
       return {
@@ -61,6 +62,7 @@ export function scoreCorpus(cases, { threshold = DEFAULT_THRESHOLD } = {}) {
         missing: expectedIds,
         extra: [],
         extraPorts: [],
+        unsafeDifferences: [],
         inventedMutations: 0,
         inventedPayments: 0,
         inventedDestructive: 0,
@@ -101,6 +103,7 @@ export function scoreCorpus(cases, { threshold = DEFAULT_THRESHOLD } = {}) {
     inventedMutations: results.reduce((total, result) => total + result.inventedMutations, 0),
     inventedPayments: results.reduce((total, result) => total + result.inventedPayments, 0),
     inventedDestructive: results.reduce((total, result) => total + result.inventedDestructive, 0),
+    unsafeDifferences: results.reduce((total, result) => total + result.unsafeDifferences.length, 0),
     readPorts: readSimilarities.length,
     readError,
     missing: results.reduce((total, result) => total + result.missing.length, 0),

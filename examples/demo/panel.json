@@ -1,0 +1,53 @@
+{
+  "panel": "hardwire.panel/1",
+  "origin": "http://127.0.0.1:8787",
+  "title": "Hardwire demo shop",
+  "revision": "demo/1",
+  "auth": {
+    "loginPort": "sign-in",
+    "note": "Schema only: this demo refuses sign-in and all writes. Do not enter credentials."
+  },
+  "ports": [
+    {
+      "id": "search",
+      "kind": "read",
+      "summary": "Search the demo catalogue.",
+      "parameters": {
+        "description": "Arguments for a catalogue search.",
+        "properties": {
+          "q": { "type": "string", "description": "Search terms." }
+        },
+        "required": ["q"]
+      },
+      "endpoint": "/search"
+    },
+    {
+      "id": "subscribe",
+      "kind": "write",
+      "summary": "Subscribe an email address to the demo newsletter.",
+      "confirmation": "user",
+      "parameters": {
+        "properties": {
+          "email": { "type": "string" }
+        },
+        "required": ["email"]
+      },
+      "endpoint": "/subscribe"
+    },
+    {
+      "id": "sign-in",
+      "kind": "write",
+      "summary": "Exchange credentials for a demo session.",
+      "confirmation": "none",
+      "reversible": true,
+      "parameters": {
+        "properties": {
+          "email": { "type": "string" },
+          "password": { "type": "string", "writeOnly": true }
+        },
+        "required": ["email", "password"]
+      },
+      "endpoint": "/api/session"
+    }
+  ]
+}

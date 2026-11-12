@@ -35,15 +35,16 @@ the origin it is served from; a mismatch is reported by `probe` as
 | Field | Required | Rules |
 | --- | --- | --- |
 | `panel` | yes | Exactly `hardwire.panel/1`. |
-| `origin` | yes | Absolute, bare origin. `https` except `localhost` / `127.0.0.1`. No path, query or fragment. |
+| `origin` | yes | Absolute, bare origin. `https`, or `http` on `localhost` / `127.0.0.1` / `[::1]`. No credentials, path, query, fragment, whitespace or backslashes. |
 | `ports` | yes | Non-empty array, at most 256 entries. |
 | `title` | no | ≤ 120 characters. |
 | `revision` | no | ≤ 128 characters, opaque. Included in the panel digest. |
 | `auth.loginPort` | no | Must name an existing port. |
 | `auth.note` | no | ≤ 500 characters. |
 
-Unknown top-level keys are ignored, not rejected. Only `ports` content is
-validated strictly.
+Unknown panel, port, auth and schema keys are rejected. This catches misspelled
+policy fields instead of silently dropping them. The current format is a draft;
+see CHANGELOG.md for compatibility changes.
 
 ## 3. Ports
 
@@ -70,11 +71,12 @@ validated strictly.
 | `reversible` | no | Boolean. Required to allow `write` with `confirmation: none`. |
 | `preconditions` | no | Array of `^[a-z][a-z0-9-]*$` labels. Advisory; the caller must check them. |
 | `parameters` | no | Object schema; absent means no arguments. |
-| `expects` | no | Object schema describing the result shape. |
-| `endpoint` | no | Site-relative (`/…`) or absolute `https`. |
+| `expects` | no | Supported schema describing the result shape; not enforced at runtime. |
+| `endpoint` | no | Single-slash site-relative (`/…`) or absolute `https://`. No credentials, fragments, whitespace, control characters, backslashes or protocol-relative URLs. |
 
-Ports are sorted by `id` on normalisation, so two identical panels always
-produce identical bytes.
+Ports are sorted by `id` on normalization. Endpoint metadata does not specify
+method, authentication or argument serialization. Absolute HTTPS endpoints may
+be cross-origin; consumers must allowlist destinations before execution.
 
 ## 4. Confirmation
 
@@ -105,14 +107,17 @@ wrong value.
 | --- | --- | --- |
 | `type` | all | `string`, `number`, `integer`, `boolean`, `array`, `object`, `null`. |
 | `description` | all | ≤ 500 characters. |
-| `enum` | all | Non-empty array of scalars, ≤ 64 entries. |
+| `enum` | scalar types | Non-empty unique scalars matching the declared type, ≤ 64 entries. Numbers must be finite. |
 | `items` | `array` | One nested schema. |
 | `properties` | `object` | Map of name → schema. |
-| `required` | `object` | Names must exist in `properties`. |
+| `required` | `object` | Names must exist in `properties` and match `^[A-Za-z_][A-Za-z0-9_]*$`. |
 | `additionalProperties` | `object` | Boolean. Default `false`: unknown keys are rejected. |
 | `writeOnly` | `string` | Boolean. Value is redacted from traces. |
 
-Nesting is limited to four levels.
+Nesting is limited to four levels. `__proto__`, `constructor` and `prototype`
+property names are rejected. Object schemas explicitly normalize to
+`additionalProperties: false` when omitted. Null is not a substitute for an
+omitted properties map or required list.
 
 `writeOnly` exists because a schema is the only thing that knows which argument
 is a secret. It is restricted to strings so redaction cannot be ambiguous.
@@ -139,8 +144,16 @@ is a secret. It is restricted to strings so redaction cannot be ambiguous.
 - `digest` is `sha256` over the canonical JSON of the document without `digest`.
 - `outcome.status` is one of `succeeded`, `failed`, `unknown`, `refused`.
 
-A trace is not a signature and not a receipt. It proves the record was not
-edited after the fact. It does not prove who produced it.
+A trace is not a signature or a receipt. Its digest checks consistency, provided
+the digest is retained and trusted. Anyone can edit the record and recompute the
+hash. Verification does not prove identity, execution or approval.
+
+`buildTrace` normalizes the panel and resolves the port from it. `at` must be a
+real UTC timestamp in the shown format (milliseconds optional). `actor` and
+optional outcome `code` are non-empty strings of at most 128 characters. An
+optional result digest must be `sha256:` plus 64 lowercase hex digits.
+`verifyTrace(trace, { panel })` additionally checks exact panel and port binding.
+Write-only array items are redacted too; unmarked secrets are not detected.
 
 ## 7. Canonical JSON
 
@@ -150,7 +163,7 @@ Digests require byte-identical serialisation:
 - arrays keep their order;
 - no insignificant whitespace;
 - `null`, `true`, `false`, finite numbers and strings only;
-- no sparse arrays, no cycles, no class instances;
+- no sparse arrays, no cycles, no class instances, symbols or accessors;
 - limits: depth 32, 10,000 nodes, 262,144 characters per string, 65,536 bytes of
   output.
 
@@ -170,6 +183,12 @@ Digests require byte-identical serialisation:
 | `hardwire_params_invalid` | Arguments do not match the schema. |
 | `hardwire_trace_invalid` | Bad outcome status or timestamp. |
 | `hardwire_origin_private` | Private host without explicit permission. |
-| `hardwire_infer_failed` | Page could not be fetched or produced nothing. |
+| `hardwire_infer_failed` | Page could not be fetched, exceeded limits or produced nothing. |
+| `hardwire_origin_mismatch` | Discovered panel declares a different origin (probe finding). |
+| `hardwire_corpus_invalid` | Invalid corpus entry or threshold. |
+| `hardwire_score_invalid` | Invalid score threshold. |
+| `hardwire_probe_invalid` | Invalid timeout. |
 
-Codes are stable. Callers may branch on them.
+Callers may branch on these codes. The low-level canonical serializer can also
+throw TypeError or RangeError for non-JSON data and resource limits. CLI usage
+and I/O errors exit 2; validation errors exit 1.

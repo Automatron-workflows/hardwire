@@ -6,7 +6,7 @@
 // explainable rather than clever, so two people scoring the same pair of panels
 // get the same result.
 import { canonicalJson } from "./canonical.mjs";
-import { normalizePanel } from "./panel.mjs";
+import { CONFIRMATIONS, HardwireError, normalizePanel } from "./panel.mjs";
 
 // Fields compared per port. `summary` is excluded on purpose: two people will
 // never word it identically, and a wording difference is not an inference bug.
@@ -17,17 +17,13 @@ const DEFAULT_THRESHOLD = 80;
 
 // Descriptions are prose, like `summary`. Two reviewers will phrase them
 // differently, and a wording difference is not a structural inference error.
-function structural(value) {
-  if (Array.isArray(value)) return value.map(structural);
-  if (value && typeof value === "object") {
-    const out = {};
-    for (const key of Object.keys(value).sort()) {
-      if (key === "description") continue;
-      out[key] = structural(value[key]);
-    }
-    return out;
-  }
-  return value;
+function structural(schema) {
+  if (!schema) return schema;
+  const { description: _description, ...out } = schema;
+  // Strip only schema annotations, never a property named "description".
+  if (schema.properties) out.properties = Object.fromEntries(Object.entries(schema.properties).map(([key, value]) => [key, structural(value)]));
+  if (schema.items) out.items = structural(schema.items);
+  return out;
 }
 
 /**
@@ -75,6 +71,15 @@ export function comparePanels(expectedInput, actualInput) {
   const penalty = extra.length * EXTRA_PORT_PENALTY;
   const extraPorts = extra.map((id) => ({ id, kind: actualById.get(id).kind }));
   const invented = (kind) => extraPorts.filter((port) => port.kind === kind).length;
+  const unsafeDifferences = expected.ports.flatMap((wanted) => {
+    const found = actualById.get(wanted.id);
+    if (!found) return [];
+    const reasons = [];
+    if (wanted.kind !== found.kind) reasons.push("kind");
+    if (CONFIRMATIONS.indexOf(found.confirmation) < CONFIRMATIONS.indexOf(wanted.confirmation)) reasons.push("confirmation");
+    if (!wanted.reversible && found.reversible) reasons.push("reversible");
+    return reasons.length ? [{ id: wanted.id, reasons }] : [];
+  });
 
   return {
     score: Math.max(0, Math.min(100, base - penalty)),
@@ -87,6 +92,7 @@ export function comparePanels(expectedInput, actualInput) {
     missing,
     extra,
     extraPorts,
+    unsafeDifferences,
     // An invented mutating port is worse than an invented read.
     inventedMutations: extraPorts.filter((port) => port.kind !== "read").length,
     inventedPayments: invented("payment"),
@@ -97,7 +103,8 @@ export function comparePanels(expectedInput, actualInput) {
 
 /** True when a score passes the adoption threshold. */
 export function passes(result, threshold = DEFAULT_THRESHOLD) {
-  return result.score >= threshold && result.inventedMutations === 0;
+  if (!Number.isFinite(threshold) || threshold < 0 || threshold > 100) throw new HardwireError("hardwire_score_invalid", "threshold", "expected 0–100");
+  return !result.error && result.originMatch === true && result.score >= threshold && result.inventedMutations === 0 && result.unsafeDifferences?.length === 0;
 }
 
 export { DEFAULT_THRESHOLD };

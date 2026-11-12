@@ -18,12 +18,12 @@ test("traces are deterministic, order-independent and tamper-evident", () => {
   const first = buildTrace({
     panel, port, at: AT,
     params: { idempotencyKey: "k1", shippingAddressId: "a1" },
-    outcome: { status: "succeeded", resultDigest: "sha256:abc" },
+    outcome: { status: "succeeded", resultDigest: "sha256:" + "a".repeat(64) },
   });
   const second = buildTrace({
     panel, port, at: AT,
     params: { shippingAddressId: "a1", idempotencyKey: "k1" },
-    outcome: { status: "succeeded", resultDigest: "sha256:abc" },
+    outcome: { status: "succeeded", resultDigest: "sha256:" + "a".repeat(64) },
   });
 
   assert.equal(first.digest, second.digest);
@@ -56,6 +56,34 @@ test("a trace refuses an outcome it cannot name and params it cannot check", () 
   assert.throws(() => buildTrace({ panel, port, outcome: { status: "probably" } }), (error) => error.code === "hardwire_trace_invalid");
   assert.throws(() => buildTrace({ panel, port, params: {} }), (error) => error.code === "hardwire_params_invalid");
   assert.throws(() => buildTrace({ panel, port, at: "yesterday" }), (error) => error.code === "hardwire_trace_invalid");
+});
+
+test("a trace refuses a port that is not in the panel", () => {
+  const panel = normalizePanel(example);
+  assert.throws(
+    () => buildTrace({ panel, port: "charge-everything", at: AT }),
+    (error) => error.code === "hardwire_panel_invalid",
+  );
+});
+
+test("a trace uses the panel's port, not a caller-supplied impostor", () => {
+  const panel = normalizePanel(example);
+  const trace = buildTrace({
+    panel,
+    port: { id: "place-order", kind: "read", confirmation: "none" },
+    at: AT,
+    params: { idempotencyKey: "k1", shippingAddressId: "a1" },
+  });
+
+  assert.equal(trace.port.kind, "payment");
+  assert.equal(trace.port.confirmation, "owner");
+  assert.equal(verifyTrace(trace), true);
+});
+
+test("a port id is enough to build a trace", () => {
+  const panel = normalizePanel(example);
+  const trace = buildTrace({ panel, port: "search-catalogue", at: AT, params: { query: "lamp" } });
+  assert.equal(trace.port.id, "search-catalogue");
 });
 
 test("write-only parameters never reach the trace", () => {

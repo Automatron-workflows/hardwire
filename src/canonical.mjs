@@ -44,6 +44,9 @@ export function canonicalJson(value, limits = {}) {
 
     seen.add(item);
     let out;
+    if (Object.getOwnPropertySymbols(item).length || Object.values(Object.getOwnPropertyDescriptors(item)).some((entry) => entry.get || entry.set)) {
+      throw new TypeError("document_object_invalid: symbols or accessors");
+    }
 
     if (Array.isArray(item)) {
       if (Object.keys(item).length !== item.length) throw new TypeError("document_sparse_array");
@@ -61,11 +64,13 @@ export function canonicalJson(value, limits = {}) {
     }
 
     seen.delete(item);
-    if (out.length > maxOutputLength) throw new RangeError("document_too_large: output");
+    if (encoder.encode(out).byteLength > maxOutputLength) throw new RangeError("document_too_large: output");
     return out;
   }
 
-  return encode(value, 0);
+  const result = encode(value, 0);
+  if (encoder.encode(result).byteLength > maxOutputLength) throw new RangeError("document_too_large: output");
+  return result;
 }
 
 export function canonicalBytes(value, limits) {

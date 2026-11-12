@@ -14,11 +14,10 @@ export function toolName(id) {
 }
 
 function describe(port, origin) {
-  const risk = port.kind === "read"
-    ? "read-only"
-    : port.confirmation === "none"
-      ? `${port.kind}, no confirmation`
-      : `${port.kind}, requires ${port.confirmation} confirmation`;
+  const effect = port.kind === "read" ? "read-only" : port.kind;
+  const risk = port.confirmation === "none"
+      ? `${effect}, no confirmation`
+      : `${effect}, requires ${port.confirmation} confirmation`;
   return `${port.summary} (${origin}; ${risk})`;
 }
 
@@ -40,7 +39,9 @@ export function compilePanel(input) {
       inputSchema: port.parameters,
       annotations: {
         readOnlyHint: port.kind === "read",
-        destructiveHint: port.kind === "destructive",
+        // A write may replace data and a payment may debit a balance. Neither
+        // is known to be additive, so retain MCP's conservative default.
+        destructiveHint: port.kind !== "read",
         idempotentHint: port.kind === "read",
       },
     };
@@ -57,6 +58,7 @@ export function toolsListResponse(input) {
  * throwing so a server can answer "no such tool" without echoing the panel.
  */
 export function findPort(panel, name) {
+  panel = normalizePanel(panel);
   const port = panel.ports.find((candidate) => toolName(candidate.id) === name);
   if (!port) return undefined;
   return { tool: compilePanel(panel).find((entry) => entry.name === name), port };
