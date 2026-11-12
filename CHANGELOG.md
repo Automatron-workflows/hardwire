@@ -1,5 +1,27 @@
 # Changelog
 
+## 0.4.1 — 2026-11-12
+
+Final use-readiness audit and runnable consumer pattern.
+
+- Trace verification now rejects malformed outcome metadata and unknown record
+  fields even if the digest was recomputed. With a panel it also checks argument
+  shape and declared redaction. It still does not establish authenticity.
+- Explicit invalid inference network options are no longer silently defaulted.
+- `npm run consumer` invokes a pinned, allowlisted demo read handler, checks its
+  result and records a success trace. It is not a general executor or MCP server.
+- `npm run test:package` packs and installs the actual artifact offline, testing
+  ESM exports, the installed CLI binary and the included consumer example.
+- CI runs these checks on the exact supported Node version, uses current pinned
+  actions, disables credential persistence and fixes the Ubuntu image version.
+- Distribution guide distinguishes an owned-app pilot, licensed npm release and
+  a future tested MCP adapter. Package name/scope availability is unverified.
+
+Valid 0.4.0 panels and trace bytes are unchanged. Malformed traces previously
+accepted by the partial verifier now fail. Extra outcome fields supplied to
+`buildTrace` are rejected rather than silently discarded. License and npm
+publication remain unchanged.
+
 ## 0.4.0 — 2026-11-12
 
 Experimental foundation audit and onboarding pass.

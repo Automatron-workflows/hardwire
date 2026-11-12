@@ -1,6 +1,6 @@
 # Foundation and next gates
 
-## Foundation: implemented in 0.4.0
+## Foundation: implemented in 0.4.1
 
 - Strict panel and schema validation, argument checks and normalized digests.
 - MCP tool descriptions with the same closed-object semantics as validation.
@@ -9,6 +9,7 @@
 - Fixed-path discovery diagnostics with bounded network responses.
 - Trace creation, redaction, verification and exact panel binding.
 - Offline walkthrough, local HTTP demo, CLI/API guides and automated checks.
+- An application-owned read-handler example and automated packed-install checks.
 
 The library is ready for controlled experiments by the owner. It is not a
 production executor or an open-source release. License selection is still open.
@@ -48,7 +49,9 @@ read-back without UI navigation. Every action must have a known handler,
 authorization, explicit approval policy, idempotency behavior, a checked result
 and a trace bound to the reviewed panel. Inject failures and retry scenarios.
 
-The local HTTP demo currently proves discovery, inference and a read response.
+The offline consumer proves one fixed read-handler mapping, result check and
+trace. It has no authentication or mutation support and does not satisfy this
+gate. The local HTTP demo proves discovery, inference and a read response.
 It deliberately refuses POST. It does not satisfy the traversal gate.
 Before adding a generic executor, define method/serialization/credential rules
 and bind approval to exact arguments and panel revision. Prefer an explicit
@@ -62,6 +65,9 @@ synthetic examples do not satisfy this gate. Resolve the license before inviting
 external implementation contributions or promoting reusable packages.
 
 ## Release decisions still open
+
+Follow [distribution and first deployment](DISTRIBUTION.md) for the ordered pilot,
+package and client-adapter rollout. Publishing the panel alone cannot connect a client.
 
 - Choose a license; `UNLICENSED` and `private: true` remain unchanged.
 - Decide whether npm distribution is useful and check/reserve an appropriate name.

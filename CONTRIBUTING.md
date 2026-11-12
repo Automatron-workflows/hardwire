@@ -11,8 +11,11 @@ npm run check
 ```
 
 This runs unit/CLI tests, real loopback HTTP integration tests, panel validation
-and the offline API walkthrough. CI runs the same command plus `npm pack
---dry-run`. All checks must pass before merging. The standalone `npm run corpus`
+and the offline API walkthrough, runnable consumer and package smoke check. The
+package check builds a tarball, installs it offline in a temporary project, then
+checks its ESM exports, CLI binary and included consumer example. CI runs the
+same command on the exact `.nvmrc` version. All checks must pass before merging.
+The standalone `npm run corpus`
 command intentionally exits 1 on the current baseline; its expected scores and
 failure modes are asserted inside the passing test suite.
 

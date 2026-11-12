@@ -243,8 +243,8 @@ export function inferFromHtml(html, { origin }) {
 export async function inferFromUrl(origin, options = {}) {
   const base = assertPublicOrigin(origin, { allowPrivate: options.allowPrivate });
   const page = await fetchPage(base, {
-    ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}),
-    ...(options.timeoutMs ? { timeoutMs: options.timeoutMs } : {}),
+    ...(options.fetchImpl !== undefined ? { fetchImpl: options.fetchImpl } : {}),
+    ...(options.timeoutMs !== undefined ? { timeoutMs: options.timeoutMs } : {}),
   });
   if (page.status !== 200 || !/text\/html|application\/xhtml\+xml/i.test(page.contentType)) {
     throw new HardwireError("hardwire_infer_failed", "origin", `page returned ${page.status || page.error}`);

@@ -152,7 +152,10 @@ hash. Verification does not prove identity, execution or approval.
 real UTC timestamp in the shown format (milliseconds optional). `actor` and
 optional outcome `code` are non-empty strings of at most 128 characters. An
 optional result digest must be `sha256:` plus 64 lowercase hex digits.
-`verifyTrace(trace, { panel })` additionally checks exact panel and port binding.
+`verifyTrace` rejects unknown record, port and outcome fields, malformed optional
+outcome metadata and non-JSON records. `verifyTrace(trace, { panel })` additionally
+checks exact panel and port binding, argument shape and `[redacted]` markers at
+declared write-only positions. Original secret values cannot be verified.
 Write-only array items are redacted too; unmarked secrets are not detected.
 
 ## 7. Canonical JSON
