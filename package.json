@@ -1,7 +1,7 @@
 {
   "name": "hardwire",
-  "version": "0.3.0",
-  "description": "Sites expose ports. Agents plug in. An open panel format for agent-operable software.",
+  "version": "0.4.0",
+  "description": "Typed action panels, static inference, MCP tool descriptions and verifiable trace digests. Experimental; no executor.",
   "type": "module",
   "private": true,
   "license": "UNLICENSED",
@@ -33,15 +33,23 @@
     "src",
     "examples",
     "docs",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md",
+    "CONTRIBUTING.md",
+    "SECURITY.md"
   ],
   "scripts": {
-    "test": "node --test test/*.test.mjs",
+    "test": "npm run test:unit && npm run test:integration",
     "validate": "node src/cli.mjs validate examples/example-panel.json",
     "audit": "node src/cli.mjs audit examples/example-panel.json",
     "compile": "node src/cli.mjs compile examples/example-panel.json",
     "score": "node src/cli.mjs score --expected examples/corpus/shop/expected.json --infer examples/corpus/shop/page.html",
-    "corpus": "node src/cli.mjs corpus examples/corpus"
+    "corpus": "node src/cli.mjs corpus examples/corpus",
+    "demo": "node examples/demo/server.mjs",
+    "walkthrough": "node examples/walkthrough.mjs",
+    "test:unit": "node --test test/*.test.mjs",
+    "test:integration": "node --test test/integration/*.test.mjs",
+    "check": "npm test && npm run validate && npm run walkthrough"
   },
   "keywords": [
     "agents",

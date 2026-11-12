@@ -3,10 +3,10 @@
 // This is the part that works without cooperation: a site that published
 // nothing still has forms and structured data, and those describe operations.
 // Inference is deliberately conservative. It may only propose `read` and
-// `write`, never `payment` or `destructive`, so a bad inference cannot spend
-// money or delete an account. Every candidate is labelled low confidence and
+// `write`, never `payment` or `destructive`. These guesses do NOT establish the
+// endpoint's actual effect; even GET may mutate state. Every candidate is labelled low confidence and
 // must be confirmed by the publisher before anyone treats it as truth.
-import { HardwireError, PANEL_VERSION } from "./panel.mjs";
+import { HardwireError, normalizeOrigin, normalizePanel, PANEL_LIMITS, PANEL_VERSION } from "./panel.mjs";
 import { assertPublicOrigin, fetchPage } from "./probe.mjs";
 
 export const INFERENCE_VERSION = "hardwire.inference/1";
@@ -25,7 +25,7 @@ const FIELD_TYPES = Object.freeze({
 const IGNORED_INPUTS = new Set(["submit", "button", "reset", "image", "file", "hidden"]);
 
 function attributes(source) {
-  const out = {};
+  const out = Object.create(null);
   for (const match of source.matchAll(ATTRIBUTE)) {
     const name = match[1].toLowerCase();
     if (!(name in out)) out[name] = match[2] ?? match[3] ?? match[4] ?? "";
@@ -38,7 +38,7 @@ function slug(value, fallback) {
     .toLowerCase()
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/^-+|-+$/g, "")
-    .slice(0, 40);
+    .slice(0, 40).replace(/-+$/, "");
   if (!clean) return fallback;
   return /^[a-z]/.test(clean) ? clean : `port-${clean}`;
 }
@@ -55,6 +55,7 @@ function lastSegment(action) {
 function fieldSchema(tag, attrs) {
   if (tag === "select" || tag === "textarea") return { type: "string" };
   const type = (attrs.type ?? "text").toLowerCase();
+  if (type === "password") return { type: "string", writeOnly: true };
   return { type: FIELD_TYPES[type] ?? "string" };
 }
 
@@ -71,7 +72,7 @@ function collectFields(body) {
     // Bracket and dashed names (`user[name]`, `search-term`) are valid HTML and
     // common. They are rejected here because accepting arbitrary keys invites
     // prototype pollution, so the omission is reported instead of hidden.
-    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name)) {
+    if (!/^[A-Za-z_][A-Za-z0-9_]*$/.test(name) || ["__proto__", "constructor", "prototype"].includes(name)) {
       unsupported.push(name);
       continue;
     }
@@ -123,9 +124,11 @@ function structuredActions(html) {
         ? raw.find((entry) => typeof entry === "string" && entry.endsWith("Action"))
         : raw;
       if (typeof type !== "string") return;
+      // BuyAction, DeleteAction, etc. must never be recast as a read.
+      if (!["SearchAction", "https://schema.org/SearchAction", "http://schema.org/SearchAction"].includes(type)) return;
       const target = actionTarget(node);
-      if (!target) return;
-      found.push({ type, target, templated: target.includes("{") });
+      if (typeof target !== "string" || !target) return;
+      found.push({ type: "SearchAction", target, templated: target.includes("{") });
     });
   }
   return found;
@@ -137,25 +140,38 @@ function structuredActions(html) {
  */
 export function inferFromHtml(html, { origin }) {
   if (typeof html !== "string") throw new HardwireError("hardwire_infer_failed", "html", "expected a string");
-  if (!origin) throw new HardwireError("hardwire_origin_invalid", "origin", "required");
-  const source = html.slice(0, MAX_HTML);
+  origin = normalizeOrigin(origin);
+  if (Buffer.byteLength(html, "utf8") > MAX_HTML) throw new HardwireError("hardwire_infer_failed", "html", "capture exceeds 512 KiB");
+  const source = html.replace(/<!--[\s\S]*?-->/g, "");
+  const formsSource = source.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, "");
+  const endpointFor = (action) => {
+    if (!action || /[\u0000-\u0020\u007f\\#{}]/.test(action) || action.startsWith("//")) return undefined;
+    try {
+      const url = new URL(action, `${origin}/`);
+      if (url.origin !== origin || url.username || url.password) return undefined;
+      return `${url.pathname}${url.search}`;
+    } catch { return undefined; }
+  };
 
   const candidates = [];
   const used = new Map();
   const taken = new Set();
   const unsupportedNames = new Set();
   const unique = (base) => {
-    const count = (used.get(base) ?? 0) + 1;
+    let count = (used.get(base) ?? 0) + 1;
+    let id = count === 1 ? base : `${base}-${count}`;
+    while (taken.has(id)) id = `${base}-${++count}`;
     used.set(base, count);
-    const id = count === 1 ? base : `${base}-${count}`;
     taken.add(id);
     return id;
   };
 
-  for (const match of source.matchAll(/<form\b([^>]*)>([\s\S]*?)<\/form>/gi)) {
+  for (const match of formsSource.matchAll(/<form\b([^>]*)>([\s\S]*?)<\/form>/gi)) {
+    if (candidates.length >= PANEL_LIMITS.maxPorts) throw new HardwireError("hardwire_infer_failed", "html", "too many candidates");
     const attrs = attributes(match[1]);
     const method = (attrs.method ?? "get").toLowerCase();
     const action = attrs.action ?? "";
+    const endpoint = endpointFor(action);
     const label = attrs["aria-label"] || attrs.name || attrs.id || lastSegment(action) || "form";
     const idBase = attrs.id || attrs.name || lastSegment(action) || "form";
     const id = unique(slug(idBase, "submit"));
@@ -167,19 +183,21 @@ export function inferFromHtml(html, { origin }) {
       id,
       kind,
       summary: `Submit the ${label} form.`,
-      confidence: action ? "low" : "very-low",
+      confidence: endpoint ? "low" : "very-low",
       evidence: [
         `form method=${method}${action ? ` action=${action}` : ""}`,
         `fields=${Object.keys(fields.properties).length}`,
         ...(unsupported.length ? [`unsupported=${unsupported.join(",")}`] : []),
+        ...(action && !endpoint ? ["endpoint omitted: unsafe, cross-origin or unsupported URL"] : []),
       ],
       ...(unsupported.length ? { unsupported } : {}),
       parameters: fields,
-      ...(action ? { endpoint: action } : {}),
+      ...(endpoint ? { endpoint } : {}),
     });
   }
 
   for (const action of structuredActions(source)) {
+    if (candidates.length >= PANEL_LIMITS.maxPorts) throw new HardwireError("hardwire_infer_failed", "html", "too many candidates");
     const base = slug(action.type.replace(/Action$/, ""), "search");
     // A form is stronger evidence than structured data; do not shadow it.
     if (taken.has(base)) continue;
@@ -200,7 +218,7 @@ export function inferFromHtml(html, { origin }) {
         required: ["query"],
       },
       // A URL template is not callable as written, so it is not offered as one.
-      ...(!action.templated ? { endpoint: action.target } : {}),
+      ...(!action.templated && endpointFor(action.target) ? { endpoint: endpointFor(action.target) } : {}),
     });
   }
 
@@ -211,6 +229,8 @@ export function inferFromHtml(html, { origin }) {
     notes: [
       "Candidates are low-confidence guesses from markup, not a published contract.",
       "Inference never proposes payment or destructive operations.",
+      "Effect labels are guesses, not safety guarantees; a GET form can still mutate data.",
+      "This static parser does not execute JavaScript or reproduce browser form submission. Hidden fields, CSRF tokens, radio groups and custom widgets require review.",
       "Every candidate must be confirmed by the publisher before it is trusted.",
       ...(unsupportedNames.size
         ? [`${unsupportedNames.size} field name(s) could not be represented: ${[...unsupportedNames].sort().join(", ")}`]
@@ -226,7 +246,7 @@ export async function inferFromUrl(origin, options = {}) {
     ...(options.fetchImpl ? { fetchImpl: options.fetchImpl } : {}),
     ...(options.timeoutMs ? { timeoutMs: options.timeoutMs } : {}),
   });
-  if (page.status !== 200) {
+  if (page.status !== 200 || !/text\/html|application\/xhtml\+xml/i.test(page.contentType)) {
     throw new HardwireError("hardwire_infer_failed", "origin", `page returned ${page.status || page.error}`);
   }
   return inferFromHtml(page.body, { origin: base });
@@ -253,11 +273,11 @@ export function toPanelDraft(inference) {
     throw new HardwireError("hardwire_infer_failed", "candidates", "nothing to draft; no forms or structured actions found");
   }
 
-  return {
+  return normalizePanel({
     panel: PANEL_VERSION,
     origin: inference.origin,
     title: "Draft inferred from a live page. Review every port before use.",
     revision: "inferred/1",
     ports,
-  };
+  });
 }

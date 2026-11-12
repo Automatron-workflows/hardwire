@@ -6,6 +6,7 @@ export {
   HardwireError,
   KINDS,
   normalizePanel,
+  normalizeOrigin,
   PANEL_FILENAME,
   PANEL_LIMITS,
   PANEL_VERSION,

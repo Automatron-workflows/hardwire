@@ -91,6 +91,81 @@ test("unsupported schema keywords fail loudly instead of being ignored", () => {
     () => normalizePanel(minimal([{ ...bare(), parameters: { properties: { q: { type: "geo" } } } }])),
     "hardwire_schema_invalid",
   );
+  rejects(
+    () => normalizePanel(minimal([{ ...bare(), parameters: { properties: { q: { type: "string", pattern: "^a" } } } }])),
+    "hardwire_schema_invalid",
+  );
+});
+
+test("schema keywords are restricted to the type they apply to", () => {
+  rejects(
+    () => normalizePanel(minimal([{
+      ...bare(),
+      parameters: { properties: { q: { type: "string", items: { type: "string" } } } },
+    }])),
+    "hardwire_schema_invalid",
+  );
+  rejects(
+    () => normalizePanel(minimal([{
+      ...bare(),
+      parameters: { properties: { q: { type: "string", required: ["x"] } } },
+    }])),
+    "hardwire_schema_invalid",
+  );
+});
+
+test("parameters must themselves be an object schema", () => {
+  rejects(() => normalizePanel(minimal([{ ...bare(), parameters: "query=lamp" }])), "hardwire_schema_invalid");
+  rejects(() => normalizePanel(minimal([{ ...bare(), parameters: { type: "string" } }])), "hardwire_schema_invalid");
+});
+
+test("parameter-root keywords survive normalisation", () => {
+  const panel = normalizePanel(minimal([{
+    ...bare(),
+    parameters: {
+      description: "Search arguments.",
+      properties: { q: { type: "string" } },
+      required: ["q"],
+      additionalProperties: true,
+    },
+  }]));
+  const port = panel.ports[0];
+
+  assert.equal(port.parameters.description, "Search arguments.");
+  assert.equal(port.parameters.additionalProperties, true);
+  assert.deepEqual(validateParams(port, { q: "lamp", sort: "price" }), { q: "lamp", sort: "price" });
+});
+
+test("endpoints cannot leave the origin through protocol-relative or backslash forms", () => {
+  for (const endpoint of [
+    "//evil.example.com/orders",
+    "/\\evil.example.com/orders",
+    "http://example.com/orders",
+    "https://user:pass@example.com/orders",
+    "api/orders",
+    "/path with space",
+  ]) {
+    rejects(
+      () => normalizePanel(minimal([{ ...bare(), endpoint }])),
+      "hardwire_port_invalid",
+    );
+  }
+
+  assert.equal(
+    normalizePanel(minimal([{ ...bare(), endpoint: "/api/orders" }])).ports[0].endpoint,
+    "/api/orders",
+  );
+  assert.equal(
+    normalizePanel(minimal([{ ...bare(), endpoint: "https://api.example.com/orders" }])).ports[0].endpoint,
+    "https://api.example.com/orders",
+  );
+});
+
+test("an origin cannot smuggle credentials", () => {
+  rejects(
+    () => normalizePanel({ ...minimal([bare()]), origin: "https://user:pass@example.com" }),
+    "hardwire_origin_invalid",
+  );
 });
 
 test("write-only is restricted to strings so redaction is unambiguous", () => {

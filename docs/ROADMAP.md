@@ -1,97 +1,85 @@
-# Roadmap and gates
+# Foundation and next gates
 
-Hardwire is a hypothesis with tests, not a product. This file lists what would
-have to be true before it deserves an adopter, in the order that matters.
+## Foundation: implemented in 0.4.0
 
----
+- Strict panel and schema validation, argument checks and normalized digests.
+- MCP tool descriptions with the same closed-object semantics as validation.
+- Static inference with evidence, draft validation and secret annotations.
+- Per-case and corpus scoring with explicit failure conditions.
+- Fixed-path discovery diagnostics with bounded network responses.
+- Trace creation, redaction, verification and exact panel binding.
+- Offline walkthrough, local HTTP demo, CLI/API guides and automated checks.
 
-## Gate 1 — Inference accuracy
+The library is ready for controlled experiments by the owner. It is not a
+production executor or an open-source release. License selection is still open.
 
-**Claim under test:** a panel can be derived from a page well enough to be
-useful without cooperation.
+## Gate 1: real inference evidence — open
 
-**Measurement:** take N real sites with forms. Infer a panel. Hand-write the
-panel a competent engineer would publish. Score the difference: ports missed,
-ports invented, wrong effect class, wrong parameter type, wrong required set.
+**Question:** does static inference save useful work on sites that did not
+publish a panel?
 
-**Pass condition:** zero invented `payment` or `destructive` ports across the
-sample (guaranteed by construction), and under 20% structural error on `read`
-ports.
+Current baseline: **three synthetic fixtures**, blog 100, legacy 60, shop 45;
+mean **68.3/100**, **1/3** pass at 80. Read structural error is **0% over two read
+ports**. There is one invented mutation and no invented payment/destructive
+label. Those latter labels are excluded by construction and are not evidence
+that endpoints cannot pay or delete.
 
-**State:** harness built (`hardwire score`, `hardwire corpus`). Three recorded
-cases — a shop, a blog with structured search, and a legacy form — score a mean
-of **68.3/100**; 1 of 3 clears the 80 threshold. On the gate's own terms,
-structural error on read ports is **0% across 2 read ports**, with zero invented
-`payment` or `destructive` ports. The dominant failures are missing endpoints
-and a field name that cannot be represented (`user[name]`). Two read ports is
-not a sample; the gate stays open until the corpus is large enough to mean
-something.
+A passing case needs the numeric threshold, matching origins, no inference
+error, no invented mutation, and no effect mismatch, weakened confirmation or
+invented reversibility. The separate read-error metric is a structural average,
+not a task-success rate or safety certification.
 
-## Gate 2 — One real traversal
+Next experiment: capture **30–50 permitted real pages** across multiple independent
+apps, including failures and forms of different kinds. Keep a manifest with
+origin, capture date, permission/provenance, redactions and human-reviewed
+expected operations. Never include real credentials, private user data or
+unlicensed page content in a public corpus. Author ground truth from actual app
+behavior, not from the inference result.
 
-**Claim under test:** an agent can complete an actual task through a panel.
+Proposed gate: under 20% structural error on read ports, no unsafe effect or
+approval downgrades in reviewed matches, and a published failure breakdown.
+Report sample size and limitations; this gate alone does not authorize execution.
+The synthetic baseline must stay separate from a real-site evaluation.
 
-**Measurement:** one task on a surface we control — log in, read a value, perform
-one reversible write, read it back — executed through compiled tools, with every
-step traced.
+## Gate 2: controlled traversal — open
 
-**Pass condition:** the task completes without the agent reading the DOM, and
-the traces verify against the panel digest.
+On one application we own, complete login, read, one reversible write, and
+read-back without UI navigation. Every action must have a known handler,
+authorization, explicit approval policy, idempotency behavior, a checked result
+and a trace bound to the reviewed panel. Inject failures and retry scenarios.
 
-**State:** not started. The repository contains no executor by design.
+The local HTTP demo currently proves discovery, inference and a read response.
+It deliberately refuses POST. It does not satisfy the traversal gate.
+Before adding a generic executor, define method/serialization/credential rules
+and bind approval to exact arguments and panel revision. Prefer an explicit
+allowlist of local handlers for the first experiment.
 
-## Gate 3 — External demand
+## Gate 3: demand — open
 
-**Claim under test:** someone who does not own this repository wants either to
-publish a panel or to consume one.
+Find one external team with a real application that wants to publish a panel or
+consume one. Measure the integration work and task reliability. Stars and
+synthetic examples do not satisfy this gate. Resolve the license before inviting
+external implementation contributions or promoting reusable packages.
 
-**Measurement:** a request from a third party, or a published panel not written
-by us.
+## Release decisions still open
 
-**Pass condition:** one. Not a star, not a message of encouragement — an
-implementation or a question with a real site behind it.
+- Choose a license; `UNLICENSED` and `private: true` remain unchanged.
+- Decide whether npm distribution is useful and check/reserve an appropriate name.
+- Design browser/WebMCP integration only against a pinned, reviewed API version.
+- Review access permissions, privacy and retention for the actual deployment.
+  A file format cannot grant access rights or guarantee compliance by itself.
 
-**State:** none.
-
-## Gate 4 — Legal review
-
-**Claim under test:** the format cannot be used as a ToS workaround.
-
-**Measurement:** a written assessment of whether publishing a panel changes any
-obligation a site already has toward automated access.
-
-**Pass condition:** a review, by someone qualified, that says the format is
-neutral with respect to access permission.
-
-**State:** reasoning only.
-
----
-
-## Between now and Gate 1
-
-Cheap work that reduces uncertainty without committing to a direction:
-
-- [x] A scoring harness: run `infer` on a captured page, diff it against a
-      hand-written panel, emit a score. `hardwire score --expected … --infer …`.
-- [x] A corpus loader: capture pages, hold the expected panel next to each, and
-      aggregate the scores into one report. `hardwire corpus examples/corpus`.
-- [ ] A `probe --batch` mode over a list of origins, producing one JSON report.
-- [ ] Publish a panel for one surface we control and serve it at the discovery
-      path, so `probe` can be validated against something real.
-- [ ] Decide the licence.
-
-## Explicitly not planned
-
-- A browser driver. If Hardwire needed a browser it would have failed.
-- Credential storage or a session vault.
-- Payment execution.
-- A crawler. `probe` checks fixed paths; it does not enumerate.
-- A hosted registry, until Gate 3 passes.
-- Any claim of standards status. WebMCP is the standards track; Hardwire should
-  compile into it if it wins, not compete with it.
+No browser driver, credential vault, payment executor, registry or hosted service
+is required for the current experiment.
 
 ## Version policy
 
-`0.x` means the format may change without notice. After Gate 2, treat
-`hardwire.panel/1` as frozen and add `hardwire.panel/2` for breaking changes;
-never mutate a version that has been published.
+The project is pre-1.0. Breaking behavior is documented in `CHANGELOG.md`.
+0.4.0 explicitly closes object schemas and normalizes inputs before digesting;
+normalized bytes and panel digests therefore change from 0.3.0. Regenerate
+experimental fixtures, retain old panels with old traces, and never silently
+reinterpret old records.
+
+Before external adoption, freeze the format and canonicalization, publish fixed
+test vectors, and use a new format identifier for later semantic changes. The
+current `hardwire.panel/1` is still a draft, not a stable interoperability claim.

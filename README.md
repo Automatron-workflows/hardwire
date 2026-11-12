@@ -2,217 +2,171 @@
 
 **Sites expose ports. Agents plug in.**
 
-Hardwire is an open panel format for agent-operable software. Instead of an
-agent guessing which element is "submit", an application publishes its real
-operations as typed ports with a declared effect and confirmation floor. One
-file, one digest, no DOM.
+[![Tests](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml/badge.svg)](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml)
+
+Hardwire describes an application's operations in a small JSON file called a
+**panel**. Each operation is a **port**: named arguments, an effect such as
+`read` or `payment`, and a declared confirmation requirement. An agent
+integration can inspect that contract instead of guessing which UI to click.
+
+**Status: 0.4.0 experimental foundation.** This Node.js library validates panels
+and arguments, compiles MCP tool descriptions, proposes panels from static HTML,
+and creates verifiable trace digests. It does **not** execute operations, provide
+an MCP server, log anyone in, or enforce human approval. No React dependency.
+
+## Start in two minutes
+
+Use **Node 24.16 or newer** (`nvm use` if you use nvm). No dependencies, API keys,
+accounts, installation step, or paid services are needed.
+
+```sh
+git clone https://github.com/Automatron-workflows/hardwire.git
+cd hardwire
+node --version
+npm run walkthrough
+npm test
+```
+
+The offline walkthrough exercises the public API, verifies a trace, demonstrates
+password redaction, and scores a sample inference. `npm test` also starts a
+short-lived server on the loopback interface. In a sandbox that forbids listening
+sockets, run `npm run test:unit`; the integration suite must still pass in CI.
+
+**Next:** [step-by-step experiments](docs/GETTING-STARTED.md),
+[API reference](docs/API.md), or [adding a panel to your app](docs/INTEGRATION.md).
+
+## What a panel looks like
 
 ```json
 {
   "panel": "hardwire.panel/1",
   "origin": "https://shop.example.com",
-  "ports": [
-    {
-      "id": "place-order",
-      "kind": "payment",
-      "summary": "Convert the current cart into a paid order.",
-      "parameters": {
-        "properties": {
-          "shippingAddressId": { "type": "string" },
-          "idempotencyKey": { "type": "string" }
-        },
-        "required": ["shippingAddressId", "idempotencyKey"]
-      },
-      "endpoint": "/api/orders"
-    }
-  ]
+  "ports": [{
+    "id": "search-catalogue",
+    "kind": "read",
+    "summary": "Search the product catalogue.",
+    "parameters": {
+      "properties": { "query": { "type": "string" } },
+      "required": ["query"]
+    },
+    "endpoint": "/api/search"
+  }]
 }
 ```
 
-That file is the whole idea. It compiles to MCP tools, it validates arguments
-before anything happens, and it cannot be downgraded into an unattended payment.
+Publish a reviewed panel at `/.well-known/hardwire.json`. That discovery path is
+Hardwire's own convention. The endpoint is a locator; the format does not yet
+specify HTTP methods, argument serialization, authentication or retries. A
+consumer needs an explicit implementation for each port it will call.
 
-## Why
+| Term | Meaning |
+| --- | --- |
+| Panel | The versioned description of an application's operations. |
+| Port | One operation, its argument schema and declared policy. |
+| Consumer / plug | Your integration that maps ports to real handlers. Not included. |
+| Trace | A record of a caller's assertion, bound to a panel digest. Not proof of execution. |
 
-Cursor emulation is the worst part of agent browsing. It is slow, it breaks on
-every redesign, and it turns a deterministic operation into a vision problem.
-The fix is not a smarter cursor; it is for software to say what it does.
-
-That idea is not new. WebMCP is a W3C Community Group draft for browser-side
-tool APIs, and MCP servers are already the dominant server-side pattern. Hardwire
-does not compete with either. It takes the part they leave to each implementer —
-**what is safe to expose, and what may run without a human** — and makes it a
-validated file with stable error codes.
-
-## Install
-
-Node 24.16 or newer. Zero dependencies, nothing to install.
+## Try the commands
 
 ```sh
-git clone https://github.com/Automatron-workflows/hardwire.git
-cd hardwire
-npm test
+node src/cli.mjs --help
+node src/cli.mjs validate examples/example-panel.json
+node src/cli.mjs audit examples/example-panel.json
+node src/cli.mjs compile examples/example-panel.json --json
+node src/cli.mjs infer https://blog.example.com --html examples/corpus/blog/page.html --draft
 ```
 
-Use it as a library:
+The last command is **offline**; the origin identifies the captured page. It does
+not contact that fictional host. Without `--html`, inference fetches the root
+page of the supplied origin. `compile --json` emits a `tools/list` **result body**,
+not a running MCP server or a complete JSON-RPC message.
+
+| Command | Purpose |
+| --- | --- |
+| `validate <panel>` | Validate; add `--json` for normalized JSON. |
+| `audit <panel>` | Summarize declared effects and confirmation requirements. |
+| `compile <panel> --json` | Produce MCP tool descriptions. |
+| `probe <origin>` | Check a fixed set of discovery paths; heuristic, not certification. |
+| `infer <origin> [--html <file>]` | Propose candidates; `--draft` emits a validated draft. |
+| `trace <panel> <port> --params '<json>' --json` | Record validated arguments; executes nothing. |
+| `verify <trace> [--panel <panel>]` | Check digest consistency and optionally panel binding. |
+| `score --expected <panel> --infer <html>` | Compare one capture with hand-written ground truth. |
+| `corpus <directory>` | Aggregate inference results across fixture pairs. |
+
+Exit codes: **0** success, **1** validation or measured failure, **2** usage or I/O
+error. `--json` puts machine-readable successful results on stdout; errors go to
+stderr. Use `--params-file` instead of command-line arguments for sensitive
+inputs; redaction cannot remove secrets from shell history or process listings.
+
+## Use the API
+
+From a script inside this checkout:
 
 ```js
-import { normalizePanel, compilePanel, buildTrace } from "hardwire";
+import { normalizePanel, compilePanel, validateParams } from './src/index.mjs';
+import { readFile } from 'node:fs/promises';
+
+const panel = normalizePanel(JSON.parse(
+  await readFile('./examples/example-panel.json', 'utf8')
+));
+const tools = compilePanel(panel);
+const port = panel.ports.find(p => p.id === 'search-catalogue');
+const args = validateParams(port, { query: 'lamp' });
+console.log(tools.length, args); // 5, { query: 'lamp' }
 ```
 
-Or from the command line:
+The package name is not published or reserved on npm. See the
+[local package setup](docs/GETTING-STARTED.md#use-it-from-another-local-project)
+and the current license before reuse.
 
-```sh
-node src/cli.mjs validate examples/example-panel.json
-node src/cli.mjs audit    examples/example-panel.json
-node src/cli.mjs compile  examples/example-panel.json
-node src/cli.mjs probe    https://shop.example.com
-node src/cli.mjs infer    https://shop.example.com --draft
-```
+## What the foundation checks
 
-## Commands
+| Declared kind | Default confirmation | Lowest accepted declaration |
+| --- | --- | --- |
+| `read` | `none` | `none` |
+| `write` | `user` | `user`, or `none` only with `reversible: true` |
+| `payment` | `owner` | `owner` |
+| `destructive` | `owner` | `owner` |
 
-| Command | What it does |
-| --- | --- |
-| `validate <panel.json>` | Check the panel and print the normalised form. |
-| `audit <panel.json>` | Report what an agent may do unattended. |
-| `compile <panel.json>` | Emit an MCP `tools/list` document. |
-| `probe <origin>` | Score an origin's agent-readiness from public endpoints. |
-| `infer <origin>` | Derive candidate ports from forms and structured data. |
-| `trace <panel.json> <port>` | Validate arguments and emit a digested record. |
-| `score --expected … --infer …` | Measure how far an inference is from a hand-written panel. |
-| `corpus <directory>` | Score every case in a corpus and aggregate the result. |
+These rules reject contradictory **declarations**. They cannot prove what an
+endpoint actually does, that a write is reversible, or that approval happened.
+MCP annotations are hints; the consumer must enforce authorization and approvals.
 
-Exit codes: `0` ok, `1` invalid input, an origin below the probe threshold, or a
-score/corpus that fails its gate, `2` usage or I/O.
+Schemas reject unsupported keywords and validate arguments, including nested
+objects. Unknown arguments are rejected by default. Traces redact strings
+explicitly marked `writeOnly` before hashing, including array items. Unmarked
+secrets are not detected. Anyone can rewrite a trace and recompute its digest;
+verification is a consistency check, not a signature or receipt.
 
-## Three rules that do the work
+## Inference is an experiment
 
-**1. Effect classes have floors that cannot be lowered.**
-
-| `kind` | Default | Floor | Overridable |
-| --- | --- | --- | --- |
-| `read` | `none` | `none` | — |
-| `write` | `user` | `none` if `reversible: true` | yes, to `none` |
-| `destructive` | `owner` | `owner` | **no** |
-| `payment` | `owner` | `owner` | **no** |
-
-A panel declaring `payment` with `confirmation: "none"` is rejected with
-`hardwire_confirmation_weakened`. It does not silently pass. Reversibility is
-never inferred; a publisher has to assert it.
-
-**2. Description is not enforcement.**
-
-`validateParams` checks real arguments against the declared schema: types,
-required fields, enums, array items and unknown keys. Unknown properties are
-rejected unless the panel opts into `additionalProperties: true`. Declaring a
-shape that nothing checks is worse than declaring nothing.
-
-**3. A trace binds to one revision.**
-
-Every trace carries the digest of the exact panel it came from. "The agent did
-X" becomes checkable against "this is what the site published at the time."
-Write-only parameters are redacted before hashing, so a login never lands in a
-log.
-
-## Inference: working with sites that published nothing
-
-`infer` reads forms, field types, `required` attributes and JSON-LD
-`potentialAction` blocks to propose candidate ports. It is deliberately
-conservative:
-
-- it may only propose `read` and `write` — **never** `payment` or `destructive`;
-- every candidate is labelled `low` or `very-low` confidence with its evidence;
-- `--draft` emits a valid panel where every write still needs user confirmation.
-
-A candidate is a starting point for a reviewer, not a contract. The point is
-that an agent gets something useful on day one and a publisher gets a concrete
-thing to correct.
-
-### Measuring inference instead of asserting it
-
-`score` compares an inferred panel with the panel a careful engineer would have
-published. Differences are named by field, invented ports cost points, and an
-invented **mutating** port fails outright regardless of score.
-
-```sh
-npm run score
-# score 45/100 (50 - 5 for invented ports)
-#   expected 4 ports, inferred 3, identical 2
-#   missing:  place-order, sign-in
-#   invented: checkout
-```
-
-The number is the product. Gate 1 in [docs/ROADMAP.md](docs/ROADMAP.md) asks for
-an error rate across a corpus, so one recorded pair is a smoke test. `corpus`
-loads a directory of them:
-
-```
-examples/corpus/
-  blog/    page.html  expected.json
-  legacy/  page.html  expected.json
-  shop/    page.html  expected.json
-```
+Inference reads static forms and JSON-LD `SearchAction` declarations. It does
+not render JavaScript, reconstruct arbitrary browser forms, or know business
+semantics. A GET form may still change state. Every candidate needs review.
 
 ```sh
 npm run corpus
-#   blog             100/100  pass
-#   legacy            60/100  fail
-#   shop              45/100  fail
-#
-# 3 cases, mean 68.3/100, min 45, max 100
-# 1/3 pass at threshold 80; 1 invented mutating port(s)
-# read error 0% across 2 read port(s); 0 invented payment(s), 0 destructive
 ```
 
-Adding a case is the contribution: capture a real page, write down the ports it
-should expose, run the corpus. The cases are deliberately ordinary — a shop, a
-blog with structured search, and a form using `user[name]` fields — because the
-interesting failures are in ordinary markup, not in demos.
+The **three synthetic fixtures** currently score 100, 60 and 45, with a mean of
+68.3/100. This command intentionally exits **1**: only one fixture passes the
+80-point threshold, and the shop inference invents a mutation. Read error is 0%
+across just **two read ports**. That is a regression baseline, not evidence of
+accuracy on real websites. See [measurement and next gates](docs/ROADMAP.md).
 
-The report separates the gate's own terms from the aggregate: structural error
-on `read` ports, and invented `payment`/`destructive` ports. Both are clean
-here, but two read ports is not a sample. Three cases is a harness with
-evidence, not a general error rate.
+## Where it fits
 
-## Probe scoring
+Hardwire is a small contract and validation experiment alongside existing APIs.
+It exports MCP-shaped tool descriptions; it does not replace MCP or OpenAPI.
+There is no WebMCP adapter yet. The [standards notes](docs/INTEGRATION.md#relationship-to-existing-standards)
+link the primary specifications and distinguish implemented features from ideas.
 
-`probe` fetches a bounded set of public paths. Weights sum to 100:
-
-| Signal | Path | Weight | Status |
-| --- | --- | --- | --- |
-| panel | `/.well-known/hardwire.json` | 30 | proposed here |
-| WebMCP declaration | in-page `<meta>`/`<link>` | 20 | draft, weak |
-| MCP descriptor | `/.well-known/mcp.json` | 15 | convention |
-| OpenAPI | `/openapi.json` | 15 | convention |
-| agent card | `/.well-known/agent-card.json` | 10 | deployed |
-| `llms.txt` | `/llms.txt` | 5 | convention |
-| x402 | `/.well-known/x402` | 5 | deployed |
-
-A panel that fails validation scores nothing. A blanket `robots.txt` disallow
-caps the total at 25 and sets `cappedByRobots`. The number is a diagnostic for
-finding work, not a grade or a certification.
-
-## What this does not do
-
-- **It does not make unauthorised automation authorised.** A panel is
-  cooperation. `probe` reports a blanket `robots.txt` disallow as a gate instead
-  of pretending the score is fine.
-- **It does not execute.** `trace` validates and digests. Calling the endpoint,
-  holding credentials and deciding whether to proceed belong to the caller.
-- **It does not sign.** A digest proves a record is unmodified, not that anyone
-  with authority asserted it.
-- **It is not a standard.** One implementation, no adopters, no registry. A
-  format with a single author is a proposal.
-
-## Status
-
-`0.3.0`, unpublished, unadopted. The format may change. See
-[docs/ROADMAP.md](docs/ROADMAP.md) for the gates that would have to pass before
-anyone should depend on it, and [docs/SAFETY.md](docs/SAFETY.md) for the threat
-model.
+[Format specification](docs/SPEC.md) · [Safety boundaries](docs/SAFETY.md) ·
+[Development](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
 
 ## License
 
-Not decided. `package.json` is `"private": true` and `"license": "UNLICENSED"`
-until the owner chooses. Do not assume permission to reuse.
+**Not selected.** The existing `UNLICENSED` / `private: true` status is retained.
+This repository is publicly visible, but it is not an open-source release and
+visibility does not grant a reuse license. Outside reuse and npm publication
+remain pending the owner's license decision.
