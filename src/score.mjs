@@ -15,6 +15,21 @@ const FIELDS = Object.freeze(["kind", "confirmation", "reversible", "endpoint", 
 const EXTRA_PORT_PENALTY = 5;
 const DEFAULT_THRESHOLD = 80;
 
+// Descriptions are prose, like `summary`. Two reviewers will phrase them
+// differently, and a wording difference is not a structural inference error.
+function structural(value) {
+  if (Array.isArray(value)) return value.map(structural);
+  if (value && typeof value === "object") {
+    const out = {};
+    for (const key of Object.keys(value).sort()) {
+      if (key === "description") continue;
+      out[key] = structural(value[key]);
+    }
+    return out;
+  }
+  return value;
+}
+
 /**
  * Compare an expected panel with an inferred one.
  * Returns a score in 0..100 plus the specific differences that produced it.
@@ -38,8 +53,8 @@ export function comparePanels(expectedInput, actualInput) {
 
     const differences = [];
     for (const field of FIELDS) {
-      const left = canonicalJson(wanted[field] ?? null);
-      const right = canonicalJson(found[field] ?? null);
+      const left = canonicalJson(field === "parameters" ? structural(wanted[field] ?? null) : (wanted[field] ?? null));
+      const right = canonicalJson(field === "parameters" ? structural(found[field] ?? null) : (found[field] ?? null));
       if (left !== right) differences.push({ field, expected: wanted[field], actual: found[field] });
     }
 

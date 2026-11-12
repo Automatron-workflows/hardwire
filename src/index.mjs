@@ -23,4 +23,6 @@ export { inferFromHtml, inferFromUrl, INFERENCE_VERSION, toPanelDraft } from "./
 
 export { comparePanels, DEFAULT_THRESHOLD, passes } from "./score.mjs";
 
+export { scoreCorpus } from "./corpus.mjs";
+
 export { canonicalJson } from "./canonical.mjs";

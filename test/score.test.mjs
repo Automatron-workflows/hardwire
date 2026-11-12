@@ -9,7 +9,7 @@ import { comparePanels, passes } from "../src/score.mjs";
 import { clone, example } from "./fixtures.mjs";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
-const SCORE_DIR = join(HERE, "..", "examples", "score");
+const SCORE_DIR = join(HERE, "..", "examples", "corpus", "shop");
 const expected = JSON.parse(await readFile(join(SCORE_DIR, "expected.json"), "utf8"));
 const page = await readFile(join(SCORE_DIR, "page.html"), "utf8");
 
@@ -78,6 +78,15 @@ test("a changed field is reported by name, not just as a lower number", () => {
   const changed = result.ports.find((entry) => entry.id === "place-order");
   assert.deepEqual(changed.differences.map((difference) => difference.field), ["kind", "confirmation"]);
   assert.equal(changed.similarity, 0.6);
+});
+
+test("a different description is wording, not an inference error", () => {
+  const actual = clone(example);
+  const port = actual.ports.find((entry) => entry.id === "search-catalogue");
+  port.parameters.properties.query.description = "Words to look for.";
+
+  const result = comparePanels(example, actual);
+  assert.equal(result.score, 100);
 });
 
 test("differing origins are reported rather than silently ignored", () => {

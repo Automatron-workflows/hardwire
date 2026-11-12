@@ -81,9 +81,10 @@ node src/cli.mjs infer    https://shop.example.com --draft
 | `infer <origin>` | Derive candidate ports from forms and structured data. |
 | `trace <panel.json> <port>` | Validate arguments and emit a digested record. |
 | `score --expected … --infer …` | Measure how far an inference is from a hand-written panel. |
+| `corpus <directory>` | Score every case in a corpus and aggregate the result. |
 
-Exit codes: `0` ok, `1` invalid input or an origin below the probe threshold,
-`2` usage or I/O.
+Exit codes: `0` ok, `1` invalid input, an origin below the probe threshold, or a
+score/corpus that fails its gate, `2` usage or I/O.
 
 ## Three rules that do the work
 
@@ -143,8 +144,31 @@ npm run score
 ```
 
 The number is the product. Gate 1 in [docs/ROADMAP.md](docs/ROADMAP.md) asks for
-an error rate across a corpus; one recorded fixture is a smoke test, not a
-result.
+an error rate across a corpus, so one recorded pair is a smoke test. `corpus`
+loads a directory of them:
+
+```
+examples/corpus/
+  blog/    page.html  expected.json
+  legacy/  page.html  expected.json
+  shop/    page.html  expected.json
+```
+
+```sh
+npm run corpus
+#   blog             100/100  pass
+#   legacy            60/100  fail
+#   shop              45/100  fail
+#
+# 3 cases, mean 68.3/100, min 45, max 100
+# 1/3 pass at threshold 80; 1 invented mutating port(s)
+```
+
+Adding a case is the contribution: capture a real page, write down the ports it
+should expose, run the corpus. The cases are deliberately ordinary — a shop, a
+blog with structured search, and a form using `user[name]` fields — because the
+interesting failures are in ordinary markup, not in demos. Three cases is a
+harness with evidence, not a general error rate.
 
 ## Probe scoring
 

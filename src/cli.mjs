@@ -9,16 +9,19 @@
 //   hardwire trace    <panel.json> <port-id> [--params <json>] [--status <state>] [--json]
 //   hardwire score    --expected <panel.json> (--actual <panel.json> | --infer <page.html>)
 //                     [--fail-under <n>] [--json]
+//   hardwire corpus   <directory> [--fail-under <n>] [--json]
 //
-// Exit codes: 0 ok, 1 invalid input, a probe below the threshold, or a score
-// below the threshold, 2 usage or I/O.
-import { readFile } from "node:fs/promises";
+// Exit codes: 0 ok, 1 a measured failure (probe, score or corpus gate), 2 usage
+// or I/O.
+import { readFile, readdir } from "node:fs/promises";
+import { join } from "node:path";
 
+import { scoreCorpus } from "./corpus.mjs";
 import { inferFromHtml, inferFromUrl, toPanelDraft } from "./infer.mjs";
 import { compilePanel } from "./mcp.mjs";
 import { auditPanel, HardwireError, normalizePanel } from "./panel.mjs";
 import { probeOrigin } from "./probe.mjs";
-import { comparePanels, DEFAULT_THRESHOLD } from "./score.mjs";
+import { comparePanels, DEFAULT_THRESHOLD, passes } from "./score.mjs";
 import { buildTrace } from "./trace.mjs";
 
 const USAGE = `usage:
@@ -29,7 +32,8 @@ const USAGE = `usage:
   hardwire infer    <origin> [--draft] [--json] [--allow-private] [--timeout <ms>]
   hardwire trace    <panel.json> <port-id> [--params <json>] [--status <state>] [--json]
   hardwire score    --expected <panel.json> (--actual <panel.json> | --infer <page.html>)
-                    [--fail-under <n>] [--json]`;
+                    [--fail-under <n>] [--json]
+  hardwire corpus   <directory> [--fail-under <n>] [--json]`;
 
 const STATUSES = new Set(["succeeded", "failed", "unknown", "refused"]);
 const VALUE_FLAGS = new Set(["--timeout", "--params", "--status", "--expected", "--actual", "--infer", "--fail-under"]);
@@ -108,7 +112,9 @@ async function score(flags, out) {
 
   const result = comparePanels(expected, actual);
   const threshold = flags.failUnder ?? DEFAULT_THRESHOLD;
-  const pass = result.score >= threshold;
+  // `passes` also fails an invented mutating port. A high score must not excuse
+  // an operation the site never offered.
+  const pass = passes(result, threshold);
 
   if (flags.json) {
     out(JSON.stringify({ ...result, threshold, pass }, null, 2));
@@ -130,6 +136,56 @@ async function score(flags, out) {
   return pass ? 0 : 1;
 }
 
+/**
+ * Load a corpus directory: one subdirectory per case, each holding the captured
+ * page and the panel a human would have published for it. Sorted by name so a
+ * run is reproducible.
+ */
+async function loadCorpus(directory) {
+  let entries;
+  try {
+    entries = await readdir(directory, { withFileTypes: true });
+  } catch {
+    throw new UsageError(`cannot read ${directory}`);
+  }
+
+  const names = entries
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
+    .sort();
+  if (names.length === 0) throw new UsageError(`${directory} contains no case directories`);
+
+  const cases = [];
+  for (const name of names) {
+    const dir = join(directory, name);
+    cases.push({
+      name,
+      expected: await loadJson(join(dir, "expected.json"), `${name}/expected.json`),
+      html: await readText(join(dir, "page.html"), `${name}/page.html`),
+    });
+  }
+  return cases;
+}
+
+async function corpus(flags, target, out) {
+  const cases = await loadCorpus(target);
+  const options = flags.failUnder === undefined ? {} : { threshold: flags.failUnder };
+  const report = scoreCorpus(cases, options);
+
+  if (flags.json) {
+    out(JSON.stringify(report, null, 2));
+  } else {
+    for (const result of report.results) {
+      const mark = passes(result, report.threshold) ? "pass" : "fail";
+      out(`  ${result.name.padEnd(16)} ${String(result.score).padStart(3)}/100  ${mark}${result.error ? `  ${result.error}` : ""}`);
+    }
+    out(`\n${report.cases} cases, mean ${report.mean}/100, min ${report.min}, max ${report.max}`);
+    out(`${report.passed}/${report.cases} pass at threshold ${report.threshold}; ${report.inventedMutations} invented mutating port(s)`);
+  }
+
+  return report.passed === report.cases ? 0 : 1;
+}
+
 async function run(argv) {
   const { positional, flags } = parse(argv);
   const [command, target, extra] = positional;
@@ -141,6 +197,11 @@ async function run(argv) {
   };
 
   if (command === "score") return score(flags, out);
+
+  if (command === "corpus") {
+    if (!target) throw new UsageError("corpus needs a directory");
+    return corpus(flags, target, out);
+  }
 
   if (!target) throw new UsageError("missing target");
 

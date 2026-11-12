@@ -18,8 +18,11 @@ ports invented, wrong effect class, wrong parameter type, wrong required set.
 sample (guaranteed by construction), and under 20% structural error on `read`
 ports.
 
-**State:** harness built (`hardwire score`), one recorded fixture at **45/100**.
-The corpus does not exist yet, so there is no error rate to report.
+**State:** harness built (`hardwire score`, `hardwire corpus`). Three recorded
+cases — a shop, a blog with structured search, and a legacy form — score a mean
+of **68.3/100**; 1 of 3 clears the 80 threshold. The dominant errors are missing
+endpoints and field names that cannot be represented (`user[name]`), not invented
+mutations. Three cases is a working measurement, not a general error rate.
 
 ## Gate 2 — One real traversal
 
@@ -67,8 +70,8 @@ Cheap work that reduces uncertainty without committing to a direction:
 
 - [x] A scoring harness: run `infer` on a captured page, diff it against a
       hand-written panel, emit a score. `hardwire score --expected … --infer …`.
-- [ ] A corpus loader: capture pages, hold the expected panel next to each, and
-      aggregate the scores into one report.
+- [x] A corpus loader: capture pages, hold the expected panel next to each, and
+      aggregate the scores into one report. `hardwire corpus examples/corpus`.
 - [ ] A `probe --batch` mode over a list of origins, producing one JSON report.
 - [ ] Publish a panel for one surface we control and serve it at the discovery
       path, so `probe` can be validated against something real.

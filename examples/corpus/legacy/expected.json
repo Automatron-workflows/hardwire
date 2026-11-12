@@ -1,0 +1,21 @@
+{
+  "panel": "hardwire.panel/1",
+  "origin": "https://legacy.example.com",
+  "title": "What a careful engineer would publish for examples/corpus/legacy/page.html",
+  "ports": [
+    {
+      "id": "profile",
+      "kind": "write",
+      "summary": "Save the signed-in user's profile.",
+      "confirmation": "user",
+      "parameters": {
+        "properties": {
+          "email": { "type": "string" },
+          "fullName": { "type": "string" }
+        },
+        "required": ["email", "fullName"]
+      },
+      "endpoint": "/profile"
+    }
+  ]
+}

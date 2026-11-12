@@ -1,0 +1,30 @@
+{
+  "panel": "hardwire.panel/1",
+  "origin": "https://blog.example.com",
+  "title": "What a careful engineer would publish for examples/corpus/blog/page.html",
+  "ports": [
+    {
+      "id": "comment",
+      "kind": "write",
+      "summary": "Post a comment on the current article.",
+      "confirmation": "user",
+      "parameters": {
+        "properties": {
+          "author": { "type": "string" },
+          "body": { "type": "string" }
+        },
+        "required": ["author", "body"]
+      },
+      "endpoint": "/comments"
+    },
+    {
+      "id": "search",
+      "kind": "read",
+      "summary": "Search the site.",
+      "parameters": {
+        "properties": { "query": { "type": "string" } },
+        "required": ["query"]
+      }
+    }
+  ]
+}

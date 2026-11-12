@@ -1,6 +1,6 @@
 {
   "name": "hardwire",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Sites expose ports. Agents plug in. An open panel format for agent-operable software.",
   "type": "module",
   "private": true,
@@ -25,7 +25,9 @@
     "./probe": "./src/probe.mjs",
     "./mcp": "./src/mcp.mjs",
     "./trace": "./src/trace.mjs",
-    "./infer": "./src/infer.mjs"
+    "./infer": "./src/infer.mjs",
+    "./score": "./src/score.mjs",
+    "./corpus": "./src/corpus.mjs"
   },
   "files": [
     "src",
@@ -38,7 +40,8 @@
     "validate": "node src/cli.mjs validate examples/example-panel.json",
     "audit": "node src/cli.mjs audit examples/example-panel.json",
     "compile": "node src/cli.mjs compile examples/example-panel.json",
-    "score": "node src/cli.mjs score --expected examples/score/expected.json --infer examples/score/page.html"
+    "score": "node src/cli.mjs score --expected examples/corpus/shop/expected.json --infer examples/corpus/shop/page.html",
+    "corpus": "node src/cli.mjs corpus examples/corpus"
   },
   "keywords": [
     "agents",

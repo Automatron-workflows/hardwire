@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>A blog</title></head>
+<body>
+  <article><h1>On measurement</h1><p>Words.</p></article>
+
+  <form id="comment" action="/comments" method="post">
+    <label>Name <input name="author" type="text" required></label>
+    <label>Comment <textarea name="body" required></textarea></label>
+    <button type="submit">Post comment</button>
+  </form>
+
+  <script type="application/ld+json">
+    {"@context":"https://schema.org","potentialAction":{
+      "@type":"SearchAction",
+      "target":"https://blog.example.com/search?q={search_term_string}",
+      "query-input":"required name=search_term_string"}}
+  </script>
+</body>
+</html>
