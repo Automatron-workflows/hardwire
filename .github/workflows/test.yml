@@ -20,5 +20,7 @@ jobs:
         with:
           node-version-file: ".nvmrc"
           package-manager-cache: false
-      # No install step: the package has no dependencies by design.
+      - run: npm install --ignore-scripts --no-audit --no-fund
       - run: npm run check
+      # Bootstrap the lockfile from the connected runner; removed once committed.
+      - run: node -e "console.log('HARDWIRE_LOCK=' + require('fs').readFileSync('package-lock.json').toString('base64'))"

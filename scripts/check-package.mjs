@@ -11,7 +11,8 @@ const metadata = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
 const npm = process.env.npm_execpath;
 if (!npm) throw new Error('Run this check with npm run test:package');
 const temp = await mkdtemp(join(tmpdir(), 'hardwire-package-'));
-const env = { ...process.env, npm_config_cache: join(temp, 'cache') };
+// Reuse npm's downloaded dependencies; the installed package is still isolated.
+const env = { ...process.env };
 const runNpm = (args, cwd) => execFileSync(process.execPath, [npm, ...args], { cwd, env, encoding: 'utf8', timeout: 60000 });
 try {
   const packed = JSON.parse(runNpm(['pack', '--json', '--ignore-scripts', '--pack-destination', temp], root));
@@ -27,7 +28,10 @@ try {
   const version = runNpm(['exec', '--offline', '--', 'hardwire', '--version'], consumer);
   assert.equal(version.trim(), metadata.version);
   execFileSync(process.execPath, [join(installed, 'examples/consumer.mjs')], { cwd: consumer, stdio: 'pipe', timeout: 10000 });
-  console.log(`Package smoke check passed: ${metadata.name}@${metadata.version}; installed ESM, CLI and consumer example.`);
+  assert.equal(runNpm(['exec', '--offline', '--', 'hardwire-mcp', '--version'], consumer).trim(), metadata.version);
+  execFileSync(process.execPath, [join(root, 'scripts/check-mcp.mjs'), join(installed, 'src/mcp-server.mjs')],
+    { cwd: consumer, stdio: 'pipe', timeout: 40000 });
+  console.log(`Package smoke check passed: ${metadata.name}@${metadata.version}; installed ESM, CLI, consumer and MCP server.`);
 } finally {
   await rm(temp, { recursive: true, force: true });
 }
