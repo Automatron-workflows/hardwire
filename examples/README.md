@@ -1,5 +1,9 @@
 # Examples
 
+Run `npm run consumer` for an application-owned read-handler integration. It
+returns a fake catalogue product and records its checked result; see
+`consumer.mjs`. `npm run walkthrough` demonstrates the format helpers offline.
+
 | Path | What it is | Try it with |
 | --- | --- | --- |
 | `example-panel.json` | A complete panel for a fictional shop, including every effect class. | `validate`, `audit`, `compile`, `trace` |

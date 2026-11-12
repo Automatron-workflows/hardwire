@@ -6,12 +6,18 @@
 import { createHash } from "node:crypto";
 
 import { canonicalJson } from "./canonical.mjs";
-import { HardwireError, normalizePanel, panelDigest, validateParams } from "./panel.mjs";
+import { HardwireError, normalizeOrigin, normalizePanel, panelDigest, validateParams } from "./panel.mjs";
 
 export const TRACE_VERSION = "hardwire.trace/1";
 const OUTCOMES = new Set(["succeeded", "failed", "unknown", "refused"]);
 const TIMESTAMP = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}(?:\.\d{3})?Z$/;
 const DIGEST = /^sha256:[a-f0-9]{64}$/;
+const record = (value) => value !== null && typeof value === "object" && !Array.isArray(value);
+const onlyKeys = (value, keys) => record(value) && Object.keys(value).every((key) => keys.includes(key));
+const shortString = (value) => typeof value === "string" && value.length > 0 && value.length <= 128;
+const validOutcome = (value) => onlyKeys(value, ["status", "code", "resultDigest"]) && OUTCOMES.has(value.status) &&
+  (value.code === undefined || shortString(value.code)) &&
+  (value.resultDigest === undefined || (typeof value.resultDigest === "string" && DIGEST.test(value.resultDigest)));
 const validTime = (at) => typeof at === "string" && TIMESTAMP.test(at) &&
   Number.isFinite(Date.parse(at)) && new Date(at).toISOString() === (at.length === 20 ? at.replace("Z", ".000Z") : at);
 
@@ -69,7 +75,7 @@ export function buildTrace({
   if (typeof bound.kind !== "string" || typeof bound.confirmation !== "string") {
     throw new HardwireError("hardwire_panel_invalid", "port", `${id} is not normalised`);
   }
-  if (!outcome || !OUTCOMES.has(outcome.status)) {
+  if (!validOutcome(outcome)) {
     throw new HardwireError("hardwire_trace_invalid", "outcome.status", `expected one of ${[...OUTCOMES].join(", ")}`);
   }
   if (!validTime(at)) throw new HardwireError("hardwire_trace_invalid", "at", "expected a real ISO-8601 UTC timestamp");
@@ -113,21 +119,37 @@ export function traceDigest(document) {
  * truncation and edits; it does not catch forgery, which needs an issuer.
  */
 export function verifyTrace(trace, { panel } = {}) {
-  if (!trace || typeof trace !== "object") return false;
-  if (trace.trace !== TRACE_VERSION) return false;
-  if (!DIGEST.test(trace.digest) || !DIGEST.test(trace.panelDigest)) return false;
-  if (!validTime(trace.at) || !OUTCOMES.has(trace.outcome?.status)) return false;
-  if (typeof trace.actor !== "string" || !trace.actor.length || trace.actor.length > 128) return false;
-  if (typeof trace.port?.id !== "string" || !["read", "write", "payment", "destructive"].includes(trace.port?.kind) || !["none", "user", "owner"].includes(trace.port?.confirmation)) return false;
-  if (!trace.params || typeof trace.params !== "object" || Array.isArray(trace.params)) return false;
   try {
+    // Reject accessors/non-JSON values before reading caller-controlled fields.
+    trace = JSON.parse(canonicalJson(trace));
+    if (!onlyKeys(trace, ["trace", "panel", "panelDigest", "revision", "port", "actor", "at", "params", "outcome", "digest"])) return false;
+    if (trace.trace !== TRACE_VERSION || normalizeOrigin(trace.panel) !== trace.panel) return false;
+    if (!DIGEST.test(trace.digest) || !DIGEST.test(trace.panelDigest)) return false;
+    if (!validTime(trace.at) || !validOutcome(trace.outcome) || !shortString(trace.actor)) return false;
+    if (trace.revision !== undefined && !shortString(trace.revision)) return false;
+    if (!onlyKeys(trace.port, ["id", "kind", "confirmation"]) || typeof trace.port.id !== "string" || trace.port.id.length > 64 || !/^[a-z][a-z0-9]*(?:-[a-z0-9]+)*$/.test(trace.port.id)) return false;
+    if (!["read", "write", "payment", "destructive"].includes(trace.port.kind) || !["none", "user", "owner"].includes(trace.port.confirmation)) return false;
+    if (["payment", "destructive"].includes(trace.port.kind) && trace.port.confirmation !== "owner") return false;
+    if (!record(trace.params)) return false;
     if (panel !== undefined) {
       const normalized = normalizePanel(panel);
       const port = normalized.ports.find((entry) => entry.id === trace.port.id);
       if (!port || trace.panel !== normalized.origin || trace.panelDigest !== panelDigest(normalized) || trace.revision !== normalized.revision || trace.port.kind !== port.kind || trace.port.confirmation !== port.confirmation) return false;
+      // Validate the recorded shape, allowing only the redaction marker where
+      // the original secret was removed. The secret itself cannot be verified.
+      validateParams({ ...port, parameters: recordedSchema(port.parameters) }, trace.params);
     }
     return traceDigest(trace) === trace.digest;
   } catch {
     return false;
   }
+}
+
+function recordedSchema(schema) {
+  if (schema.writeOnly) return { type: "string", enum: ["[redacted]"] };
+  return {
+    ...schema,
+    ...(schema.properties ? { properties: Object.fromEntries(Object.entries(schema.properties).map(([key, value]) => [key, recordedSchema(value)])) } : {}),
+    ...(schema.items ? { items: recordedSchema(schema.items) } : {}),
+  };
 }

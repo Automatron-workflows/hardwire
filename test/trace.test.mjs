@@ -2,7 +2,7 @@ import assert from "node:assert/strict";
 import test from "node:test";
 
 import { normalizePanel, panelDigest } from "../src/panel.mjs";
-import { buildTrace, verifyTrace } from "../src/trace.mjs";
+import { buildTrace, traceDigest, verifyTrace } from "../src/trace.mjs";
 import { clone, example } from "./fixtures.mjs";
 
 const AT = "2026-11-11T10:00:00.000Z";
@@ -99,4 +99,45 @@ test("write-only parameters never reach the trace", () => {
   assert.equal(trace.params.password, "[redacted]");
   assert.equal(JSON.stringify(trace).includes("hunter2"), false);
   assert.equal(verifyTrace(trace), true);
+});
+
+test("recomputed digests do not make malformed records valid", () => {
+  const panel = normalizePanel(example);
+  const original = buildTrace({ panel, port: "search-catalogue", params: { query: "lamp" }, at: AT });
+  for (const mutate of [
+    t => { t.outcome.resultDigest = "broken"; },
+    t => { t.outcome.code = 42; },
+    t => { t.outcome.extra = true; },
+    t => { t.extra = true; },
+    t => { t.port.extra = true; },
+    t => { t.panel = "not-an-origin"; },
+    t => { t.revision = 12; },
+  ]) {
+    const trace = clone(original);
+    mutate(trace);
+    trace.digest = traceDigest(trace);
+    assert.equal(verifyTrace(trace), false);
+  }
+  assert.throws(() => buildTrace({ panel, port: "search-catalogue", params: { query: "lamp" }, outcome: { status: "succeeded", extra: true } }), { code: "hardwire_trace_invalid" });
+});
+
+test("panel verification checks argument shape and required redaction", () => {
+  const panel = normalizePanel(example);
+  for (const params of [{ query: 42 }, {}, { query: "lamp", extra: true }]) {
+    const trace = buildTrace({ panel, port: "search-catalogue", params: { query: "lamp" }, at: AT });
+    trace.params = params;
+    trace.digest = traceDigest(trace);
+    assert.equal(verifyTrace(trace), true); // No schema was supplied.
+    assert.equal(verifyTrace(trace, { panel }), false);
+  }
+  const login = buildTrace({ panel, port: "sign-in", params: { email: "demo@example.com", password: "secret" }, at: AT });
+  assert.equal(verifyTrace(login, { panel }), true);
+  login.params.password = "unredacted-secret";
+  login.digest = traceDigest(login);
+  assert.equal(verifyTrace(login, { panel }), false);
+});
+
+test("trace verification rejects non-JSON input without invoking getters", () => {
+  assert.equal(verifyTrace({ get trace() { throw new Error("must not run"); } }), false);
+  assert.equal(verifyTrace(null), false);
 });

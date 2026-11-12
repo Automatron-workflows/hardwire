@@ -45,8 +45,8 @@ const trace = buildTrace({
   outcome: { status: 'unknown' },
   actor: 'local-experiment', at: '2026-11-12T10:00:00.000Z'
 });
-verifyTrace(trace);            // digest and basic record checks
-verifyTrace(trace, { panel }); // also exact panel revision and port binding
+verifyTrace(trace);            // digest and strict record-shape checks
+verifyTrace(trace, { panel }); // also panel binding, argument shape and redaction
 ```
 
 `buildTrace` accepts a raw or normalized panel and a port ID or port object. It
@@ -60,7 +60,11 @@ SHA-256 digest string. No response body is recorded. All outcomes are assertions
 by the caller; none are independently observed by this package.
 
 `verifyTrace` returns false for a changed record or a mismatch with the supplied
-panel. It does not establish identity, approval, execution, or authenticity.
+panel. With a panel it validates the recorded argument shape, including required
+fields, and requires `[redacted]` at declared write-only positions. Secret enums
+are replaced by that marker for this check; original secrets cannot be recovered
+or validated from the record. Unknown trace/outcome/port fields are rejected.
+It does not establish identity, approval, execution, or authenticity.
 It cannot reconstruct redacted values. Two otherwise identical records that
 differ only in redacted secrets intentionally have the same digest.
 

@@ -123,3 +123,13 @@ test("inferFromUrl fetches once and reports a non-200 page", async () => {
     (error) => error.code === "hardwire_infer_failed",
   );
 });
+
+test("invalid explicit network options are refused instead of replaced by defaults", async () => {
+  let calls = 0;
+  const fetchImpl = async () => { calls++; return new Response(PAGE, { headers: { 'content-type': 'text/html' } }); };
+  for (const timeoutMs of [0, null, false, NaN]) {
+    await assert.rejects(inferFromUrl('https://shop.example.com', { timeoutMs, fetchImpl }), { code: 'hardwire_probe_invalid' });
+  }
+  await assert.rejects(inferFromUrl('https://shop.example.com', { fetchImpl: null }), { code: 'hardwire_panel_invalid' });
+  assert.equal(calls, 0);
+});

@@ -9,7 +9,7 @@ Hardwire describes an application's operations in a small JSON file called a
 `read` or `payment`, and a declared confirmation requirement. An agent
 integration can inspect that contract instead of guessing which UI to click.
 
-**Status: 0.4.0 experimental foundation.** This Node.js library validates panels
+**Status: 0.4.1 experimental foundation.** This Node.js library validates panels
 and arguments, compiles MCP tool descriptions, proposes panels from static HTML,
 and creates verifiable trace digests. It does **not** execute operations, provide
 an MCP server, log anyone in, or enforce human approval. No React dependency.
@@ -24,6 +24,7 @@ git clone https://github.com/Automatron-workflows/hardwire.git
 cd hardwire
 node --version
 npm run walkthrough
+npm run consumer
 npm test
 ```
 
@@ -32,8 +33,14 @@ password redaction, and scores a sample inference. `npm test` also starts a
 short-lived server on the loopback interface. In a sandbox that forbids listening
 sockets, run `npm run test:unit`; the integration suite must still pass in CI.
 
+`npm run consumer` goes one step further: it maps `search_catalogue` to a known
+application function, returns a matching demo product, checks the result and
+records a successful trace. It runs offline on fake data. This is a runnable
+integration pattern, not an MCP server or an authenticated deployment.
+
 **Next:** [step-by-step experiments](docs/GETTING-STARTED.md),
 [API reference](docs/API.md), or [adding a panel to your app](docs/INTEGRATION.md).
+For adoption and packaging, see [distribution and first deployment](docs/DISTRIBUTION.md).
 
 ## What a panel looks like
 

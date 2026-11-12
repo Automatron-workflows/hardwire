@@ -4,6 +4,12 @@ Run every command below from the repository root with Node 24.16+.
 `npm run walkthrough` is the fastest complete offline tour. It makes no network
 requests and needs no model or credentials.
 
+To see a tool actually call an application function, run `npm run consumer`.
+It calls `search_catalogue` with `{ "query": "lamp" }`, returns the fake
+`Desk lamp` product and records a checked success. Read `examples/consumer.mjs`
+to replace the fixed handler with your own authorized service. A model client
+still needs a transport adapter; merely publishing a panel cannot make calls.
+
 ## 1. Inspect an explicit contract
 
 ```sh

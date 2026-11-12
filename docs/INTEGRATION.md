@@ -27,6 +27,13 @@ method, headers, CSRF handling, body serialization or session requirements.
 
 ## Consumer setup
 
+Start with `npm run consumer` and [the runnable consumer](../examples/consumer.mjs).
+It pins a reviewed panel digest, refuses unknown tools or changed panels,
+validates arguments, invokes an allowlisted read handler, checks the application's
+result and binds its digest into a trace. It handles only fake public catalogue
+data and grants no account access. Handler failures propagate to the caller;
+production error reporting and refusal/failure traces remain integration work.
+
 A trusted Node consumer can use this explicit sequence:
 
 1. Fetch the panel under your own access and network policy. Validate it.
@@ -38,7 +45,8 @@ A trusted Node consumer can use this explicit sequence:
 7. Observe the result, build a trace, and retain the exact panel for verification.
 
 The repository implements steps 2–4's format helpers and step 7's record helper.
-It does not implement a generic runtime for steps 1, 5 or 6. Do not implement a
+The consumer example demonstrates a single fixed handler for step 6. It does not
+implement a generic runtime for steps 1, 5 or 6. Do not implement a
 consumer as “fetch whatever endpoint the untrusted panel says.” Absolute HTTPS
 endpoints can be cross-origin; a real consumer needs an explicit destination
 allowlist and must never forward credentials automatically.
@@ -63,3 +71,6 @@ The WebMCP document explicitly identifies itself as a Community Group draft,
 not a W3C Standard or a standards-track specification. Hardwire is an independent
 experiment, not a competing web standard or an official extension of any of the
 above. Its own discovery file and metadata vocabulary may change.
+
+See [distribution and first deployment](DISTRIBUTION.md) for the concrete path
+from this example to a client-connected pilot and an installable release.
