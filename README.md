@@ -9,38 +9,49 @@ Hardwire describes an application's operations in a small JSON file called a
 `read` or `payment`, and a declared confirmation requirement. An agent
 integration can inspect that contract instead of guessing which UI to click.
 
-**Status: 0.4.1 experimental foundation.** This Node.js library validates panels
-and arguments, compiles MCP tool descriptions, proposes panels from static HTML,
-and creates verifiable trace digests. It does **not** execute operations, provide
-an MCP server, log anyone in, or enforce human approval. No React dependency.
+**Status: 0.5.0 experimental MCP toolkit and Node.js library.** Connect an agent
+to five local tools for HTML inference, panel inspection, tool-description
+compilation, argument validation and trace verification. You do not need an app,
+a website, an API key or hosting. The toolkit processes supplied data; it does
+not browse websites, log in or execute the operations described in a panel.
 
-## Start in two minutes
+License selection is pending. The setup below is for the owner or users with
+separate permission; the public repository currently grants no reuse license.
 
-Use **Node 24.16 or newer** (`nvm use` if you use nvm). No dependencies, API keys,
-accounts, installation step, or paid services are needed.
+## Connect in five minutes
+
+Use **Node 24.16 or newer** (`nvm use` if you use nvm).
 
 ```sh
 git clone https://github.com/Automatron-workflows/hardwire.git
 cd hardwire
-node --version
-npm run walkthrough
-npm run consumer
-npm test
+npm ci --ignore-scripts
+npm run test:mcp
+npm run --silent mcp:config
 ```
 
-The offline walkthrough exercises the public API, verifies a trace, demonstrates
-password redaction, and scores a sample inference. `npm test` also starts a
-short-lived server on the loopback interface. In a sandbox that forbids listening
-sockets, run `npm run test:unit`; the integration suite must still pass in CI.
+The smoke check launches a real server, discovers all five tools and calls them
+with the official MCP client. The last command prints a client configuration
+with exact paths for this machine. Merge its `hardwire` entry into your MCP
+client's configuration. [Full setup, a first prompt and troubleshooting](docs/MCP.md).
 
-`npm run consumer` goes one step further: it maps `search_catalogue` to a known
-application function, returns a matching demo product, checks the result and
-records a successful trace. It runs offline on fake data. This is a runnable
-integration pattern, not an MCP server or an authenticated deployment.
+| Tool | What it does |
+| --- | --- |
+| `hardwire_inspect_panel` | Validates a panel and summarizes declared effects. |
+| `hardwire_compile_panel` | Produces MCP descriptions as data, without registering them. |
+| `hardwire_infer_html` | Turns supplied static HTML into a draft that needs review. |
+| `hardwire_validate_params` | Checks arguments against a port without executing it. |
+| `hardwire_verify_trace` | Checks trace consistency and binding to a supplied panel. |
 
-**Next:** [step-by-step experiments](docs/GETTING-STARTED.md),
-[API reference](docs/API.md), or [adding a panel to your app](docs/INTEGRATION.md).
-For adoption and packaging, see [distribution and first deployment](docs/DISTRIBUTION.md).
+To explore the library without an agent, run `npm run walkthrough` and
+`npm run consumer`. The consumer calls one fixed function on fake catalogue data.
+Run `npm run check` for all tests, including a clean package installation and
+MCP calls through the installed command. HTTP integration tests need loopback
+sockets; restricted sandboxes can run `npm run test:unit` as a partial check.
+
+**Next:** [MCP setup](docs/MCP.md), [library experiments](docs/GETTING-STARTED.md),
+[API reference](docs/API.md), [application integration](docs/INTEGRATION.md),
+or [release and distribution](docs/DISTRIBUTION.md).
 
 ## What a panel looks like
 
@@ -70,7 +81,7 @@ consumer needs an explicit implementation for each port it will call.
 | --- | --- |
 | Panel | The versioned description of an application's operations. |
 | Port | One operation, its argument schema and declared policy. |
-| Consumer / plug | Your integration that maps ports to real handlers. Not included. |
+| Consumer / plug | An integration mapping application ports to real handlers. See the demo consumer. |
 | Trace | A record of a caller's assertion, bound to a panel digest. Not proof of execution. |
 
 ## Try the commands

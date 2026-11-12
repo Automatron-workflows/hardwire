@@ -1,5 +1,22 @@
 # Changelog
 
+## 0.5.0 — 2026-11-12
+
+Standalone agent access without an owned application.
+
+- Adds `hardwire-mcp`: five fixed offline tools for panel inspection/compilation,
+  HTML inference, parameter validation and panel-bound trace verification.
+- Uses official MCP server SDK 2.4.0, with a separate official client dependency
+  for transport tests. Core format helpers retain their built-in-only imports.
+- Adds exact-path client configuration, first-task examples and troubleshooting.
+- Tests actual discovery/calls, invalid inputs and installed-command startup.
+  The clean-install test caught and fixed symlink-based executable detection.
+- Replaces the owned-app prerequisite with a standalone toolkit distribution path.
+
+Existing panel and trace formats are unchanged. Install dependencies with
+`npm ci --ignore-scripts` before running the full checks. The toolkit does not
+execute submitted ports or fetch websites. License selection remains pending.
+
 ## 0.4.1 — 2026-11-12
 
 Final use-readiness audit and runnable consumer pattern.

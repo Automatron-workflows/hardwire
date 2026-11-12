@@ -1,7 +1,7 @@
 {
   "name": "hardwire",
-  "version": "0.4.1",
-  "description": "Typed action panels, static inference, MCP tool descriptions and verifiable trace digests. Experimental; no executor.",
+  "version": "0.5.0",
+  "description": "Local MCP toolkit for inspecting HTML, validating action panels and checking trace digests. Experimental; no website executor.",
   "type": "module",
   "private": true,
   "license": "UNLICENSED",
@@ -17,7 +17,8 @@
     "node": ">=24.16.0"
   },
   "bin": {
-    "hardwire": "./src/cli.mjs"
+    "hardwire": "./src/cli.mjs",
+    "hardwire-mcp": "./src/mcp-server.mjs"
   },
   "exports": {
     ".": "./src/index.mjs",
@@ -31,6 +32,7 @@
   },
   "files": [
     "src",
+    "scripts/client-config.mjs",
     "examples",
     "docs",
     "README.md",
@@ -48,10 +50,20 @@
     "demo": "node examples/demo/server.mjs",
     "walkthrough": "node examples/walkthrough.mjs",
     "consumer": "node examples/consumer.mjs",
+    "mcp": "node src/mcp-server.mjs",
+    "mcp:config": "node scripts/client-config.mjs",
+    "test:mcp": "node scripts/check-mcp.mjs",
+    "release:prepare": "node scripts/prepare-release.mjs",
     "test:package": "node scripts/check-package.mjs",
     "test:unit": "node --test test/*.test.mjs",
     "test:integration": "node --test test/integration/*.test.mjs",
-    "check": "npm test && npm run validate && npm run walkthrough && npm run consumer && npm run test:package"
+    "check": "npm test && npm run validate && npm run walkthrough && npm run consumer && npm run test:mcp && npm run test:package"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/server": "2.4.0"
+  },
+  "devDependencies": {
+    "@modelcontextprotocol/client": "2.4.0"
   },
   "keywords": [
     "agents",

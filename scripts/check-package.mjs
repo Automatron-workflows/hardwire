@@ -11,6 +11,8 @@ const metadata = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
 const npm = process.env.npm_execpath;
 if (!npm) throw new Error('Run this check with npm run test:package');
 const temp = await mkdtemp(join(tmpdir(), 'hardwire-package-'));
+// A fresh consumer also needs fresh registry metadata. npm ci's cache only
+// guarantees tarballs, so test the actual online installation path in isolation.
 const env = { ...process.env, npm_config_cache: join(temp, 'cache') };
 const runNpm = (args, cwd) => execFileSync(process.execPath, [npm, ...args], { cwd, env, encoding: 'utf8', timeout: 60000 });
 try {
@@ -18,7 +20,7 @@ try {
   const consumer = join(temp, 'consumer');
   await mkdir(consumer);
   await writeFile(join(consumer, 'package.json'), JSON.stringify({ name: 'hardwire-package-check', private: true, type: 'module' }));
-  runNpm(['install', join(temp, packed[0].filename), '--offline', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock=false'], consumer);
+  runNpm(['install', join(temp, packed[0].filename), '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock=false'], consumer);
   const imported = execFileSync(process.execPath, ['--input-type=module', '-e',
     `import {normalizePanel,compilePanel} from ${JSON.stringify(metadata.name)}; console.log(compilePanel(normalizePanel({panel:'hardwire.panel/1',origin:'https://example.com',ports:[{id:'read-status',kind:'read',summary:'Read status.'}]}))[0].name);`],
   { cwd: consumer, encoding: 'utf8', timeout: 10000 });
@@ -27,7 +29,10 @@ try {
   const version = runNpm(['exec', '--offline', '--', 'hardwire', '--version'], consumer);
   assert.equal(version.trim(), metadata.version);
   execFileSync(process.execPath, [join(installed, 'examples/consumer.mjs')], { cwd: consumer, stdio: 'pipe', timeout: 10000 });
-  console.log(`Package smoke check passed: ${metadata.name}@${metadata.version}; installed ESM, CLI and consumer example.`);
+  assert.equal(runNpm(['exec', '--offline', '--', 'hardwire-mcp', '--version'], consumer).trim(), metadata.version);
+  execFileSync(process.execPath, [join(root, 'scripts/check-mcp.mjs'), join(consumer, 'node_modules/.bin/hardwire-mcp')],
+    { cwd: consumer, stdio: 'pipe', timeout: 40000 });
+  console.log(`Package smoke check passed: ${metadata.name}@${metadata.version}; installed ESM, CLI, consumer and MCP server.`);
 } finally {
   await rm(temp, { recursive: true, force: true });
 }

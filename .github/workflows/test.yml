@@ -20,5 +20,5 @@ jobs:
         with:
           node-version-file: ".nvmrc"
           package-manager-cache: false
-      # No install step: the package has no dependencies by design.
+      - run: npm ci --ignore-scripts --no-audit --no-fund
       - run: npm run check
