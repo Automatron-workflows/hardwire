@@ -202,7 +202,7 @@ finding work, not a grade or a certification.
 
 ## Status
 
-`0.1.0`, unpublished, unadopted. The format may change. See
+`0.3.0`, unpublished, unadopted. The format may change. See
 [docs/ROADMAP.md](docs/ROADMAP.md) for the gates that would have to pass before
 anyone should depend on it, and [docs/SAFETY.md](docs/SAFETY.md) for the threat
 model.
