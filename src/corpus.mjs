@@ -60,7 +60,10 @@ export function scoreCorpus(cases, { threshold = DEFAULT_THRESHOLD } = {}) {
         // Every expected port is absent; saying `[]` would hide the failure.
         missing: expectedIds,
         extra: [],
+        extraPorts: [],
         inventedMutations: 0,
+        inventedPayments: 0,
+        inventedDestructive: 0,
         // There is no inferred panel to compare against, so origin is unknown.
         originMatch: null,
         ports: [],
@@ -73,6 +76,20 @@ export function scoreCorpus(cases, { threshold = DEFAULT_THRESHOLD } = {}) {
   const scores = results.map((result) => result.score);
   const mean = scores.reduce((total, score) => total + score, 0) / scores.length;
 
+  // Gate 1 is stated as structural error on read ports, not as an all-port
+  // mean, so it is reported separately. A missing port is full error.
+  const readSimilarities = [];
+  for (const [index, result] of results.entries()) {
+    const expectedPorts = Array.isArray(cases[index].expected.ports) ? cases[index].expected.ports : [];
+    const similarity = new Map(result.ports.map((port) => [port.id, port.similarity]));
+    for (const port of expectedPorts) {
+      if (port.kind === "read") readSimilarities.push(similarity.get(port.id) ?? 0);
+    }
+  }
+  const readError = readSimilarities.length === 0
+    ? null
+    : round1((1 - readSimilarities.reduce((total, value) => total + value, 0) / readSimilarities.length) * 100);
+
   return {
     corpus: "hardwire.corpus/1",
     threshold,
@@ -82,6 +99,10 @@ export function scoreCorpus(cases, { threshold = DEFAULT_THRESHOLD } = {}) {
     max: Math.max(...scores),
     passed: results.filter((result) => passes(result, threshold)).length,
     inventedMutations: results.reduce((total, result) => total + result.inventedMutations, 0),
+    inventedPayments: results.reduce((total, result) => total + result.inventedPayments, 0),
+    inventedDestructive: results.reduce((total, result) => total + result.inventedDestructive, 0),
+    readPorts: readSimilarities.length,
+    readError,
     missing: results.reduce((total, result) => total + result.missing.length, 0),
     results,
   };

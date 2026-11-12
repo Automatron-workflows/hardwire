@@ -30,6 +30,9 @@ test("corpus reports the aggregate and exits 1 when cases fail", async () => {
   assert.equal(report.mean, 68.3);
   assert.equal(report.passed, 1);
   assert.equal(report.inventedMutations, 1);
+  assert.equal(report.readError, 0);
+  assert.equal(report.readPorts, 2);
+  assert.equal(report.inventedPayments, 0);
 });
 
 test("a panel compared with itself passes from the command line", async () => {

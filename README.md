@@ -162,13 +162,18 @@ npm run corpus
 #
 # 3 cases, mean 68.3/100, min 45, max 100
 # 1/3 pass at threshold 80; 1 invented mutating port(s)
+# read error 0% across 2 read port(s); 0 invented payment(s), 0 destructive
 ```
 
 Adding a case is the contribution: capture a real page, write down the ports it
 should expose, run the corpus. The cases are deliberately ordinary — a shop, a
 blog with structured search, and a form using `user[name]` fields — because the
-interesting failures are in ordinary markup, not in demos. Three cases is a
-harness with evidence, not a general error rate.
+interesting failures are in ordinary markup, not in demos.
+
+The report separates the gate's own terms from the aggregate: structural error
+on `read` ports, and invented `payment`/`destructive` ports. Both are clean
+here, but two read ports is not a sample. Three cases is a harness with
+evidence, not a general error rate.
 
 ## Probe scoring
 

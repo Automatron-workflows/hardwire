@@ -181,6 +181,10 @@ async function corpus(flags, target, out) {
     }
     out(`\n${report.cases} cases, mean ${report.mean}/100, min ${report.min}, max ${report.max}`);
     out(`${report.passed}/${report.cases} pass at threshold ${report.threshold}; ${report.inventedMutations} invented mutating port(s)`);
+    const read = report.readError === null
+      ? "read error n/a (no read ports);"
+      : `read error ${report.readError}% across ${report.readPorts} read port(s);`;
+    out(`${read} ${report.inventedPayments} invented payment(s), ${report.inventedDestructive} destructive`);
   }
 
   return report.passed === report.cases ? 0 : 1;

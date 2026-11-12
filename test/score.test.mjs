@@ -65,7 +65,23 @@ test("an invented mutation is counted separately", () => {
   const result = comparePanels(example, actual);
 
   assert.equal(result.inventedMutations, 1);
+  assert.equal(result.inventedPayments, 0);
   assert.equal(passes(result), false, "an invented mutation fails the gate regardless of score");
+});
+
+test("an invented payment or destructive port is named as such", () => {
+  const actual = clone(example);
+  actual.ports.push({ id: "charge", kind: "payment", summary: "Charge the card." });
+  actual.ports.push({ id: "wipe", kind: "destructive", summary: "Delete everything." });
+  const result = comparePanels(example, actual);
+
+  assert.equal(result.inventedMutations, 2);
+  assert.equal(result.inventedPayments, 1);
+  assert.equal(result.inventedDestructive, 1);
+  assert.deepEqual(
+    result.extraPorts.map((port) => port.kind).sort(),
+    ["destructive", "payment"],
+  );
 });
 
 test("a changed field is reported by name, not just as a lower number", () => {

@@ -73,6 +73,8 @@ export function comparePanels(expectedInput, actualInput) {
 
   const base = Math.round(mean * 100);
   const penalty = extra.length * EXTRA_PORT_PENALTY;
+  const extraPorts = extra.map((id) => ({ id, kind: actualById.get(id).kind }));
+  const invented = (kind) => extraPorts.filter((port) => port.kind === kind).length;
 
   return {
     score: Math.max(0, Math.min(100, base - penalty)),
@@ -84,8 +86,11 @@ export function comparePanels(expectedInput, actualInput) {
     matched: ports.filter((port) => port.similarity === 1).length,
     missing,
     extra,
+    extraPorts,
     // An invented mutating port is worse than an invented read.
-    inventedMutations: extra.filter((id) => actualById.get(id).kind !== "read").length,
+    inventedMutations: extraPorts.filter((port) => port.kind !== "read").length,
+    inventedPayments: invented("payment"),
+    inventedDestructive: invented("destructive"),
     ports,
   };
 }

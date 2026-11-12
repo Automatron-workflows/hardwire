@@ -29,6 +29,10 @@ test("the recorded corpus produces the documented numbers", () => {
   assert.equal(report.max, 100);
   assert.equal(report.passed, 1);
   assert.equal(report.inventedMutations, 1);
+  assert.equal(report.inventedPayments, 0);
+  assert.equal(report.inventedDestructive, 0);
+  assert.equal(report.readPorts, 2);
+  assert.equal(report.readError, 0);
   assert.deepEqual(
     report.results.map((result) => [result.name, result.score]),
     [["blog", 100], ["legacy", 60], ["shop", 45]],
@@ -47,6 +51,8 @@ test("a case whose capture yields nothing scores zero instead of aborting the ru
   assert.equal(report.results[0].expected, example.ports.length);
   assert.deepEqual(report.results[0].missing, example.ports.map((port) => port.id).sort());
   assert.equal(report.results[0].originMatch, null);
+  assert.equal(report.readPorts, 3, "the failed case's read port is still measured");
+  assert.equal(report.readError, 33.3, "a missing read port is full structural error");
   assert.equal(report.results.length, 4, "the remaining cases still ran");
 });
 

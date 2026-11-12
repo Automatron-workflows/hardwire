@@ -20,9 +20,12 @@ ports.
 
 **State:** harness built (`hardwire score`, `hardwire corpus`). Three recorded
 cases — a shop, a blog with structured search, and a legacy form — score a mean
-of **68.3/100**; 1 of 3 clears the 80 threshold. The dominant errors are missing
-endpoints and field names that cannot be represented (`user[name]`), not invented
-mutations. Three cases is a working measurement, not a general error rate.
+of **68.3/100**; 1 of 3 clears the 80 threshold. On the gate's own terms,
+structural error on read ports is **0% across 2 read ports**, with zero invented
+`payment` or `destructive` ports. The dominant failures are missing endpoints
+and a field name that cannot be represented (`user[name]`). Two read ports is
+not a sample; the gate stays open until the corpus is large enough to mean
+something.
 
 ## Gate 2 — One real traversal
 
