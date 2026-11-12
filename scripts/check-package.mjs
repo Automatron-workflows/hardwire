@@ -11,15 +11,16 @@ const metadata = JSON.parse(await readFile(join(root, 'package.json'), 'utf8'));
 const npm = process.env.npm_execpath;
 if (!npm) throw new Error('Run this check with npm run test:package');
 const temp = await mkdtemp(join(tmpdir(), 'hardwire-package-'));
-// Reuse npm's downloaded dependencies; the installed package is still isolated.
-const env = { ...process.env };
+// A fresh consumer also needs fresh registry metadata. npm ci's cache only
+// guarantees tarballs, so test the actual online installation path in isolation.
+const env = { ...process.env, npm_config_cache: join(temp, 'cache') };
 const runNpm = (args, cwd) => execFileSync(process.execPath, [npm, ...args], { cwd, env, encoding: 'utf8', timeout: 60000 });
 try {
   const packed = JSON.parse(runNpm(['pack', '--json', '--ignore-scripts', '--pack-destination', temp], root));
   const consumer = join(temp, 'consumer');
   await mkdir(consumer);
   await writeFile(join(consumer, 'package.json'), JSON.stringify({ name: 'hardwire-package-check', private: true, type: 'module' }));
-  runNpm(['install', join(temp, packed[0].filename), '--offline', '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock=false'], consumer);
+  runNpm(['install', join(temp, packed[0].filename), '--ignore-scripts', '--no-audit', '--no-fund', '--package-lock=false'], consumer);
   const imported = execFileSync(process.execPath, ['--input-type=module', '-e',
     `import {normalizePanel,compilePanel} from ${JSON.stringify(metadata.name)}; console.log(compilePanel(normalizePanel({panel:'hardwire.panel/1',origin:'https://example.com',ports:[{id:'read-status',kind:'read',summary:'Read status.'}]}))[0].name);`],
   { cwd: consumer, encoding: 'utf8', timeout: 10000 });

@@ -14,7 +14,7 @@ npm run check
 
 This runs unit/CLI tests, real loopback HTTP integration tests, panel validation
 and the offline API walkthrough, runnable consumer, MCP transport and package checks. The
-package check builds a tarball, installs it offline in a temporary project, then
+package check builds a tarball, installs it with a fresh cache in a temporary project, then
 checks its ESM exports, CLI binaries, consumer and actual MCP calls through the
 installed symlink. The official SDK client is a development dependency. CI runs the
 same command on the exact `.nvmrc` version. All checks must pass before merging.
