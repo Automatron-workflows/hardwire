@@ -4,7 +4,7 @@
   "description": "Local MCP toolkit for inspecting HTML, validating action panels and checking trace digests. Experimental; no website executor.",
   "type": "module",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "homepage": "https://github.com/Automatron-workflows/hardwire#readme",
   "repository": {
     "type": "git",
@@ -14,7 +14,7 @@
     "url": "https://github.com/Automatron-workflows/hardwire/issues"
   },
   "engines": {
-    "node": ">=24.16.0"
+    "node": ">=22.0.0"
   },
   "bin": {
     "hardwire": "./src/cli.mjs",
@@ -28,7 +28,8 @@
     "./trace": "./src/trace.mjs",
     "./infer": "./src/infer.mjs",
     "./score": "./src/score.mjs",
-    "./corpus": "./src/corpus.mjs"
+    "./corpus": "./src/corpus.mjs",
+    "./canonical": "./src/canonical.mjs"
   },
   "files": [
     "src",

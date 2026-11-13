@@ -18,8 +18,8 @@ Keep this distinction in every listing.
 | GitHub source | Public under Automatron-workflows/hardwire |
 | MCP transport | Implemented with official SDK 2.4.0 |
 | Clean installation | CI installs the packed artifact and exercises its MCP command |
-| Public reuse license | Awaiting owner decision; UNLICENSED remains in effect |
-| npm package | Not published; unscoped name is not reserved |
+| Public reuse license | MIT, chosen by the owner on 13 November 2026 |
+| npm package | Not published; `private: true`; unscoped name is not reserved |
 | MCP Registry listing | Not submitted |
 | External users or measured demand | Not established |
 
@@ -27,11 +27,11 @@ Keep this distinction in every listing.
 
 GitHub is already available and needs no new npm account or paid hosting.
 
-1. Resolve the license. [The release proposal](RELEASE-DECISION.md) recommends
-   MIT for low-friction adoption and explains the rights it grants.
+1. The license is resolved: MIT. The release proposal and decision are recorded
+   in [the release decision](RELEASE-DECISION.md).
 2. Run the checks from the committed lockfile. Create the experimental `v0.5.0`
    tag and a GitHub prerelease with the tested package and SHA-256 checksum.
-   Use [the prepared release notes](releases/v0.5.0.md) after licensing.
+   Use [the prepared release notes](releases/v0.5.0.md).
 3. Verify the exact downloaded asset in a fresh directory with an MCP client.
    Link the source, license, setup and limitations.
 4. Offer one concrete experiment: infer a panel from a small saved HTML page,
@@ -41,10 +41,10 @@ This document does not publish a release. Do not advertise a tag, asset URL,
 package name or registry listing before it exists and has been verified.
 
 `npm run release:prepare` builds a local package and checksum for owner review.
-After licensing, run the GitHub Actions `prepare-release` workflow on main. It
-checks the license, runs the full suite and creates a **draft** prerelease with
-assets. Review that concrete draft before publication. This does not publish to
-npm or require an npm account. The workflow refuses the current UNLICENSED state.
+Run the GitHub Actions `prepare-release` workflow on main. It checks the license,
+runs the full suite and creates a **draft** prerelease with assets. Review that
+concrete draft before publication. This does not publish to npm or require an
+npm account. The workflow refuses a package with no reuse license.
 
 ## Then npm and discovery
 
@@ -67,8 +67,8 @@ No hosted endpoint is needed for a local package.
 ## Reach the first users
 
 Start with developers already using MCP and browser automation. They can try the
-toolkit without controlling a website. After licensing, publish the release and
-a reproducible demo, then seek three independent evaluations.
+toolkit without controlling a website. Publish the release and a reproducible
+demo, then seek three independent evaluations.
 
 Measure whether people connect without help, complete the first task, understand
 limitations and return for a second project. Record client/version, setup time,

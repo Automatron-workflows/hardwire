@@ -2,12 +2,12 @@
 
 The local toolkit works even if you do not own an app. An agent can inspect a
 panel, infer a draft from HTML, compile tool descriptions, check arguments and
-verify traces. It never calls an endpoint from a panel. License selection is
-pending; setup is currently for the owner or users with separate permission.
+verify traces. It never calls an endpoint from a panel. MIT licensed; setup is
+open to anyone.
 
 ## Install and verify
 
-Use Node 24.16+ and npm. From a checkout:
+Use Node 22 or newer and npm. From a checkout:
 
 ```sh
 npm ci --ignore-scripts

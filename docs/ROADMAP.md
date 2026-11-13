@@ -13,8 +13,8 @@
 - A standalone offline MCP toolkit with five fixed tools, official SDK transport,
   actual client calls, installed-command tests and generated client configuration.
 
-The library is ready for controlled experiments by the owner. It is not a
-production executor or an open-source release. License selection is still open.
+The library is MIT licensed and ready for controlled experiments. It is not a
+production executor; application execution remains gated below.
 
 ## Gate 1: real inference evidence — open
 
@@ -64,8 +64,8 @@ allowlist of local handlers for the first experiment.
 First recruit users for the standalone toolkit; no app ownership is required.
 Separately, find one consenting application team that wants to publish a panel or
 consume one. Measure the integration work and task reliability. Stars and
-synthetic examples do not satisfy this gate. Resolve the license before inviting
-external implementation contributions or promoting reusable packages.
+synthetic examples do not satisfy this gate. The licence is resolved (MIT), so
+external implementation contributions are open under it.
 
 ## Release decisions still open
 
@@ -73,8 +73,8 @@ Follow [distribution and first deployment](DISTRIBUTION.md) for the ordered pilo
 package and client rollout. The toolkit can connect now; submitted panel operations
 remain data until an application integration supplies trusted handlers.
 
-- Choose a license; `UNLICENSED` and `private: true` remain unchanged.
 - Decide whether npm distribution is useful and check/reserve an appropriate name.
+  The source licence is settled; removing `private: true` is a separate step.
 - Design browser/WebMCP integration only against a pinned, reviewed API version.
 - Review access permissions, privacy and retention for the actual deployment.
   A file format cannot grant access rights or guarantee compliance by itself.

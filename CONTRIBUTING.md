@@ -1,11 +1,11 @@
 # Development
 
-The repository's license has not been chosen. These instructions describe the
-owner's development workflow; they do not grant outside reuse rights or invite
-code contributions under an unspecified license.
+Hardwire is MIT licensed. These instructions describe development; the same
+licence covers contributions unless a file says otherwise.
 
-Use Node 24.16+ (`nvm use`). The MCP transport uses the pinned official SDK.
-The core format modules still use only Node built-ins; no build step is needed.
+Use Node 22 or newer (`nvm use` pins 24.16). The MCP transport uses the pinned
+official SDK. The core format modules still use only Node built-ins; no build
+step is needed.
 
 ```sh
 npm ci --ignore-scripts
@@ -17,7 +17,7 @@ and the offline API walkthrough, runnable consumer, MCP transport and package ch
 package check builds a tarball, installs it with a fresh cache in a temporary project, then
 checks its ESM exports, CLI binaries, consumer and actual MCP calls through the
 installed symlink. The official SDK client is a development dependency. CI runs the
-same command on the exact `.nvmrc` version. All checks must pass before merging.
+same command on Node 22 and 24. All checks must pass before merging.
 The standalone `npm run corpus`
 command intentionally exits 1 on the current baseline; its expected scores and
 failure modes are asserted inside the passing test suite.

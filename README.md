@@ -15,12 +15,13 @@ compilation, argument validation and trace verification. You do not need an app,
 a website, an API key or hosting. The toolkit processes supplied data; it does
 not browse websites, log in or execute the operations described in a panel.
 
-License selection is pending. The setup below is for the owner or users with
-separate permission; the public repository currently grants no reuse license.
+MIT licensed, with no npm publication: `package.json` keeps `"private": true`
+so an npm release remains a separate owner decision. The toolkit is ready to
+clone, run and evaluate.
 
 ## Connect in five minutes
 
-Use **Node 24.16 or newer** (`nvm use` if you use nvm).
+Use **Node 22 or newer** (`nvm use` if you use nvm). CI tests Node 22 and 24.
 
 ```sh
 git clone https://github.com/Automatron-workflows/hardwire.git
@@ -135,7 +136,8 @@ console.log(tools.length, args); // 5, { query: 'lamp' }
 
 The package name is not published or reserved on npm. See the
 [local package setup](docs/GETTING-STARTED.md#use-it-from-another-local-project)
-and the current license before reuse.
+to use it from another project. The code is MIT licensed; the npm package is
+deliberately not published.
 
 ## What the foundation checks
 
@@ -184,7 +186,12 @@ link the primary specifications and distinguish implemented features from ideas.
 
 ## License
 
-**Not selected.** The existing `UNLICENSED` / `private: true` status is retained.
-This repository is publicly visible, but it is not an open-source release and
-visibility does not grant a reuse license. Outside reuse and npm publication
-remain pending the owner's license decision.
+**MIT**, chosen by the owner on 13 November 2026. You may use, modify,
+redistribute and sell copies provided the copyright and permission notice are
+retained. The software is provided without warranty.
+
+`package.json` keeps `"private": true`: the source is licensed, but publishing to
+npm is a separate decision. The package name is not reserved, so do not assume
+`npm install hardwire` installs this project.
+
+See [LICENSE](LICENSE) and the [release decision record](docs/RELEASE-DECISION.md).

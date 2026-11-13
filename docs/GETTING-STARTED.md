@@ -1,6 +1,6 @@
 # Experiment with Hardwire
 
-Run every command below from the repository root with Node 24.16+.
+Run every command below from the repository root with Node 22+ (24 recommended).
 For an agent-connected experience, start with [the standalone MCP toolkit](MCP.md).
 Install dependencies with `npm ci --ignore-scripts` for MCP checks.
 `npm run walkthrough` is the fastest complete offline tour. It makes no network
@@ -128,7 +128,7 @@ while its backend or a trusted Node integration uses the library.
 
 | Symptom | Explanation / action |
 | --- | --- |
-| `node --version` shows 18 or 20 | Activate Node 24.16+, e.g. `nvm use`. |
+| `node --version` shows 20 or older | Activate Node 22+, e.g. `nvm use`. |
 | `listen EPERM` | Your sandbox forbids local servers. Use the offline tour and `npm run test:unit`; run the full suite on a machine that permits loopback sockets. |
 | `hardwire_origin_private` | The probe refused a local target. Use `--allow-private` only for a development origin you control. |
 | Probe exits 1 | The score is below the threshold; inspect the report and network findings. |

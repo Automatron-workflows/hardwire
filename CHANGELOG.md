@@ -15,7 +15,9 @@ Standalone agent access without an owned application.
 
 Existing panel and trace formats are unchanged. Install dependencies with
 `npm ci --ignore-scripts` before running the full checks. The toolkit does not
-execute submitted ports or fetch websites. License selection remains pending.
+execute submitted ports or fetch websites. MIT licensed as of 13 November 2026;
+`private: true` keeps npm publication a separate decision. Requires Node 22 or
+newer; CI tests Node 22 and 24.
 
 ## 0.4.1 — 2026-11-12
 
@@ -80,7 +82,8 @@ port and auth fields are rejected. Invalid trace timestamps and malformed
 result digests are rejected. Keep original panels/traces when testing older
 versions. The draft format is not frozen.
 
-License remains `UNLICENSED`; npm publication remains disabled. No executor,
+License remains `UNLICENSED` at this point (resolved to MIT in 0.5.0); npm
+publication remains disabled. No executor,
 MCP transport, React SDK, WebMCP adapter or real-site accuracy claim is added.
 
 ## 0.3.0

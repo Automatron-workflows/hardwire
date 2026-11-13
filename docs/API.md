@@ -1,6 +1,6 @@
 # Public API
 
-Node.js ESM. Core helpers use only Node built-ins; the MCP server uses the official SDK. Import from `hardwire` after a permitted local
+Node.js ESM. Core helpers use only Node built-ins; the MCP server uses the official SDK. Import from `hardwire` after a local
 package install, or from `./src/index.mjs` inside the checkout. Subpath exports
 are listed in `package.json`. Functions are synchronous unless marked async.
 
