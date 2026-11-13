@@ -42,15 +42,17 @@ package name or registry listing before it exists and has been verified.
 
 `npm run release:prepare` builds a local package and checksum for owner review.
 Run the GitHub Actions `prepare-release` workflow on main. It checks the license,
-runs the full suite and creates a **draft** prerelease with assets. Review that
-concrete draft before publication. This does not publish to npm or require an
+runs the full suite and creates a **draft** prerelease with assets. It then
+downloads those assets, verifies the checksum and tests the downloaded package
+in a fresh installation, including actual MCP calls. Publish the draft only
+after this workflow passes. This does not publish to npm or require an
 npm account. The workflow refuses a package with no reuse license.
 
 ## Then npm and discovery
 
 Verify an npm account/scope controlled by the owner. `@automatron-workflows/hardwire`
 is a candidate, not a verified identity. Rename the package and regenerate its
-lockfile, resolve license metadata, and remove `private: true` only for the
+lockfile, retain MIT license metadata, and remove `private: true` only for the
 intentional package release. Never direct users to `npm install hardwire`, which
 can resolve to unrelated software.
 

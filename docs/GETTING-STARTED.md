@@ -101,8 +101,8 @@ real evidence without representing synthetic examples as a benchmark.
 
 ## Use it from another local project
 
-The owner can test the checkout as a local package. Outside developers must
-resolve the current license restriction before reuse. In a separate project:
+The MIT-licensed checkout can be installed as a local package. In a separate
+project:
 
 ```sh
 npm install /absolute/path/to/hardwire
