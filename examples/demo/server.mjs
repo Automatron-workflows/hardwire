@@ -12,6 +12,12 @@ import { dirname, join } from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
 const HERE = dirname(fileURLToPath(import.meta.url));
+const ROOT = join(HERE, '../..');
+const ASSETS = [
+  'examples/catalogue.mjs',
+  ...['index.html', 'styles.css', 'app.mjs', 'model.mjs', 'worker.mjs', 'samples.mjs'].map(name => `playground/${name}`),
+  ...['browser', 'panel-schema', 'canonical', 'infer-html', 'mcp', 'score'].map(name => `src/${name}.mjs`),
+];
 const DEFAULT_PORT = 8787;
 const HOST = "127.0.0.1";
 
@@ -43,15 +49,26 @@ export async function createDemoServer({
     readFile(pagePath, "utf8"),
   ]);
 
+  const assets = new Map(await Promise.all(ASSETS.map(async path => [`/${path}`, await readFile(join(ROOT, path))])));
   const server = createServer((request, response) => {
-    const url = new URL(request.url ?? "/", `http://${HOST}`);
     const send = (status, headers, body) => {
       response.writeHead(status, headers);
       response.end(request.method === "HEAD" ? undefined : body);
     };
 
+    let url;
+    try { url = new URL(request.url ?? "/", `http://${HOST}`); }
+    catch { send(400, TEXT_HEADERS, "invalid request URL\n"); return; }
+
     if (request.method !== "GET" && request.method !== "HEAD") {
       send(405, { ...TEXT_HEADERS, allow: "GET, HEAD" }, "the demo does not execute writes\n");
+      return;
+    }
+
+    const assetPath = url.pathname === '/playground/' ? '/playground/index.html' : url.pathname;
+    if (assets.has(assetPath)) {
+      const type = assetPath.endsWith('.mjs') ? 'text/javascript' : assetPath.endsWith('.css') ? 'text/css' : 'text/html';
+      send(200, { 'content-type': `${type}; charset=utf-8`, 'cache-control': 'no-store', 'x-content-type-options': 'nosniff' }, assets.get(assetPath));
       return;
     }
 
@@ -116,13 +133,14 @@ function parsePort(argv) {
 async function main() {
   const { server, origin } = await startDemo({ port: parsePort(process.argv.slice(2)) });
   process.stdout.write(`Hardwire demo serving ${origin}\n`);
+  process.stdout.write(`  playground  ${origin}/playground/\n`);
   process.stdout.write(`  panel  ${origin}/.well-known/hardwire.json\n`);
   process.stdout.write("\nTry, in another terminal:\n");
   process.stdout.write(`  node src/cli.mjs probe ${origin} --allow-private --fail-under 30\n`);
   process.stdout.write(`  node src/cli.mjs infer ${origin} --allow-private\n`);
   process.stdout.write(`  node src/cli.mjs infer ${origin} --allow-private --draft > /tmp/hardwire-draft.json\n`);
   process.stdout.write(`  node src/cli.mjs compile /tmp/hardwire-draft.json\n`);
-  process.stdout.write("\nCtrl-C to stop. The demo executes nothing and stores nothing.\n");
+  process.stdout.write("\nCtrl-C to stop. The browser searches fake data; the server performs no writes.\n");
 
   const stop = () => server.close(() => process.exit(0));
   process.on("SIGINT", stop);

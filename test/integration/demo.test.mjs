@@ -58,3 +58,25 @@ test('documented local probe and inference commands succeed against the demo', a
   const inferred = await exec(process.execPath, [cli, 'infer', origin, '--allow-private', '--draft']);
   assert.equal(JSON.parse(inferred.stdout).ports.length, 3);
 });
+
+test('local playground serves its module graph and does not expose arbitrary repository files', async (t) => {
+  const { server, origin } = await startDemo({ port: 0 });
+  t.after(() => new Promise(resolve => server.close(resolve)));
+  const page = await fetch(`${origin}/playground/`);
+  assert.equal(page.status, 200);
+  assert.match(await page.text(), /Hardwire \| Try it/);
+  for (const path of ['/playground/app.mjs', '/playground/worker.mjs', '/playground/model.mjs', '/src/browser.mjs', '/src/panel-schema.mjs']) {
+    const response = await fetch(origin + path);
+    assert.equal(response.status, 200);
+    assert.match(response.headers.get('content-type'), /text\/javascript/);
+    await response.body.cancel();
+  }
+  for (const path of ['/package.json', '/src/probe.mjs', '/playground/../package.json']) {
+    const response = await fetch(origin + path);
+    assert.equal(response.status, 404);
+    await response.body.cancel();
+  }
+  const head = await fetch(`${origin}/playground/`, { method: 'HEAD' });
+  assert.equal(head.status, 200);
+  assert.equal(await head.text(), '');
+});

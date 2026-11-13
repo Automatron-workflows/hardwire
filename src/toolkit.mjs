@@ -1,8 +1,9 @@
 // Fixed offline operations. Supplied panels never become executable handlers.
-import {
-  auditPanel, canonicalJson, compilePanel, HardwireError, inferFromHtml,
-  normalizePanel, panelDigest, toPanelDraft, validateParams, verifyTrace,
-} from './index.mjs';
+import { auditPanel, HardwireError, normalizePanel, panelDigest, validateParams } from './panel.mjs';
+import { canonicalJson } from './canonical.mjs';
+import { compilePanel } from './mcp.mjs';
+import { inferFromHtml, toPanelDraft } from './infer-html.mjs';
+import { verifyTrace } from './trace.mjs';
 
 const MAX_JSON = 256 * 1024;
 const json = { type: 'string', minLength: 1, maxLength: MAX_JSON };

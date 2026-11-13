@@ -6,7 +6,7 @@
 // explainable rather than clever, so two people scoring the same pair of panels
 // get the same result.
 import { canonicalJson } from "./canonical.mjs";
-import { CONFIRMATIONS, HardwireError, normalizePanel } from "./panel.mjs";
+import { CONFIRMATIONS, HardwireError, normalizePanel } from "./panel-schema.mjs";
 
 // Fields compared per port. `summary` is excluded on purpose: two people will
 // never word it identically, and a wording difference is not an inference bug.

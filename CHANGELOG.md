@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.6.0: 13 November 2026
+
+Adds a browser demo with one guided journey from a catalogue search to an
+inferred action contract and a direct call. Invalid inputs stop before the fixed
+fake data handler runs. The new `hardwire/browser` entry point shares the same core as
+Node and uses platform Web Crypto for asynchronous digests. Node APIs and format
+versions remain unchanged. Adds static builds, GitHub Pages deployment, runtime
+parity tests, packaged demo checks and an architecture guide. The local demo
+serves the playground at `/playground/` through an explicit asset allowlist.
+
 ## Documentation update: 13 November 2026
 
 Clarifies the purpose, mission, vision, audience and value proposition across the

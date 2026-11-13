@@ -1,6 +1,6 @@
 {
   "name": "hardwire",
-  "version": "0.5.0",
+  "version": "0.6.0",
   "description": "Describe and validate application actions for AI agents. Open source tools for reviewing inputs, declared effects and approval requirements.",
   "type": "module",
   "private": true,
@@ -29,7 +29,8 @@
     "./infer": "./src/infer.mjs",
     "./score": "./src/score.mjs",
     "./corpus": "./src/corpus.mjs",
-    "./canonical": "./src/canonical.mjs"
+    "./canonical": "./src/canonical.mjs",
+    "./browser": "./src/browser.mjs"
   },
   "files": [
     "src",
@@ -39,7 +40,9 @@
     "README.md",
     "CHANGELOG.md",
     "CONTRIBUTING.md",
-    "SECURITY.md"
+    "SECURITY.md",
+    "playground",
+    "scripts/build-playground.mjs"
   ],
   "scripts": {
     "test": "npm run test:unit && npm run test:integration",
@@ -58,7 +61,8 @@
     "test:package": "node scripts/check-package.mjs",
     "test:unit": "node --test test/*.test.mjs",
     "test:integration": "node --test test/integration/*.test.mjs",
-    "check": "npm test && npm run validate && npm run walkthrough && npm run consumer && npm run test:mcp && npm run test:package"
+    "check": "npm test && npm run validate && npm run walkthrough && npm run consumer && npm run test:mcp && npm run test:package && npm run build:playground",
+    "build:playground": "node scripts/build-playground.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.4.0"

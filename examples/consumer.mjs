@@ -1,5 +1,6 @@
 // Application-owned consumer example. No arbitrary URL execution or credentials.
 import { createHash } from 'node:crypto';
+import { searchCatalogue } from './catalogue.mjs';
 import { resolve } from 'node:path';
 import { pathToFileURL } from 'node:url';
 import {
@@ -21,15 +22,7 @@ const reviewedDigest = panelDigest(cataloguePanel);
 
 // Replace this application function with an existing, authorized read service.
 // The model chooses arguments, never source code, URLs, headers or credentials.
-const catalogue = [
-  { id: 'lamp-1', name: 'Desk lamp' },
-  { id: 'chair-1', name: 'Reading chair' },
-];
-const handlers = new Map([
-  ['search-catalogue', ({ query }) => catalogue
-    .filter(item => item.name.toLowerCase().includes(query.toLowerCase()))
-    .map(item => ({ ...item }))],
-]);
+const handlers = new Map([['search-catalogue', searchCatalogue]]);
 
 export async function callReadTool(name, args, { panel: input = cataloguePanel } = {}) {
   const panel = normalizePanel(input);

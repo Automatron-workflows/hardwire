@@ -49,7 +49,8 @@ identifiers and links.
 
 | Item | State |
 | --- | --- |
-| GitHub prerelease | [0.5.0 published](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.5.0) on 13 November 2026 |
+| Browser playground | [Try it without installation](https://automatron-workflows.github.io/hardwire/) |
+| GitHub prerelease | [0.6.0](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.6.0) |
 | Download | Installable package and SHA256SUMS attached to the release |
 | Verification | The uploaded package was downloaded, checked and installed with real MCP calls |
 | Source license | MIT |
@@ -60,7 +61,9 @@ identifiers and links.
 
 ## First experiment to share
 
-Ask a developer already using an MCP client to inspect the sample search form in
+Share the [playground](https://automatron-workflows.github.io/hardwire/) as the
+first experience. A visitor can inspect the search example without installing
+anything. Developers already using an MCP client can then follow
 [the setup guide](MCP.md#first-task). They should infer a draft, review its declared
 rules and test invalid arguments. This demonstrates a useful workflow without
 requiring an application integration.
