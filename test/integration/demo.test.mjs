@@ -65,7 +65,7 @@ test('local playground serves its module graph and does not expose arbitrary rep
   const page = await fetch(`${origin}/playground/`);
   assert.equal(page.status, 200);
   assert.match(await page.text(), /Hardwire \| Try it/);
-  for (const path of ['/playground/app.mjs', '/playground/comparison.mjs', '/playground/worker.mjs', '/playground/model.mjs', '/src/browser.mjs', '/src/panel-schema.mjs']) {
+  for (const path of ['/playground/app.mjs', '/playground/comparison.mjs', '/playground/experiment.mjs', '/playground/experiment-model.mjs', '/playground/worker.mjs', '/playground/model.mjs', '/src/browser.mjs', '/src/panel-schema.mjs']) {
     const response = await fetch(origin + path);
     assert.equal(response.status, 200);
     assert.match(response.headers.get('content-type'), /text\/javascript/);
@@ -79,4 +79,11 @@ test('local playground serves its module graph and does not expose arbitrary rep
   const head = await fetch(`${origin}/playground/`, { method: 'HEAD' });
   assert.equal(head.status, 200);
   assert.equal(await head.text(), '');
+  const experiment = await fetch(`${origin}/playground/experiment.html`);
+  assert.equal(experiment.status, 200);
+  assert.match(await experiment.text(), /Hardwire \| Run the experiment/);
+  const css = await fetch(`${origin}/playground/experiment.css`);
+  assert.equal(css.status, 200);
+  assert.match(css.headers.get('content-type'), /text\/css/);
+  await css.body.cancel();
 });

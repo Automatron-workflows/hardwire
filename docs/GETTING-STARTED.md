@@ -1,30 +1,33 @@
 # Experiment with Hardwire
 
-This guide shows how to turn application actions into descriptions you can
-inspect and test. You will review a sample contract, infer a draft from HTML,
-check arguments and verify a call record. Use the included fake data; you do not
-need to own an app or connect a live account.
+Start with the three actions from the demo: sign in, pay an invoice and change a
+setting. Run them, change an input and see validation block it before local state
+changes. No owned app or live account is required.
 
-For the quickest start, [open the browser playground](https://automatron-workflows.github.io/hardwire/).
-Watch the silent sign in, invoice and settings comparisons. They start
-automatically; pause and replay controls sit below the scenes. Reduced motion
-shows a still comparison. The information icon explains the illustration.
-This film does not run handlers, authenticate users or move money. For executable
-local fixtures, inspect `playground/comparison.mjs` and run
-`node --test test/comparison.test.mjs` from the checkout. Those tests exercise
-actual contract validation, approval binding and local state changes.
-The live demo follows main; the versioned 0.6.0 package retains its original catalogue demo.
+[Open the working experiment](https://automatron-workflows.github.io/hardwire/experiment.html)
+or use Node 22 or newer from the current main checkout:
 
-Run the commands from the repository root with Node 22 or newer. Install
-dependencies with `npm ci --ignore-scripts`. For a guided tour without a model or
-credentials, run `npm run walkthrough`. To work through an agent client, use
-[the MCP setup guide](MCP.md).
+```sh
+npm run experiment
+npm run demo
+```
 
-The separate `npm run consumer` example calls one fixed catalogue search handler
-with `{ "query": "lamp" }`, returns the fake `Desk lamp` product and records the
-result. Read `examples/consumer.mjs` to understand that mapping before replacing
-it with an authorized service. Publishing an action description alone does not
-make it executable.
+The first command checks all three fixtures offline without package dependencies.
+The second serves the experiment at
+`http://127.0.0.1:8787/playground/experiment.html`. The browser asks for explicit
+local approval for sign in and invoice payment. The offline script simulates
+that step. Nothing connects to Google or a payment provider.
+
+[The experiment guide](EXPERIMENT.md) shows which inputs to change and follows a
+request through the validator and fixed handler. It includes JSON output and
+regression commands. These files are newer than the 0.6.0 release.
+
+The [landing demo](https://automatron-workflows.github.io/hardwire/) remains a
+silent illustration. The separate experiment runs real local state changes.
+
+To explore other toolkit features below, install dependencies with
+`npm ci --ignore-scripts`. Run `npm run walkthrough` for a format tour, or follow
+[the MCP setup guide](MCP.md) for the five agent inspection tools.
 
 ## 1. Inspect an explicit contract
 

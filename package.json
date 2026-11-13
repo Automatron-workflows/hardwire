@@ -54,6 +54,7 @@
     "demo": "node examples/demo/server.mjs",
     "walkthrough": "node examples/walkthrough.mjs",
     "consumer": "node examples/consumer.mjs",
+    "experiment": "node examples/experiment.mjs",
     "mcp": "node src/mcp-server.mjs",
     "mcp:config": "node scripts/client-config.mjs",
     "test:mcp": "node scripts/check-mcp.mjs",
@@ -61,7 +62,7 @@
     "test:package": "node scripts/check-package.mjs",
     "test:unit": "node --test test/*.test.mjs",
     "test:integration": "node --test test/integration/*.test.mjs",
-    "check": "npm test && npm run validate && npm run walkthrough && npm run consumer && npm run test:mcp && npm run test:package && npm run build:playground",
+    "check": "npm test && npm run validate && npm run experiment && npm run walkthrough && npm run consumer && npm run test:mcp && npm run test:package && npm run build:playground",
     "build:playground": "node scripts/build-playground.mjs"
   },
   "dependencies": {

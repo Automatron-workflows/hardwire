@@ -46,10 +46,14 @@ try {
   const version = runNpm(['exec', '--offline', '--', 'hardwire', '--version'], consumer);
   assert.equal(version.trim(), metadata.version);
   execFileSync(process.execPath, [join(installed, 'examples/consumer.mjs')], { cwd: consumer, stdio: 'pipe', timeout: 10000 });
+  const experiment = JSON.parse(execFileSync(process.execPath, [join(installed, 'examples/experiment.mjs'), '--json'], { cwd: consumer, encoding: 'utf8', timeout: 10000 }));
+  assert.equal(experiment.localOnly, true);
+  assert.deepEqual(experiment.results.map(result => result.scenario), ['signin', 'payment', 'settings']);
+  assert.ok(experiment.results.every(result => result.duplicateRejected && result.blocked.every(item => item.stateUnchanged)));
   assert.equal(runNpm(['exec', '--offline', '--', 'hardwire-mcp', '--version'], consumer).trim(), metadata.version);
   execFileSync(process.execPath, [join(root, 'scripts/check-mcp.mjs'), join(consumer, 'node_modules/.bin/hardwire-mcp')],
     { cwd: consumer, stdio: 'pipe', timeout: 40000 });
-  console.log(`Package smoke check passed: ${metadata.name}@${metadata.version}; installed ESM, CLI, consumer and MCP server.`);
+  console.log(`Package smoke check passed: ${metadata.name}@${metadata.version}; installed ESM, CLI, consumer, three action experiment and MCP server.`);
 } finally {
   await rm(temp, { recursive: true, force: true });
 }

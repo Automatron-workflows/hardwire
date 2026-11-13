@@ -2,7 +2,7 @@
 
 ## What we are offering
 
-**Make software understandable to AI agents.**
+**Agentic actions. Without the clicks.**
 
 Hardwire helps developers describe application actions and check their inputs,
 declared effects and approval requirements before connecting those actions to
@@ -21,8 +21,8 @@ and test. They can catch invalid arguments and contradictory declarations before
 connecting an agent to application code. The toolkit helps prepare an integration;
 it does not establish that a described endpoint behaves safely.
 
-The [README](../README.md) is the public overview. [MCP setup](MCP.md) takes a
-reader from installation to a concrete experiment.
+The [README](../README.md) is the public overview. The [three action experiment](EXPERIMENT.md)
+is the first hands on task. [MCP setup](MCP.md) connects the inspection toolkit.
 
 ## Public description
 
@@ -49,7 +49,8 @@ identifiers and links.
 
 | Item | State |
 | --- | --- |
-| Browser playground | [Try it without installation](https://automatron-workflows.github.io/hardwire/) |
+| Visual demo | [Watch the three scenes](https://automatron-workflows.github.io/hardwire/) |
+| Working experiment | [Run the three local actions](https://automatron-workflows.github.io/hardwire/experiment.html) |
 | GitHub prerelease | [0.6.0](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.6.0) |
 | Download | Installable package and SHA256SUMS attached to the release |
 | Verification | The uploaded package was downloaded, checked and installed with real MCP calls |
@@ -61,19 +62,27 @@ identifiers and links.
 
 ## First experiment to share
 
-Share the [playground](https://automatron-workflows.github.io/hardwire/) as the
-first experience. Three silent animated comparisons show Google sign in, payment
-and settings through cursor navigation and direct paths. They need no installation
-or account connection. These are illustrations, not real executions or speed
-benchmarks. Pause and replay are built in. Developers already using an MCP client
-can then follow
-[the setup guide](MCP.md#first-task). They should infer a draft, review its declared
-rules and test invalid arguments. This demonstrates a useful workflow without
-requiring an application integration.
+Share the [film](https://automatron-workflows.github.io/hardwire/) and its **Try it**
+link to the [working experiment](https://automatron-workflows.github.io/hardwire/experiment.html).
+The invitation is concrete:
 
-The release page contains installation instructions and a downloadable package.
-Use its exact version link when sharing a reproducible experiment. Public
-availability is established; independent usage and demand still need evidence.
+> Run the three actions from the demo. Change an input. Watch validation stop an
+> invalid request before local state changes.
+
+Sign in requires local user consent, invoice payment requires local owner
+approval, and the reversible setting runs without confirmation. Visitors can
+inspect the actual request, compiled tool description, state and call record.
+All data and handlers are fixed fixtures. The film illustrates the idea; the
+experiment executes local JavaScript. Neither connects accounts or moves money.
+
+The current main checkout also runs all three with `npm run experiment`, without
+installing dependencies. The 0.6.0 release predates this experiment. Use the
+current source link until a new versioned package has been published and verified.
+
+Ask evaluators to report which scenario they tried, whether they finished without
+help, what changed and what was confusing. The repository includes an experiment
+feedback issue form. Public availability is established; independent usage and
+demand still need evidence.
 
 ## Preparing later releases
 

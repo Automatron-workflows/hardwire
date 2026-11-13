@@ -27,6 +27,8 @@ flowchart TD
 | `toolkit.mjs`, `mcp-server.mjs` | Expose five fixed inspection tools through the official MCP SDK | Stdio transport; no supplied action execution |
 | `playground/model.mjs`, `worker.mjs` | Keep the bounded inspection helpers available for experiments | Worker messaging only |
 | `playground/comparison.mjs` | Validate and dispatch fixed session, invoice and preference handlers; bind approval to exact requests | Local fixtures and call records |
+| `playground/experiment-model.mjs`, `experiment.mjs` | Review requests, collect explicit local approval and show fixture results | Browser memory and DOM |
+| `examples/experiment.mjs` | Exercise all three handlers and assert rejection, result and duplicate behavior | Local fixtures and stdout |
 | `examples/calendar.mjs` | Plan and apply an approved batch with conflict checks and undo | In memory calendar example |
 | `playground/app.mjs` | Render a silent SVG film with pause, replay and visibility controls | Local DOM only |
 
@@ -58,7 +60,13 @@ illustration, not a benchmark or latency promise.
 `playground/comparison.mjs` remains a separate executable developer example with
 three fixed ports: `start-session`, `pay-invoice` and `set-preferences`. It uses the
 portable core to pin the contract digest, validate exact arguments and dispatch
-only known local fixture handlers. It is not loaded by the public film.
+only known local fixture handlers. It is not loaded by the public film. The separate `experiment.html` page imports
+it through `experiment-model.mjs`, which snapshots reviewed arguments and cancels
+pending approval when an input changes. The UI only dispatches after a user
+action, exposes actual state and records, and resets into a new fixture. Each
+scenario is isolated; the sign in fixture does not authorize the payment fixture.
+The Node experiment uses the same handler module and simulates the local approval
+step while asserting outcomes and rejection behavior.
 Sign in requires a user approval object and payment requires an owner approval
 object. These are one use grants scoped to the exact arguments and instance.
 Their levels are local assertions, not remote authentication. Concurrent duplicate
@@ -74,7 +82,8 @@ is also separate from the film. Page delivery uses the hosting provider.
 `npm run demo` serves the playground at `/playground/` and keeps the original
 fixture origin at `/` for probe and inference experiments. The server serves an
 explicit asset allowlist. It does not expose repository files through arbitrary
-paths. The packaged demo includes the same assets as the checkout.
+paths. A freshly built package includes the same assets as the checkout. The existing
+0.6.0 release remains unchanged and predates the new experiment.
 
 `npm run build:playground` copies only portable source modules, static assets and
 the license into `output/playground`. There is no bundler or third party script.

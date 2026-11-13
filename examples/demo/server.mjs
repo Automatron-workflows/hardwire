@@ -14,7 +14,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, '../..');
 const ASSETS = [
-  ...['index.html', 'styles.css', 'app.mjs', 'model.mjs', 'worker.mjs', 'samples.mjs', 'comparison.mjs'].map(name => `playground/${name}`),
+  ...['index.html', 'styles.css', 'app.mjs', 'model.mjs', 'worker.mjs', 'samples.mjs', 'comparison.mjs', 'experiment.html', 'experiment.css', 'experiment.mjs', 'experiment-model.mjs'].map(name => `playground/${name}`),
   ...['browser', 'panel-schema', 'canonical', 'infer-html', 'mcp', 'score'].map(name => `src/${name}.mjs`),
 ];
 const DEFAULT_PORT = 8787;
@@ -133,13 +133,14 @@ async function main() {
   const { server, origin } = await startDemo({ port: parsePort(process.argv.slice(2)) });
   process.stdout.write(`Hardwire demo serving ${origin}\n`);
   process.stdout.write(`  playground  ${origin}/playground/\n`);
+  process.stdout.write(`  experiment  ${origin}/playground/experiment.html\n`);
   process.stdout.write(`  panel  ${origin}/.well-known/hardwire.json\n`);
   process.stdout.write("\nTry, in another terminal:\n");
   process.stdout.write(`  node src/cli.mjs probe ${origin} --allow-private --fail-under 30\n`);
   process.stdout.write(`  node src/cli.mjs infer ${origin} --allow-private\n`);
   process.stdout.write(`  node src/cli.mjs infer ${origin} --allow-private --draft > /tmp/hardwire-draft.json\n`);
   process.stdout.write(`  node src/cli.mjs compile /tmp/hardwire-draft.json\n`);
-  process.stdout.write("\nCtrl-C to stop. The browser film is illustrative; the server performs no writes.\n");
+  process.stdout.write("\nCtrl-C to stop. The film is illustrative. The experiment changes browser memory only. The server performs no writes.\n");
 
   const stop = () => server.close(() => process.exit(0));
   process.on("SIGINT", stop);

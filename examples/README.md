@@ -1,11 +1,17 @@
 # Examples
 
+Start with **`npm run experiment`**. It runs the three actions from the demo:
+sign in, invoice payment and settings. It checks rejected inputs, local approvals,
+state readback and duplicate rejection without dependencies or external services.
+See [the experiment guide](../docs/EXPERIMENT.md).
+
 Run `npm run consumer` for an application-owned read-handler integration. It
 returns a fake catalogue product and records its checked result; see
 `consumer.mjs`. `npm run walkthrough` demonstrates the format helpers offline.
 
 | Path | What it is | Try it with |
 | --- | --- | --- |
+| `experiment.mjs` | The three demo actions through real validation and fixed local handlers. | `npm run experiment` |
 | `example-panel.json` | A complete panel for a fictional shop, including every effect class. | `validate`, `audit`, `compile`, `trace` |
 | `demo/` | A local HTTP origin that publishes a panel and serves forms. | `npm run demo`, then `probe` and `infer` |
 | `corpus/` | Three synthetic HTML fixtures paired with hand-written panels. | `corpus` |

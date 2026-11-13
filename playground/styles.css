@@ -5,8 +5,9 @@ a { color: inherit; text-decoration: none; }
 button { font: inherit; border: 0; cursor: pointer; color: inherit; background: transparent; }
 a, button { -webkit-tap-highlight-color: transparent; }
 a:focus-visible, button:focus-visible { outline: 2px solid #c9e4b0; outline-offset: 5px; border-radius: 5px; }
-header { padding: 28px 42px; }
+header { padding: 28px 42px; display: flex; align-items: center; justify-content: space-between; }
 header a { font-size: 25px; font-weight: 600; letter-spacing: -1.2px; }
+header .try-link { font-size: 13px; font-weight: 400; letter-spacing: 0; color: #c3d2b3; padding: 10px 0; }
 main { max-width: 1192px; margin: 0 auto; padding: 28px 36px 0; }
 h1 { font-size: clamp(48px,6.5vw,76px); line-height: 1.03; letter-spacing: -.065em; font-weight: 500; margin: 0 0 37px; }
 h1 span { color: #777875; }
