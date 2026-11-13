@@ -1,6 +1,6 @@
 {
   "name": "hardwire",
-  "version": "0.6.0",
+  "version": "0.7.0",
   "description": "Describe and validate application actions for AI agents. Open source tools for reviewing inputs, declared effects and approval requirements.",
   "type": "module",
   "private": true,
@@ -18,7 +18,8 @@
   },
   "bin": {
     "hardwire": "./src/cli.mjs",
-    "hardwire-mcp": "./src/mcp-server.mjs"
+    "hardwire-mcp": "./src/mcp-server.mjs",
+    "hardwire-experiment": "./examples/experiment.mjs"
   },
   "exports": {
     ".": "./src/index.mjs",
@@ -42,7 +43,9 @@
     "CONTRIBUTING.md",
     "SECURITY.md",
     "playground",
-    "scripts/build-playground.mjs"
+    "scripts/build-playground.mjs",
+    "CODE_OF_CONDUCT.md",
+    "SUPPORT.md"
   ],
   "scripts": {
     "test": "npm run test:unit && npm run test:integration",

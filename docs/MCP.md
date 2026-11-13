@@ -57,6 +57,25 @@ Launch `node src/mcp-server.mjs` directly from clients. `npm run mcp` without
 `--silent` can print npm's banner to the protocol stream. A terminal waiting
 quietly is expected: the server waits for an MCP client, not a browser.
 
+## Verified client checks
+
+On 13 November 2026, the official SDK 2.4.0 client listed and called all five tools
+through a fresh installed package. MCP Inspector 2.0.0 independently listed all
+five tools and called `hardwire_validate_params` against the experiment invoice:
+2400 cents returned `valid: true` and `executed: false`; 2500 cents returned
+`isError: true` and Inspector exit 5.
+
+Reproduce discovery from a checkout with Node 24.16 or a compatible Node version:
+
+```sh
+npx --yes --ignore-scripts @modelcontextprotocol/inspector@2.0.0 --cli node src/mcp-server.mjs --method tools/list
+```
+
+This pins the Inspector version actually tested. Its CLI is a second protocol
+client, not proof of a successful conversational workflow in a desktop agent.
+VS Code and native Codex setup remain unverified in their host UIs. The attempted
+VS Code check did not reach a running client. [Help verify a native client](https://github.com/Automatron-workflows/hardwire/issues/17).
+
 ## First task
 
 Ask your connected agent:

@@ -50,6 +50,9 @@ try {
   assert.equal(experiment.localOnly, true);
   assert.deepEqual(experiment.results.map(result => result.scenario), ['signin', 'payment', 'settings']);
   assert.ok(experiment.results.every(result => result.duplicateRejected && result.blocked.every(item => item.stateUnchanged)));
+  const executable = JSON.parse(runNpm(['exec', '--offline', '--', 'hardwire-experiment', 'payment', '--json'], consumer));
+  assert.equal(executable.results[0].scenario, 'payment');
+  assert.equal(executable.results[0].after.invoicePaid, true);
   assert.equal(runNpm(['exec', '--offline', '--', 'hardwire-mcp', '--version'], consumer).trim(), metadata.version);
   execFileSync(process.execPath, [join(root, 'scripts/check-mcp.mjs'), join(consumer, 'node_modules/.bin/hardwire-mcp')],
     { cwd: consumer, stdio: 'pipe', timeout: 40000 });

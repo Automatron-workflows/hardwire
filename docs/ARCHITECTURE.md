@@ -43,7 +43,8 @@ provides hashing in both environments.
 The public page is a silent SVG film. Three parallel scenes illustrate Google
 sign in, an invoice payment and email settings. A cursor progresses through
 interface states while a direct path reaches the same pictured outcome.
-`app.mjs` contains only fixed artwork and a bounded animation clock. It does not
+`art.mjs` supplies fixed SVG artwork shared by the film and experiment.
+`app.mjs` contains the film scenes and a bounded animation clock. It does not
 import the executor examples, issue approval objects, authenticate users, call
 application handlers or send network requests. The scenes describe an integration
 with authorized sessions and approved payments; they do not bypass those duties.
@@ -65,6 +66,10 @@ it through `experiment-model.mjs`, which snapshots reviewed arguments and cancel
 pending approval when an input changes. The UI only dispatches after a user
 action, exposes actual state and records, and resets into a new fixture. Each
 scenario is isolated; the sign in fixture does not authorize the payment fixture.
+Visual phases follow model state. Review stops at a lock, errors stop the route,
+and a completed route appears only after the handler resolves. There is no
+simulated wait to suggest a measured speed improvement. The native dialog keeps
+input editing and technical output optional, traps focus and supports Escape.
 The Node experiment uses the same handler module and simulates the local approval
 step while asserting outcomes and rejection behavior.
 Sign in requires a user approval object and payment requires an owner approval
@@ -82,8 +87,8 @@ is also separate from the film. Page delivery uses the hosting provider.
 `npm run demo` serves the playground at `/playground/` and keeps the original
 fixture origin at `/` for probe and inference experiments. The server serves an
 explicit asset allowlist. It does not expose repository files through arbitrary
-paths. A freshly built package includes the same assets as the checkout. The existing
-0.6.0 release remains unchanged and predates the new experiment.
+paths. The 0.7.0 package includes both the film and experiment. The
+`hardwire-experiment` binary runs the three fixtures from an installed package.
 
 `npm run build:playground` copies only portable source modules, static assets and
 the license into `output/playground`. There is no bundler or third party script.

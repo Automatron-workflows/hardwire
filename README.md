@@ -12,10 +12,23 @@ API key.
 
 [Watch the demo](https://automatron-workflows.github.io/hardwire/)
 · [Run the three actions](https://automatron-workflows.github.io/hardwire/experiment.html)
-· [Download the release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.6.0)
+· [Download the release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.7.0)
 · [Connect an agent](docs/MCP.md) · [Explore without an agent](docs/GETTING-STARTED.md)
 
 [![Tests](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml/badge.svg)](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml)
+
+[![Three illustrated action paths: sign in, invoice payment and settings](docs/assets/demo.png)](https://automatron-workflows.github.io/hardwire/)
+
+## Try it in one command
+
+Use Node 22 or newer. This downloads the versioned GitHub package and checks all
+three local actions, including invalid inputs and approval requirements:
+
+```sh
+npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.7.0/hardwire-0.7.0.tgz hardwire-experiment
+```
+
+No app, account or API key is needed. For a visual journey, [run the experiment](https://automatron-workflows.github.io/hardwire/experiment.html).
 
 ## Why Hardwire exists
 
@@ -37,7 +50,7 @@ operations, while applications retain control over access and approvals.
 
 ## What you can use today
 
-Version 0.6.0 includes a browser playground, portable library, Node.js CLI and local
+Version 0.7.0 includes a browser playground, portable library, Node.js CLI and local
 MCP server. Model Context Protocol, or MCP, lets an agent client call tools.
 Hardwire exposes five tools for inspecting and checking supplied data.
 
@@ -95,6 +108,9 @@ provider or API key is needed.
 | Pay an invoice | Change €24 to €25, then restore it and approve | The fixture invoice becomes paid |
 | Change a setting | Try a string instead of a boolean, then send valid input | Marketing emails turn off |
 
+The experiment starts with one action and advances through all three. Open
+**Inputs & code** to change the request or inspect the actual result and contract.
+
 The film remains an illustration. The experiment executes JavaScript against
 local fixtures. Google sign in is simulated and no money moves. Approval levels
 are local assertions, not verified identities.
@@ -131,9 +147,8 @@ they do not execute the three fixture actions.
 For the format tour, run `npm run walkthrough`. The separate `npm run consumer`
 example demonstrates a fixed catalogue read handler.
 
-The live site and experiment follow main. The [0.6.0 release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.6.0)
-provides an older installable package and checksum; it does not contain this new
-experiment. Hardwire is not published on npm or listed in the MCP Registry.
+The live site follows main. The [0.7.0 release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.7.0)
+contains the three action experiment, toolkit and checksum. Hardwire is not published on npm or listed in the MCP Registry.
 Do not use `npm install hardwire` to obtain this project.
 
 ## The format in one example
@@ -179,6 +194,15 @@ See [the roadmap](docs/ROADMAP.md) for the open evidence and integration gates.
 
 Hardwire works alongside APIs and MCP. There is no WebMCP adapter or general
 website executor. [Integration notes](docs/INTEGRATION.md) explain the boundaries.
+
+## Help shape Hardwire
+
+[Start here](https://github.com/Automatron-workflows/hardwire/discussions/18).
+Run one action, change one input and share what happened in
+[Show and tell](https://github.com/Automatron-workflows/hardwire/discussions/categories/show-and-tell).
+Ask for help in [Q&A](https://github.com/Automatron-workflows/hardwire/discussions/categories/q-a),
+or pick a [first contribution](https://github.com/Automatron-workflows/hardwire/issues?q=is%3Aissue%20is%3Aopen%20label%3A%22good%20first%20issue%22).
+See [support](SUPPORT.md) and [community guidelines](CODE_OF_CONDUCT.md).
 
 ## Go deeper
 
