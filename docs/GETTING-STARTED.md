@@ -5,6 +5,11 @@ inspect and test. You will review a sample contract, infer a draft from HTML,
 check arguments and verify a call record. Use the included fake data; you do not
 need to own an app or connect a live account.
 
+For the quickest start, [open the browser playground](https://automatron-workflows.github.io/hardwire/).
+Search for a lamp, let Hardwire describe the form, then call the fixed demo
+action with valid and invalid arguments. The same fake catalogue powers the UI
+and the direct call. Download the inferred contract at the end.
+
 Run the commands from the repository root with Node 22 or newer. Install
 dependencies with `npm ci --ignore-scripts`. For a guided tour without a model or
 credentials, run `npm run walkthrough`. To work through an agent client, use
@@ -66,6 +71,9 @@ Terminal one:
 npm run demo
 ```
 
+Open `http://127.0.0.1:8787/playground/` for the interactive demo.
+The root URL remains the HTML fixture used by these CLI commands.
+
 Terminal two:
 
 ```sh
@@ -123,9 +131,10 @@ console.log(compilePanel(panel));
 ```
 
 Do not run `npm install hardwire` expecting this repository. It is not published
-on npm, and the package name has not been reserved. Current code is Node.js ESM;
-it is not a React SDK that runs in a browser. A React app can serve the static panel,
-while its backend or a trusted Node integration uses the library.
+on npm, and the package name has not been reserved. Use `hardwire/browser` for portable inference, validation and compilation in a
+browser application. Its `panelDigestAsync` uses Web Crypto over HTTPS or localhost.
+The Node entry point retains synchronous hashing, traces and network helpers.
+See [the API reference](API.md) and [architecture](ARCHITECTURE.md).
 
 ## Troubleshooting
 

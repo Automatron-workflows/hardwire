@@ -1,6 +1,6 @@
 # Public API
 
-Node.js ESM. Core helpers use only Node built-ins; the MCP server uses the official SDK. Import from `hardwire` after a local
+ES modules for Node.js and browsers. The MCP server uses the official SDK. Import from `hardwire` after a local
 package install, or from `./src/index.mjs` inside the checkout. Subpath exports
 are listed in `package.json`. Functions are synchronous unless marked async.
 
@@ -108,3 +108,22 @@ invented reversibility, and invented mutations always fail the pass predicate.
 
 Other exports: `DEFAULT_THRESHOLD`, `INFERENCE_VERSION`, `SIGNALS`,
 `ROBOTS_CAP`, `WEBMCP_WEIGHT`. Discovery paths and weights are experimental.
+
+## Browser entry point
+
+After installing the release package, a browser bundler can use:
+
+```js
+import { inferFromHtml, toPanelDraft, compilePanel, panelDigestAsync } from 'hardwire/browser';
+const draft = toPanelDraft(inferFromHtml(html, { origin: 'https://example.com' }));
+const tools = compilePanel(draft);
+const digest = await panelDigestAsync(draft);
+```
+
+This entry point exports panel normalization, argument validation, auditing,
+canonical JSON, static HTML inference, draft creation, MCP compilation and panel
+comparison. It has no Node imports or runtime dependencies. Hashing is asynchronous
+and requires Web Crypto in a secure browser context such as HTTPS or localhost.
+There is no browser export for URL fetching, corpus filesystem reads or traces.
+The Node API is unchanged. See [architecture](ARCHITECTURE.md) for the exact
+module boundaries.

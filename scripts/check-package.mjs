@@ -29,9 +29,18 @@ try {
     `import {normalizePanel,compilePanel} from ${JSON.stringify(metadata.name)}; console.log(compilePanel(normalizePanel({panel:'hardwire.panel/1',origin:'https://example.com',ports:[{id:'read-status',kind:'read',summary:'Read status.'}]}))[0].name);`],
   { cwd: consumer, encoding: 'utf8', timeout: 10000 });
   assert.equal(imported.trim(), 'read_status');
+  const portable = execFileSync(process.execPath, ['--input-type=module', '-e',
+    `import {panelDigestAsync} from '${metadata.name}/browser'; console.log(await panelDigestAsync({panel:'hardwire.panel/1',origin:'https://example.com',ports:[{id:'read-status',kind:'read',summary:'Read status.'}]}));`],
+  { cwd: consumer, encoding: 'utf8', timeout: 10000 });
+  assert.match(portable.trim(), /^sha256:[a-f0-9]{64}$/);
   const installed = join(consumer, 'node_modules', ...metadata.name.split('/'));
   const installedMetadata = JSON.parse(await readFile(join(installed, 'package.json'), 'utf8'));
   assert.equal(installedMetadata.version, metadata.version);
+  assert.match(await readFile(join(installed, 'playground/index.html'), 'utf8'), /Hardwire \| Try it/);
+  const demo = execFileSync(process.execPath, ['--input-type=module', '-e',
+    `import {createDemoServer} from './node_modules/${metadata.name}/examples/demo/server.mjs'; const server = await createDemoServer(); server.close(); console.log('assets loaded');`],
+  { cwd: consumer, encoding: 'utf8', timeout: 10000 });
+  assert.equal(demo.trim(), 'assets loaded');
   assert.equal(installedMetadata.license, 'MIT');
   assert.match(await readFile(join(installed, 'LICENSE'), 'utf8'), /Permission is hereby granted, free of charge/);
   const version = runNpm(['exec', '--offline', '--', 'hardwire', '--version'], consumer);

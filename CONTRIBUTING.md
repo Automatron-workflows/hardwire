@@ -4,8 +4,8 @@ Hardwire is MIT licensed. These instructions describe development; the same
 licence covers contributions unless a file says otherwise.
 
 Use Node 22 or newer (`nvm use` pins 24.16). The MCP transport uses the pinned
-official SDK. The core format modules still use only Node built-ins; no build
-step is needed.
+official SDK. The shared core is portable JavaScript. Node hashing and network adapters use
+Node built ins. The playground needs no bundler or additional dependency.
 
 ```sh
 npm ci --ignore-scripts
@@ -17,7 +17,7 @@ and the offline API walkthrough, runnable consumer, MCP transport and package ch
 package check builds a tarball, installs it with a fresh cache in a temporary project, then
 checks its ESM exports, CLI binaries, consumer and actual MCP calls through the
 installed symlink. The official SDK client is a development dependency. CI runs the
-same command on Node 22 and 24. All checks must pass before merging.
+same command on Node 22 and 24. It also builds the static playground. All checks must pass before merging.
 The standalone `npm run corpus`
 command intentionally exits 1 on the current baseline; its expected scores and
 failure modes are asserted inside the passing test suite.
@@ -40,3 +40,16 @@ pages the parser already understands.
 Report a reproducible bug with the Node version, command, expected/actual output,
 and the smallest sanitized panel/HTML sample. Never paste credentials or private
 customer data. See `SECURITY.md` for sensitive reports.
+
+## Playground development
+
+Run `npm run demo` and open `http://127.0.0.1:8787/playground/`. Restart the server
+after changing an asset, because it reads the allowlisted files at startup.
+Walk the search, description and direct call journey. Check valid and invalid
+arguments, cancellation after editing, the contract download and a narrow mobile
+viewport. The fixed demo handler must reject changed panels before execution.
+No endpoint should receive requests based on supplied input.
+
+`npm run build:playground` writes the deployable site to `output/playground`.
+The build contains only an explicit portable module graph and static assets.
+See [architecture](docs/ARCHITECTURE.md) for deployment and rollback.

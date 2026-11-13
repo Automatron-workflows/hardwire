@@ -10,7 +10,8 @@ Start with saved HTML or an existing action description. You can inspect and
 validate it locally without owning an app, hosting a service or providing an
 API key.
 
-[Try the public release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.5.0)
+[Try the browser playground](https://automatron-workflows.github.io/hardwire/)
+· [Download the release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.6.0)
 · [Connect an agent](docs/MCP.md) · [Explore without an agent](docs/GETTING-STARTED.md)
 
 [![Tests](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml/badge.svg)](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml)
@@ -35,7 +36,7 @@ operations, while applications retain control over access and approvals.
 
 ## What you can use today
 
-Version 0.5.0 is an experimental Node.js library, command line tool and local
+Version 0.6.0 includes a browser playground, portable library, Node.js CLI and local
 MCP server. Model Context Protocol, or MCP, lets an agent client call tools.
 Hardwire exposes five tools for inspecting and checking supplied data.
 
@@ -80,10 +81,18 @@ start with the included examples or permitted HTML captures.
 
 ## Try it
 
+**[Open the playground](https://automatron-workflows.github.io/hardwire/)** to
+try a search, turn its form into an action contract and call a fixed demo
+handler directly. Try the wrong input to see validation stop the call. No installation or agent setup is needed. Inputs stay in your
+browser. The only executable action searches the included fake catalogue.
+
+To run the same playground locally after cloning and installing, use
+`npm run demo` and open `http://127.0.0.1:8787/playground/`.
+
 Use **Node 22 or newer**. CI tests Node 22 and 24.
 
 ```sh
-git clone --branch v0.5.0 --depth 1 https://github.com/Automatron-workflows/hardwire.git
+git clone --branch v0.6.0 --depth 1 https://github.com/Automatron-workflows/hardwire.git
 cd hardwire
 npm ci --ignore-scripts
 npm run test:mcp
@@ -100,7 +109,7 @@ handler search fake catalogue data, run `npm run consumer`. This example shows
 how an application integration could work; the toolkit does not execute arbitrary
 panel operations.
 
-The [GitHub release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.5.0)
+The [GitHub release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.6.0)
 also provides an installable package and checksum. Hardwire is not published on
 npm or listed in the MCP Registry. Do not use `npm install hardwire` to obtain
 this project.
@@ -156,6 +165,7 @@ website executor. [Integration notes](docs/INTEGRATION.md) explain the boundarie
 | Connect an agent and complete a first task | [MCP setup](docs/MCP.md) |
 | Explore commands and local examples | [Getting started](docs/GETTING-STARTED.md) |
 | Use the library in your code | [API reference](docs/API.md) |
+| Understand the runtime boundaries and deployment | [Architecture](docs/ARCHITECTURE.md) |
 | Understand the action format | [Specification](docs/SPEC.md) |
 | Design an application integration | [Integration](docs/INTEGRATION.md) |
 | Review limits and trust assumptions | [Safety](docs/SAFETY.md) |

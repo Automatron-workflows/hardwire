@@ -3,7 +3,7 @@
 // This is the whole point of the format: one file a site already had to write
 // for itself becomes a tool list any agent runtime can consume. Nothing here
 // executes anything and nothing is fetched.
-import { HardwireError, normalizePanel } from "./panel.mjs";
+import { HardwireError, normalizePanel } from "./panel-schema.mjs";
 
 const MAX_TOOL_NAME = 64;
 
