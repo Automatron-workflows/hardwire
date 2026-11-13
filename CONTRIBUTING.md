@@ -45,13 +45,15 @@ customer data. See `SECURITY.md` for sensitive reports.
 
 Run `npm run demo` and open `http://127.0.0.1:8787/playground/`. Restart the server
 after changing an asset, because it reads the allowlisted files at startup.
-Request the calendar move, inspect the proposed conflict resolution, cancel,
-try again, approve and undo. Verify the calendar rows change and restore, keyboard
-focus returns to the available control and a narrow viewport has no horizontal
-overflow. Expand the action log to inspect the actual calls. Keep the scripted
-agent and local sample data labels visible. Do not invent performance benchmarks.
-The calendar tests cover schema and contract rejection, approval binding,
-cancellation, stale proposals, duplicate calls, atomic changes and undo.
+Play all three comparisons. Cancel both approval dialogs, approve a fresh replay,
+and reset a running comparison. Verify both routes reach the same visible result,
+keyboard focus returns to Play or Replay, and mobile has no horizontal overflow.
+With reduced motion, cursor animation is removed and the stages complete without
+paced delays. Keep the illustrated flow and local demo labels visible. Do not
+turn the replay timings into performance claims.
+The comparison tests cover schema and contract rejection, exact approval binding,
+owner confirmation for the payment fixture, cancellation, concurrent duplicate
+calls and input isolation. The separate calendar example retains its own tests.
 
 `npm run build:playground` writes the deployable site to `output/playground`.
 The build contains only an explicit portable module graph and static assets.

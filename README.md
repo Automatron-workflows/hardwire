@@ -81,13 +81,13 @@ start with the included examples or permitted HTML captures.
 
 ## Try it
 
-**[Open the playground](https://automatron-workflows.github.io/hardwire/)** to
-move Friday's meetings to Monday. Hardwire validates the calendar's typed
-actions; the example finds available times, previews the changes, requires your
-approval and reads the result back. Undo restores the original meetings.
-No installation or account connection is needed. The calendar is sample data
-held in the current tab, driven by a scripted agent. Expand “See the actions” to
-inspect the actual contract and calls.
+**[Open the playground](https://automatron-workflows.github.io/hardwire/)** and play
+three visual comparisons: sign in, pay an invoice and change a setting. Watch a
+cursor navigate the interface while a typed action reaches the same result.
+Sign in and payment still require explicit demo approval. Hardwire validates the
+contract and arguments before a fixed local handler changes the fixture state.
+No installation, account connection or app ownership is needed. These are
+illustrated flows, not live OAuth, real payments or measured speed benchmarks.
 
 The live demo follows main. To run that version locally, check out main after
 cloning and installing, then use

@@ -6,10 +6,11 @@ check arguments and verify a call record. Use the included fake data; you do not
 need to own an app or connect a live account.
 
 For the quickest start, [open the browser playground](https://automatron-workflows.github.io/hardwire/).
-Ask to move Friday's meetings to Monday. Review the proposed times, approve the
-batch and watch the calendar update. Try Undo or cancel before approval.
-The fixed calendar handlers use Hardwire's real contract and argument validation.
-A scripted agent coordinates the example; no real calendar is connected.
+Play the sign in, invoice and settings comparisons. Each shows cursor navigation
+beside a direct action with the same outcome. Sign in and payment ask for demo
+approval before either route starts. Try Cancel, Reset and Replay.
+The handlers use Hardwire's real contract and argument validation with local
+fixtures. No account or payment provider is connected; the timings are illustrative.
 The live demo follows main; the versioned 0.6.0 package retains its original catalogue demo.
 
 Run the commands from the repository root with Node 22 or newer. Install
