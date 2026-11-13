@@ -1,131 +1,155 @@
-import { catalogue, searchCatalogue } from '../examples/catalogue.mjs';
-import { samples } from './samples.mjs';
+import { themePanel } from './theme-contract.mjs';
 
 const $ = id => document.getElementById(id);
-let contract = null;
-let active = null;
-let generation = 0;
-const sections = ['browse', 'contract', 'call'];
-const titles = ['Find a lamp.', 'Now the agent knows how.', 'Call it. Without the clicks.'];
-const status = message => { $('status').textContent = message; };
-function cancel() { generation += 1; active?.cancel(); }
-function run(operation, input) {
-  active?.cancel();
+const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+let route = 'browser';
+let controller = null;
+let animations = [];
+let point = { x: 0, y: 0 };
+const theme = () => document.documentElement.dataset.theme;
+const nextTheme = () => theme() === 'light' ? 'dark' : 'light';
+
+function applyTheme(value) {
+  if (!['light', 'dark'].includes(value)) throw new Error('Invalid theme.');
+  document.documentElement.dataset.theme = value;
+}
+function updateRequest() {
+  $('request-label').textContent = `Turn on ${nextTheme()} mode`;
+}
+function setRoute(value) {
+  route = value;
+  $('browser-route').setAttribute('aria-pressed', String(value === 'browser'));
+  $('hardwire-route').setAttribute('aria-pressed', String(value === 'hardwire'));
+  $('status').textContent = '';
+  updateRequest();
+}
+function announce(message) { $('announcement').textContent = message; }
+function pause(ms, signal) {
+  signal.throwIfAborted();
   return new Promise((resolve, reject) => {
-    const worker = new Worker(new URL('./worker.mjs', import.meta.url), { type: 'module' });
-    const finish = () => { clearTimeout(timer); worker.terminate(); if (active === job) active = null; };
-    const job = { cancel: () => { finish(); resolve({ cancelled: true }); } };
-    const timer = setTimeout(() => { finish(); reject(new Error('That took too long. Please try again.')); }, 5000);
-    active = job;
-    worker.onmessage = ({ data }) => {
-      finish();
-      if (data.error) reject(new Error(data.error.message)); else resolve(data.result);
-    };
-    worker.onerror = event => { event.preventDefault(); finish(); reject(new Error('Could not load Hardwire. Reload to try again.')); };
-    worker.postMessage({ operation, input });
+    const abort = () => { clearTimeout(timer); reject(signal.reason); };
+    const timer = setTimeout(() => { signal.removeEventListener('abort', abort); resolve(); }, ms);
+    signal.addEventListener('abort', abort, { once: true });
   });
 }
-function go(index) {
-  cancel(); status('');
-  sections.forEach((id, position) => { $(id).hidden = position !== index; });
-  for (let i = 1; i <= 3; i++) {
-    if (i === index + 1) $(`step-${i}`).setAttribute('aria-current', 'step');
-    else $(`step-${i}`).removeAttribute('aria-current');
+function clearReplay() {
+  for (const animation of animations) animation.cancel();
+  animations = [];
+  $('cursor').hidden = true;
+  $('settings').hidden = true;
+  for (const id of ['settings-link', 'appearance-link', 'light-choice', 'dark-choice']) $(id).classList.remove('hovered');
+}
+async function moveTo(id, signal) {
+  signal.throwIfAborted();
+  const rect = $(id).getBoundingClientRect();
+  const destination = { x: rect.left + rect.width * .6, y: rect.top + rect.height * .6 };
+  if (!reducedMotion.matches) {
+    const animation = $('cursor').animate([
+      { transform: `translate(${point.x}px, ${point.y}px)` },
+      { transform: `translate(${destination.x}px, ${destination.y}px)` },
+    ], { duration: 550, easing: 'cubic-bezier(.25,.1,.25,1)', fill: 'forwards' });
+    animations.push(animation);
+    const abort = () => animation.cancel();
+    signal.addEventListener('abort', abort, { once: true });
+    try { await animation.finished; }
+    finally { signal.removeEventListener('abort', abort); }
   }
-  $('title').textContent = titles[index];
-  $('title').focus({ preventScroll: true });
+  point = destination;
+  $(id).classList.add('hovered');
+  await pause(reducedMotion.matches ? 120 : 400, signal);
+  $(id).classList.remove('hovered');
 }
-function productIcon(id) {
-  const icon = document.createElement('span'); icon.className = 'object'; icon.setAttribute('aria-hidden', 'true');
-  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-  svg.setAttribute('viewBox', '0 0 40 40');
-  const path = document.createElementNS(svg.namespaceURI, 'path');
-  path.setAttribute('d', id === 'lamp-1' ? 'M13 7h14l5 15H8L13 7ZM20 22v11M12 34h16' : 'M10 21V9a3 3 0 0 1 3-3h14a3 3 0 0 1 3 3v12M8 21h24v6H8v-6ZM11 27v8M29 27v8');
-  path.setAttribute('fill', id === 'lamp-1' ? '#d6dfbd' : 'none');
-  path.setAttribute('stroke', '#526d48'); path.setAttribute('stroke-width', '1.8');
-  path.setAttribute('stroke-linejoin', 'round'); path.setAttribute('stroke-linecap', 'round');
-  svg.append(path); icon.append(svg); return icon;
+async function replayBrowser(target, signal) {
+  const rect = $('request').getBoundingClientRect();
+  point = { x: rect.right - 27, y: rect.top + rect.height / 2 };
+  $('cursor').hidden = reducedMotion.matches;
+  $('settings').hidden = false;
+  $('settings-title').textContent = 'Preferences';
+  $('settings-menu').hidden = false;
+  $('appearance-menu').hidden = true;
+  $('theme-menu').hidden = true;
+  announce('Browser replay. Opening settings.');
+  await moveTo('settings-link', signal);
+  $('settings-menu').hidden = true;
+  $('appearance-menu').hidden = false;
+  $('settings-title').textContent = 'Settings';
+  announce('Browser replay. Opening appearance.');
+  await moveTo('appearance-link', signal);
+  $('appearance-menu').hidden = true;
+  $('theme-menu').hidden = false;
+  $('settings-title').textContent = 'Appearance';
+  announce(`Browser replay. Selecting ${target} mode.`);
+  await moveTo(`${target}-choice`, signal);
+  signal.throwIfAborted();
+  applyTheme(target);
+  await pause(reducedMotion.matches ? 100 : 500, signal);
+  clearReplay();
 }
-function products(target, items) {
-  target.replaceChildren();
-  if (!items.length) { const text = document.createElement('p'); text.className = 'result-note'; text.textContent = 'No matches. Try lamp or chair.'; target.append(text); return; }
-  for (const item of items) {
-    const row = document.createElement('div'); row.className = 'product';
-    const text = document.createElement('div'); const name = document.createElement('p'); name.textContent = item.name;
-    const note = document.createElement('small'); note.textContent = 'Sample product';
-    text.append(name, note); row.append(productIcon(item.id), text); target.append(row);
-  }
+function checkedTheme(target, signal) {
+  signal.throwIfAborted();
+  return new Promise((resolve, reject) => {
+    const worker = new Worker(new URL('./worker.mjs', import.meta.url), { type: 'module' });
+    const finish = () => { clearTimeout(timer); worker.terminate(); signal.removeEventListener('abort', abort); };
+    const abort = () => { finish(); reject(signal.reason); };
+    const timer = setTimeout(() => { finish(); reject(new Error('Hardwire could not respond. Try again.')); }, 5000);
+    signal.addEventListener('abort', abort, { once: true });
+    worker.onmessage = ({ data }) => {
+      finish();
+      if (data.error) reject(new Error(data.error.message));
+      else resolve(data.result);
+    };
+    worker.onerror = event => { event.preventDefault(); finish(); reject(new Error('Could not load Hardwire. Please reload.')); };
+    worker.postMessage({ operation: 'theme', input: { panel: themePanel(), params: JSON.stringify({ theme: target }) } });
+  });
 }
-function search() {
-  cancel(); contract = null; status(''); $('describe').disabled = false;
-  products($('catalogue'), searchCatalogue({ query: $('search').value }));
-  $('describe').hidden = false; $('browse-hint').hidden = true;
-}
-async function describe() {
-  cancel(); const captured = generation;
-  $('describe').disabled = true; status('');
+async function request() {
+  if (controller) return;
+  const previous = theme();
+  const target = nextTheme();
+  const selectedRoute = route;
+  controller = new AbortController();
+  const signal = controller.signal;
+  for (const id of ['request', 'browser-route', 'hardwire-route']) $(id).disabled = true;
+  $('request').setAttribute('aria-busy', 'true');
+  $('cancel').hidden = false;
+  $('status').textContent = '';
+  $('status').classList.remove('error');
   try {
-    const result = await run('inspect', samples.search);
-    if (result.cancelled || captured !== generation) return;
-    contract = result;
-    const port = result.panel.ports[0];
-    $('action-name').textContent = result.tools[0].name;
-    $('call-name').textContent = result.tools[0].name.toUpperCase();
-    $('input-type').textContent = `query · ${port.parameters.properties.query.type}`;
-    $('effect').textContent = port.kind; $('approval').textContent = port.confirmation;
-    go(1);
-  } catch (error) { if (captured === generation) status(error.message); }
-  finally { $('describe').disabled = false; }
-}
-function clearResult() {
-  cancel(); $('run').disabled = false; $('result').hidden = true; $('result').replaceChildren(); status('');
-  $('title').textContent = titles[2];
-}
-function setArguments(query, selected) {
-  clearResult();
-  $('arguments').value = JSON.stringify({ query }, null, 2);
-  for (const id of ['lamp', 'chair', 'wrong']) $(id).setAttribute('aria-pressed', String(id === selected));
-}
-async function call() {
-  clearResult(); const captured = generation;
-  $('run').disabled = true;
-  try {
-    const result = await run('demo', { panel: contract.panel, params: $('arguments').value });
-    if (result.cancelled || captured !== generation) return;
-    $('title').textContent = 'One action. A direct result.';
-    const label = document.createElement('p'); label.className = 'result-label'; label.textContent = '✓ Input checked. Demo search completed.';
-    const list = document.createElement('div'); products(list, result.products);
-    $('result').replaceChildren(label, list); $('result').hidden = false;
+    if (selectedRoute === 'browser') {
+      await replayBrowser(target, signal);
+      signal.throwIfAborted();
+      setRoute('hardwire');
+      $('status').textContent = 'Now with Hardwire.';
+    } else {
+      const checked = await checkedTheme(target, signal);
+      signal.throwIfAborted();
+      if (checked.validated !== true || checked.theme !== target) throw new Error('The action could not be verified.');
+      $('request').classList.remove('direct');
+      // Reflow restarts the single visual pulse for subsequent calls.
+      void $('request').offsetWidth;
+      $('request').classList.add('direct');
+      applyTheme(checked.theme);
+      $('status').textContent = 'Done.';
+    }
+    announce(`${target} mode is on. ${selectedRoute === 'browser' ? 'Try the same action through Hardwire.' : 'Hardwire validated the action and this tab applied it directly.'}`);
   } catch (error) {
-    if (captured !== generation) return;
-    $('title').textContent = 'Bad input stops here.';
-    const message = document.createElement('p'); message.className = 'result-error';
-    message.textContent = `Input rejected: ${error.message}`;
-    const note = document.createElement('p'); note.className = 'result-note'; note.textContent = 'The search was not called.';
-    $('result').replaceChildren(message, note); $('result').hidden = false;
-  } finally { if (captured === generation) $('run').disabled = false; }
+    applyTheme(previous);
+    if (signal.aborted) { $('status').textContent = 'Cancelled.'; announce('Cancelled. The original theme is restored.'); }
+    else { $('status').textContent = error.message; $('status').classList.add('error'); }
+  } finally {
+    clearReplay();
+    controller = null;
+    for (const id of ['request', 'browser-route', 'hardwire-route']) $(id).disabled = false;
+    $('request').removeAttribute('aria-busy');
+    if ([document.body, $('cancel')].includes(document.activeElement)) $('request').focus({ preventScroll: true });
+    $('cancel').hidden = true;
+    updateRequest();
+  }
 }
-function restart() {
-  contract = null; $('search').value = 'lamp'; products($('catalogue'), catalogue);
-  $('describe').hidden = true; $('browse-hint').hidden = false; go(0);
-}
-$('search-button').addEventListener('click', search);
-$('search').addEventListener('keydown', event => { if (event.key === 'Enter') search(); });
-$('search').addEventListener('input', () => { cancel(); contract = null; $('describe').hidden = true; $('browse-hint').hidden = false; });
-$('describe').addEventListener('click', describe);
-$('back-browse').addEventListener('click', () => go(0));
-$('try-action').addEventListener('click', () => { go(2); setArguments($('search').value, $('search').value === 'chair' ? 'chair' : 'lamp'); });
-$('arguments').addEventListener('input', () => { clearResult(); for (const id of ['lamp', 'chair', 'wrong']) $(id).setAttribute('aria-pressed', 'false'); });
-$('run').addEventListener('click', call);
-for (const [id, query] of [['lamp', 'lamp'], ['chair', 'chair'], ['wrong', 42]]) {
-  $(id).addEventListener('click', () => { setArguments(query, id); call(); });
-}
-$('restart').addEventListener('click', restart);
-$('download').addEventListener('click', () => {
-  if (!contract?.panel) return;
-  const url = URL.createObjectURL(new Blob([JSON.stringify(contract.panel, null, 2) + '\n'], { type: 'application/json' }));
-  const link = document.createElement('a'); link.href = url; link.download = 'hardwire.panel.json';
-  document.body.append(link); link.click(); link.remove(); setTimeout(() => URL.revokeObjectURL(url), 1000);
-});
-window.addEventListener('pagehide', cancel);
-products($('catalogue'), catalogue);
+$('request').addEventListener('click', request);
+$('browser-route').addEventListener('click', () => setRoute('browser'));
+$('hardwire-route').addEventListener('click', () => setRoute('hardwire'));
+$('cancel').addEventListener('click', () => controller?.abort());
+window.addEventListener('keydown', event => { if (event.key === 'Escape') controller?.abort(); });
+window.addEventListener('pagehide', () => controller?.abort());
+updateRequest();

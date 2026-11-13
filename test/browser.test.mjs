@@ -5,8 +5,9 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import * as browser from '../src/browser.mjs';
 import * as node from '../src/index.mjs';
-import { inspect, checkArguments, runDemoSearch } from '../playground/model.mjs';
+import { inspect, checkArguments, validateThemeRequest } from '../playground/model.mjs';
 import { samples } from '../playground/samples.mjs';
+import { themePanel } from '../playground/theme-contract.mjs';
 
 test('browser and Node APIs produce identical panels, tools and digests across the corpus', async () => {
   for (const name of ['shop', 'blog', 'legacy']) {
@@ -66,20 +67,33 @@ test('playground handles empty captures, malicious markup, invalid JSON and over
 test('static build includes the runnable portable graph and only allowlisted files', async () => {
   execFileSync(process.execPath, [fileURLToPath(new URL('../scripts/build-playground.mjs', import.meta.url))]);
   const output = new URL('../output/playground/', import.meta.url);
-  assert.deepEqual((await readdir(output)).sort(), ['.nojekyll', 'LICENSE', 'examples', 'index.html', 'playground', 'src']);
+  assert.deepEqual((await readdir(output)).sort(), ['.nojekyll', 'LICENSE', 'index.html', 'playground', 'src']);
   const html = await readFile(new URL('index.html', output), 'utf8');
   assert.match(html, /\.\/playground\/app\.mjs/);
   const built = await import(new URL('playground/model.mjs', output));
   assert.equal((await built.inspect(samples.search)).digest, (await inspect(samples.search)).digest);
 });
 
-test('the journey runs only its fixed reviewed handler and rejects invalid arguments or changed contracts', async () => {
-  const { panel } = await inspect(samples.search);
-  assert.deepEqual(await runDemoSearch({ panel, params: '{"query":"lamp"}' }), {
-    products: [{ id: 'lamp-1', name: 'Desk lamp' }], executed: true, demo: true,
-  });
-  await assert.rejects(runDemoSearch({ panel, params: '{"query":42}' }), /expected a string/);
-  await assert.rejects(runDemoSearch({ panel: { ...panel, revision: 'changed' }, params: '{"query":"lamp"}' }), /hardwire_demo_unreviewed/);
-  const write = await inspect(samples.signup);
-  await assert.rejects(runDemoSearch({ panel: write.panel, params: '{"email":"fake@example.com"}' }), /hardwire_demo_unreviewed/);
+test('the demo accepts only its reviewed reversible theme contract', async () => {
+  const panel = themePanel();
+  const normalized = browser.normalizePanel(panel);
+  assert.equal(normalized.ports[0].kind, 'write');
+  assert.equal(normalized.ports[0].reversible, true);
+  assert.equal(normalized.ports[0].confirmation, 'none');
+  assert.equal(browser.compilePanel(panel)[0].name, 'set_theme');
+  for (const theme of ['light', 'dark']) {
+    assert.deepEqual(await validateThemeRequest({ panel, params: JSON.stringify({ theme }) }), { theme, validated: true });
+  }
+  await assert.rejects(validateThemeRequest({ panel: { ...panel, revision: 'changed' }, params: '{"theme":"dark"}' }), /hardwire_demo_unreviewed/);
+  await assert.rejects(validateThemeRequest({ panel: (await inspect(samples.signup)).panel, params: '{"theme":"dark"}' }), /hardwire_demo_unreviewed/);
+});
+
+test('theme requests reject invalid values and extra fields without producing an executable result', async () => {
+  for (const params of ['{}', '{"theme":42}', '{"theme":"blue"}', '{"theme":"dark","url":"https://evil.example"}', '[]', '{bad']) {
+    await assert.rejects(validateThemeRequest({ panel: themePanel(), params }));
+  }
+  const mutated = themePanel();
+  mutated.ports[0].parameters.properties.theme.enum.push('blue');
+  await assert.rejects(validateThemeRequest({ panel: mutated, params: '{"theme":"blue"}' }), /hardwire_demo_unreviewed/);
+  assert.deepEqual(await validateThemeRequest({ panel: themePanel(), params: '{"theme":"dark"}' }), { theme: 'dark', validated: true });
 });

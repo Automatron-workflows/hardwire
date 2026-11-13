@@ -1,9 +1,9 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Try a search. Turn it into an agent action. Call it directly. A hands on Hardwire demo.">
+  <meta name="description" content="Watch a browser navigate an interface. Then let Hardwire change the same page directly.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; worker-src 'self'; style-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <title>Hardwire | Try it</title>
@@ -13,44 +13,36 @@
 <body>
   <header><a href="./" aria-label="Hardwire home">hardwire</a></header>
   <main>
-    <h1 id="title" tabindex="-1">Find a lamp.</h1>
-    <div class="stage">
-      <section id="browse" aria-label="Search the sample shop">
-        <div class="card">
-          <p class="card-label">THE LITTLE SHOP</p>
-          <label class="sr-only" for="search">Search products</label>
-          <div class="search-row"><input id="search" type="search" value="lamp" placeholder="Search products" maxlength="200" autocomplete="off"><button id="search-button" type="button">Search <span aria-hidden="true">↗</span></button></div>
-          <div id="catalogue" class="products" aria-live="polite"></div>
+    <h1>Actions.<br><span>Without the clicks.</span></h1>
+    <div class="interaction" id="interaction">
+      <div class="routes" role="group" aria-label="Choose an interaction route">
+        <button id="browser-route" type="button" aria-pressed="true">Browser replay</button>
+        <button id="hardwire-route" type="button" aria-pressed="false">Hardwire</button>
+      </div>
+      <button id="request" class="request" type="button">
+        <span id="request-label">Turn on dark mode</span>
+        <span class="send" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+      </button>
+      <div class="feedback"><p id="status" role="status" aria-live="polite"></p><button id="cancel" type="button" hidden>Cancel</button></div>
+      <div id="settings" class="settings" inert hidden aria-hidden="true">
+        <div class="settings-head"><span id="settings-title">Preferences</span><span aria-hidden="true">···</span></div>
+        <div id="settings-menu" class="settings-menu">
+          <div id="settings-link" class="menu-item"><span>Settings</span><span aria-hidden="true">↗</span></div>
         </div>
-        <button class="next" id="describe" type="button" hidden>Give this action to an agent <span aria-hidden="true">→</span></button>
-        <p id="browse-hint" class="hint">Try the search.</p>
-      </section>
-      <section id="contract" aria-label="The action Hardwire inferred" hidden>
-        <div class="card contract-card">
-          <p class="card-label">HARDWIRE ACTION</p>
-          <p class="function"><span id="action-name">search</span><span class="brackets">(query)</span></p>
-          <dl><div><dt>Input</dt><dd id="input-type">query · string</dd></div><div><dt>Effect</dt><dd id="effect">read</dd></div><div><dt>Approval</dt><dd id="approval">none</dd></div></dl>
-          <span class="draft">Inferred draft · review before connecting</span>
+        <div id="appearance-menu" class="settings-menu" hidden>
+          <div class="menu-item muted">Account</div>
+          <div id="appearance-link" class="menu-item"><span>Appearance</span><span aria-hidden="true">↗</span></div>
         </div>
-        <button class="next" id="try-action" type="button">Try the action <span aria-hidden="true">→</span></button>
-        <button class="back" id="back-browse" type="button">Back</button>
-      </section>
-      <section id="call" aria-label="Call the fixed demo action" hidden>
-        <div class="card call-card">
-          <p class="card-label">CALL <span id="call-name">SEARCH</span></p>
-          <div class="choices" aria-label="Example arguments"><button type="button" id="lamp" aria-pressed="true">Lamp</button><button type="button" id="chair" aria-pressed="false">Chair</button><button type="button" id="wrong" aria-pressed="false">Wrong input</button></div>
-          <label class="sr-only" for="arguments">Action arguments as JSON</label>
-          <textarea id="arguments" rows="3" spellcheck="false" maxlength="4096" autocomplete="off">{ "query": "lamp" }</textarea>
-          <button class="run" id="run" type="button">Run action <span aria-hidden="true">↗</span></button>
-          <div id="result" aria-live="polite" class="call-result" hidden></div>
+        <div id="theme-menu" class="settings-menu theme-menu" hidden>
+          <div id="light-choice" class="theme-choice"><span class="theme-preview light-preview"></span><span>Light</span></div>
+          <div id="dark-choice" class="theme-choice"><span class="theme-preview dark-preview"></span><span>Dark</span></div>
         </div>
-        <div class="finish"><button class="back" id="restart" type="button">Start again</button><button class="back" id="download" type="button">Download contract ↗</button></div>
-      </section>
-      <p id="status" class="status" role="status" aria-live="polite"></p>
+      </div>
     </div>
-    <nav class="steps" aria-label="Demo progress"><span id="step-1" aria-current="step">1 <span>Try</span></span><i aria-hidden="true"></i><span id="step-2">2 <span>Describe</span></span><i aria-hidden="true"></i><span id="step-3">3 <span>Call</span></span></nav>
   </main>
-  <footer><span>Local demo · fake products</span><a href="https://github.com/Automatron-workflows/hardwire">Explore Hardwire ↗</a></footer>
-  <noscript><p class="status">Enable JavaScript to try the demo.</p></noscript>
+  <footer><span>Simulated agent · real local action</span><a href="https://github.com/Automatron-workflows/hardwire">GitHub ↗</a></footer>
+  <svg id="cursor" class="cursor" viewBox="0 0 28 32" aria-hidden="true" hidden><path d="M3 2v24l6-6 5 10 5-3-5-9h9Z"/></svg>
+  <p class="sr-only" id="announcement" aria-live="polite"></p>
+  <noscript><p>Enable JavaScript to try this interaction.</p></noscript>
 </body>
 </html>
