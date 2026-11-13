@@ -6,11 +6,13 @@ check arguments and verify a call record. Use the included fake data; you do not
 need to own an app or connect a live account.
 
 For the quickest start, [open the browser playground](https://automatron-workflows.github.io/hardwire/).
-Play the sign in, invoice and settings comparisons. Each shows cursor navigation
-beside a direct action with the same outcome. Sign in and payment ask for demo
-approval before either route starts. Try Cancel, Reset and Replay.
-The handlers use Hardwire's real contract and argument validation with local
-fixtures. No account or payment provider is connected; the timings are illustrative.
+Watch the silent sign in, invoice and settings comparisons. They start
+automatically; pause and replay controls sit below the scenes. Reduced motion
+shows a still comparison. The information icon explains the illustration.
+This film does not run handlers, authenticate users or move money. For executable
+local fixtures, inspect `playground/comparison.mjs` and run
+`node --test test/comparison.test.mjs` from the checkout. Those tests exercise
+actual contract validation, approval binding and local state changes.
 The live demo follows main; the versioned 0.6.0 package retains its original catalogue demo.
 
 Run the commands from the repository root with Node 22 or newer. Install

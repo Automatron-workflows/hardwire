@@ -62,11 +62,11 @@ identifiers and links.
 ## First experiment to share
 
 Share the [playground](https://automatron-workflows.github.io/hardwire/) as the
-first experience. Three visual comparisons show sign in, payment and settings
-through cursor navigation and direct actions. Both routes use the same local
-handlers and approval rules. No installation or account connection is needed.
-The cursor replay is an illustration, not a performance benchmark. Developers
-already using an MCP client can then follow
+first experience. Three silent animated comparisons show Google sign in, payment
+and settings through cursor navigation and direct paths. They need no installation
+or account connection. These are illustrations, not real executions or speed
+benchmarks. Pause and replay are built in. Developers already using an MCP client
+can then follow
 [the setup guide](MCP.md#first-task). They should infer a draft, review its declared
 rules and test invalid arguments. This demonstrates a useful workflow without
 requiring an application integration.

@@ -45,15 +45,16 @@ customer data. See `SECURITY.md` for sensitive reports.
 
 Run `npm run demo` and open `http://127.0.0.1:8787/playground/`. Restart the server
 after changing an asset, because it reads the allowlisted files at startup.
-Play all three comparisons. Cancel both approval dialogs, approve a fresh replay,
-and reset a running comparison. Verify both routes reach the same visible result,
-keyboard focus returns to Play or Replay, and mobile has no horizontal overflow.
-With reduced motion, cursor animation is removed and the stages complete without
-paced delays. Keep the illustrated flow and local demo labels visible. Do not
-turn the replay timings into performance claims.
-The comparison tests cover schema and contract rejection, exact approval binding,
-owner confirmation for the payment fixture, cancellation, concurrent duplicate
-calls and input isolation. The separate calendar example retains its own tests.
+Watch a full loop, pause midway, resume and replay. Verify keyboard controls,
+the collapsed information note and mobile layout. Motion must pause when the
+page is hidden or the film is outside the viewport. Reduced motion starts with a
+still result and disables transitions. The public film is illustrative: do not
+invoke fixture payment or session handlers during autoplay or claim measured
+performance. Keep its descriptions available to screen readers.
+
+The separate `comparison.mjs` fixture tests retain schema and contract rejection,
+exact approval binding, owner confirmation, cancellation, duplicate calls and
+input isolation. They verify those executable examples, not the film's artwork.
 
 `npm run build:playground` writes the deployable site to `output/playground`.
 The build contains only an explicit portable module graph and static assets.
