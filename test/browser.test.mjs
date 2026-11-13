@@ -71,6 +71,6 @@ test('static build includes the runnable portable graph and only allowlisted fil
   assert.match(html, /\.\/playground\/app\.mjs/);
   const built = await import(new URL('playground/model.mjs', output));
   assert.equal((await built.inspect(samples.search)).digest, (await inspect(samples.search)).digest);
-  const { createCalendar } = await import(new URL('playground/calendar.mjs', output));
-  assert.equal((await createCalendar().call({ portId: 'list-events', params: { day: 'friday' } })).events.length, 3);
+  const { createComparison } = await import(new URL('playground/comparison.mjs', output));
+  assert.equal((await createComparison('settings').run({ params: { marketingEmails: false } })).marketingEmails, false);
 });

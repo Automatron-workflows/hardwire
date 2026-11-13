@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
-import { calendarPanel, createCalendar, clock } from '../playground/calendar.mjs';
+import { calendarPanel, createCalendar, clock } from '../examples/calendar.mjs';
 
 async function plan(calendar) {
   const friday = await calendar.call({ portId: 'list-events', params: { day: 'friday' } });

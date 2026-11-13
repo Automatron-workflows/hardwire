@@ -14,7 +14,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, '../..');
 const ASSETS = [
-  ...['index.html', 'styles.css', 'app.mjs', 'model.mjs', 'worker.mjs', 'samples.mjs', 'calendar.mjs'].map(name => `playground/${name}`),
+  ...['index.html', 'styles.css', 'app.mjs', 'model.mjs', 'worker.mjs', 'samples.mjs', 'comparison.mjs'].map(name => `playground/${name}`),
   ...['browser', 'panel-schema', 'canonical', 'infer-html', 'mcp', 'score'].map(name => `src/${name}.mjs`),
 ];
 const DEFAULT_PORT = 8787;
@@ -139,7 +139,7 @@ async function main() {
   process.stdout.write(`  node src/cli.mjs infer ${origin} --allow-private\n`);
   process.stdout.write(`  node src/cli.mjs infer ${origin} --allow-private --draft > /tmp/hardwire-draft.json\n`);
   process.stdout.write(`  node src/cli.mjs compile /tmp/hardwire-draft.json\n`);
-  process.stdout.write("\nCtrl-C to stop. The browser edits only its demo calendar; the server performs no writes.\n");
+  process.stdout.write("\nCtrl-C to stop. The browser changes only local demo fixtures; the server performs no writes.\n");
 
   const stop = () => server.close(() => process.exit(0));
   process.on("SIGINT", stop);

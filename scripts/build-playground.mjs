@@ -8,7 +8,7 @@ await rm(output, { recursive: true, force: true });
 await mkdir(resolve(output, 'src'), { recursive: true });
 await mkdir(resolve(output, 'playground'), { recursive: true });
 const core = ['browser', 'panel-schema', 'canonical', 'infer-html', 'mcp', 'score'];
-const assets = ['index.html', 'styles.css', 'app.mjs', 'worker.mjs', 'model.mjs', 'samples.mjs', 'calendar.mjs'];
+const assets = ['index.html', 'styles.css', 'app.mjs', 'worker.mjs', 'model.mjs', 'samples.mjs', 'comparison.mjs'];
 for (const name of core) await copyFile(resolve(root, `src/${name}.mjs`), resolve(output, `src/${name}.mjs`));
 for (const name of assets) await copyFile(resolve(root, 'playground', name), resolve(output, 'playground', name));
 const html = await readFile(resolve(root, 'playground/index.html'), 'utf8');

@@ -1,150 +1,162 @@
-import { createCalendar, clock } from './calendar.mjs';
+import { createComparison, scenarios } from './comparison.mjs';
 
-const $ = id => document.getElementById(id);
-const calendar = createCalendar();
-let phase = 'ready';
-let proposal = null;
-let change = null;
-let discovery = null;
-let controller = null;
-const arrow = 'M5 12h14M13 6l6 6-6 6';
-const tick = 'M5 12l4 4L19 6';
-
-function row(event, before) {
-  const li = document.createElement('li');
-  li.className = 'meeting' + (before || phase === 'complete' && event.id !== 'team-sync' ? ' changed' : '') + (event.id === 'team-sync' ? ' existing' : '');
-  const marker = document.createElement('span');
-  marker.className = 'marker';
-  marker.setAttribute('aria-hidden', 'true');
-  const title = document.createElement('span');
-  title.className = 'meeting-title';
-  title.textContent = event.title;
-  const time = document.createElement('span');
-  time.className = 'meeting-time';
-  if (before && before.start !== event.start) {
-    const old = document.createElement('span');
-    old.className = 'old-time';
-    old.textContent = clock(before.start);
-    old.setAttribute('aria-label', 'Previously ' + clock(before.start) + '. Now');
-    time.append(old);
-  }
-  time.append(document.createTextNode(clock(event.start)));
-  li.append(marker, title, time);
-  return li;
+const definitions = [
+  { id: 'signin', title: 'Sign in', action: 'session.start', result: 'Signed in', approval: 'user',
+    approvalTitle: 'Demo account · Google', approvalNote: 'Local simulation. No account connects.', approvalLabel: 'Allow demo sign in',
+    stages: [
+      { page: 'Your workspace', rows: ['Projects', 'Files', 'Sign in'], target: 2 },
+      { page: 'Sign in', rows: ['Continue with Google', 'Continue with email'], target: 0 },
+      { page: 'Choose an account', rows: ['Demo account', 'Use another account'], target: 0 },
+      { page: 'Access approved', rows: ['Continue to workspace'], target: 0 },
+    ] },
+  { id: 'payment', title: 'Pay an invoice', action: 'invoice.pay', result: 'Invoice paid', approval: 'owner',
+    approvalTitle: 'Demo invoice · €24.00', approvalNote: 'Local simulation. No money moves.', approvalLabel: 'Approve demo €24',
+    stages: [
+      { page: 'Your workspace', rows: ['Overview', 'Billing', 'Settings'], target: 1 },
+      { page: 'Billing', rows: ['Payment method', 'Invoices', 'Usage'], target: 1 },
+      { page: 'Invoices', rows: ['Demo invoice · €24.00', 'Previous invoices'], target: 0 },
+      { page: 'Payment approved', rows: ['Pay €24.00'], target: 0 },
+    ] },
+  { id: 'settings', title: 'Change a setting', action: 'preferences.set', result: 'Marketing emails off',
+    stages: [
+      { page: 'Your workspace', rows: ['Projects', 'Team', 'Settings'], target: 2 },
+      { page: 'Settings', rows: ['Profile', 'Notifications', 'Appearance'], target: 1 },
+      { page: 'Notifications', rows: ['Push notifications', 'Email preferences'], target: 1 },
+      { page: 'Email preferences', rows: ['Security alerts', 'Marketing emails'], target: 1, toggle: true },
+      { page: 'Marketing emails off', rows: ['Save changes'], target: 0 },
+    ] },
+];
+const node = (tag, className, text) => {
+  const element = document.createElement(tag);
+  if (className) element.className = className;
+  if (text !== undefined) element.textContent = text;
+  return element;
+};
+const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+function pause(ms, signal) {
+  return new Promise((resolve, reject) => {
+    signal.throwIfAborted();
+    const abort = () => { clearTimeout(timer); reject(signal.reason); };
+    const timer = setTimeout(() => { signal.removeEventListener('abort', abort); resolve(); }, ms);
+    signal.addEventListener('abort', abort, { once: true });
+  });
 }
-function render() {
-  const complete = ['complete', 'undoing'].includes(phase);
-  const reviewing = ['review', 'applying'].includes(phase);
-  $('request-label').textContent = controller ? (phase === 'applying' ? 'Updating your calendar…' : phase === 'undoing' ? 'Restoring Friday…' : 'Checking your calendar…')
-    : complete ? 'Friday is clear.' : reviewing ? 'Approve ' + proposal.moves.length + ' changes' : 'Move Friday’s meetings to Monday';
-  $('request').disabled = !!controller || complete;
-  $('request').setAttribute('aria-busy', String(!!controller));
-  $('request').classList.toggle('complete', complete);
-  $('send-path').setAttribute('d', complete ? tick : arrow);
-  $('calendar-day').textContent = reviewing ? 'Friday → Monday' : complete ? 'Monday' : 'Friday';
-  $('calendar-caption').textContent = reviewing ? 'Proposed changes' : 'Demo calendar';
-  const entries = reviewing ? proposal.moves.map(move => row(move.after, move.before))
-    : calendar.snapshot().events.filter(event => event.day === (complete ? 'monday' : 'friday')).sort((a, b) => a.start - b.start).map(event => row(event));
-  $('meetings').replaceChildren(...entries);
-  $('secondary').textContent = complete ? 'Undo' : 'Cancel';
-  $('secondary').hidden = !['review', 'complete', 'planning'].includes(phase);
-  $('secondary').disabled = !!controller && phase !== 'planning';
-  if (discovery) {
-    $('details').hidden = false;
-    $('discovery').textContent = discovery.tools.length + ' typed actions discovered. Each call below passed Hardwire validation.';
-    const labels = {
-      'list-events': record => 'Read ' + record.params.day + ': ' + record.result.events.length + ' meetings.',
-      'plan-move': record => 'Checked Monday: ' + record.result.moves.length + ' available times, ' + record.result.conflicts + ' conflict avoided.',
-      'move-events': () => 'Applied the approved changes together.',
-      'undo-move': () => 'Restored the meetings after your Undo request.',
+const dialog = document.querySelector('#approval');
+let pending = null;
+const cards = [];
+
+function makeCard(definition, index) {
+  const card = node('article', 'comparison');
+  card.setAttribute('aria-label', definition.title);
+  const head = node('div', 'card-head');
+  const title = node('h2', '', definition.title);
+  const play = node('button', 'play', 'Play');
+  const controlName = () => `${play.textContent} ${definition.title.toLowerCase()} comparison`;
+  play.type = 'button'; play.setAttribute('aria-label', controlName());
+  head.append(node('span', 'number', String(index + 1).padStart(2, '0')), title, play);
+  const before = node('section', 'route before');
+  before.append(node('div', 'route-label', 'Before'));
+  const window = node('div', 'mock-window');
+  const page = node('div', 'mock-title');
+  const rows = node('div', 'mock-rows');
+  window.append(page, rows);
+  const beforeStatus = node('p', 'route-status', 'Cursor navigation');
+  before.append(window, beforeStatus);
+  const after = node('section', 'route after');
+  after.append(node('div', 'route-label', 'With Hardwire'));
+  const direct = node('div', 'direct');
+  const call = node('code', 'call', definition.action + '()');
+  const arrow = node('span', 'wire', '→'); arrow.setAttribute('aria-hidden', 'true');
+  const endpoint = node('span', 'endpoint', '↵'); endpoint.setAttribute('aria-hidden', 'true');
+  direct.append(call, arrow, endpoint);
+  const afterStatus = node('p', 'route-status', 'Direct action');
+  afterStatus.setAttribute('role', 'status');
+  after.append(direct, afterStatus);
+  card.append(head, before, after);
+  document.querySelector('#comparisons').append(card);
+  let controller = null;
+  let phase = 'ready';
+  let beforeApp, afterApp;
+  function stage(step, moving = false) {
+    page.textContent = step.page;
+    rows.replaceChildren();
+    step.rows.forEach((text, i) => {
+      const row = node('div', `mock-row${i === step.target ? ' target' : ''}`, text);
+      if (step.toggle && i === step.target) row.append(node('span', 'toggle'));
+      if (moving && i === step.target && !reducedMotion.matches) {
+        const cursor = node('span', 'cursor'); cursor.setAttribute('aria-hidden', 'true');
+        cursor.innerHTML = '<svg viewBox="0 0 24 28"><path d="M3 2v22l6-6 4 8 4-2-4-8h9Z"/></svg>';
+        row.append(cursor);
+      }
+      rows.append(row);
+    });
+  }
+  function reset() {
+    controller?.abort(); controller = null; phase = 'ready';
+    beforeApp = createComparison(definition.id); afterApp = createComparison(definition.id);
+    card.classList.remove('running', 'complete'); after.classList.remove('finished'); before.classList.remove('finished');
+    stage(definition.stages[0]); beforeStatus.textContent = 'Cursor navigation'; afterStatus.textContent = 'Direct action';
+    endpoint.textContent = '↵'; play.textContent = 'Play'; play.setAttribute('aria-label', controlName());
+  }
+  async function run(approved = false) {
+    reset();
+    controller = new AbortController(); const current = controller; const { signal } = current;
+    const params = scenarios[definition.id].params;
+    const grant = app => approved ? app.approve({ level: definition.approval, params }) : undefined;
+    const beforeApproval = grant(beforeApp), afterApproval = grant(afterApp);
+    phase = 'running'; card.classList.add('running'); play.textContent = 'Reset'; play.setAttribute('aria-label', controlName());
+    const cursorRoute = async () => {
+      for (let i = 0; i < definition.stages.length; i++) {
+        stage(definition.stages[i], true);
+        beforeStatus.textContent = `${i + 1} of ${definition.stages.length} UI steps`;
+        // Deliberately paced illustration, never reported as a measured benchmark.
+        await pause(reducedMotion.matches ? 0 : 1100, signal);
+      }
+      const result = await beforeApp.run({ params, approval: beforeApproval, signal });
+      showResult(result, before, beforeStatus);
+      stage({ page: definition.result, rows: ['Complete'], target: -1 });
     };
-    $('action-log').replaceChildren(...calendar.log().map(record => {
-      const li = document.createElement('li');
-      li.textContent = labels[record.port](record);
-      return li;
-    }));
-    $('record').textContent = JSON.stringify({ contract: discovery.panel, tools: discovery.tools, calls: calendar.log() }, null, 2);
-  }
-}
-function status(message, error = false) {
-  $('status').textContent = message;
-  $('status').classList.toggle('error', error);
-}
-async function work(operation) {
-  if (controller) return;
-  controller = new AbortController();
-  const signal = controller.signal;
-  render();
-  try { await operation(signal); }
-  catch (error) {
-    calendar.discardProposal();
-    proposal = null;
-    // Reflect actual application state, including an error after a write.
-    phase = calendar.snapshot().events.some(event => event.day === 'friday') ? 'ready' : 'complete';
-    status(signal.aborted ? 'Cancelled. Your meetings stayed where they were.' : error.message, !signal.aborted);
-  } finally {
-    controller = null;
-    render();
-    if ([document.body, $('secondary'), $('request')].includes(document.activeElement)) {
-      (phase === 'complete' ? $('secondary') : $('request')).focus({ preventScroll: true });
+    const directRoute = async () => {
+      afterStatus.textContent = 'Validating action…';
+      const result = await afterApp.run({ params, approval: afterApproval, signal });
+      showResult(result, after, afterStatus); endpoint.textContent = '✓';
+    };
+    try {
+      await Promise.all([cursorRoute(), directRoute()]);
+      if (controller !== current) return;
+      phase = 'complete'; card.classList.remove('running'); card.classList.add('complete');
+      play.textContent = 'Replay'; play.setAttribute('aria-label', controlName());
+    } catch (error) {
+      if (controller !== current || signal.aborted) return;
+      current.abort(); reset(); afterStatus.textContent = error.message;
     }
   }
-}
-async function plan() {
-  phase = 'planning';
-  status('Finding times that work.');
-  await work(async signal => {
-    discovery = await calendar.discover();
-    const friday = await calendar.call({ portId: 'list-events', params: { day: 'friday' }, signal });
-    proposal = await calendar.call({ portId: 'plan-move', params: { ids: friday.events.map(event => event.id), day: 'monday' }, signal });
-    signal.throwIfAborted();
-    phase = 'review';
-    const shifted = proposal.moves.find(move => move.before.start !== move.after.start);
-    status(shifted ? clock(shifted.before.start) + ' is busy on Monday. Your first meeting fits at ' + clock(shifted.after.start) + '.' : 'Every meeting fits. Ready for your approval.');
-  });
-}
-async function apply() {
-  phase = 'applying';
-  status('Applying the changes you approved.');
-  await work(async signal => {
-    const params = { planId: proposal.id, version: proposal.version };
-    const approval = calendar.approve('move-events', params);
-    change = await calendar.call({ portId: 'move-events', params, approval, signal });
-    // Verify through the declared read interface, not a timer or animation.
-    const friday = await calendar.call({ portId: 'list-events', params: { day: 'friday' } });
-    const monday = await calendar.call({ portId: 'list-events', params: { day: 'monday' } });
-    if (friday.events.length || !proposal.moves.every(move => monday.events.some(event => event.id === move.after.id && event.start === move.after.start))) throw new Error('The calendar result needs review.');
-    phase = 'complete';
-    status(proposal.moves.length + ' meetings moved to Monday. Nothing overlaps.');
-    proposal = null;
-  });
-}
-async function undo() {
-  phase = 'undoing';
-  status('Restoring your original meetings.');
-  await work(async signal => {
-    const params = { changeId: change.changeId, version: change.version };
-    const approval = calendar.approve('undo-move', params);
-    await calendar.call({ portId: 'undo-move', params, approval, signal });
-    change = null;
-    phase = 'ready';
-    status('Friday is back as it was. Try again.');
-  });
-}
-$('request').addEventListener('click', () => {
-  if (controller) return;
-  if (phase === 'ready') void plan();
-  else if (phase === 'review') void apply();
-});
-function cancel() {
-  if (phase === 'planning') controller?.abort();
-  else if (phase === 'review') {
-    calendar.discardProposal(); proposal = null; phase = 'ready';
-    status('Cancelled. Your meetings stayed where they were.'); render(); $('request').focus();
+  function showResult(result, route, status) {
+    const success = definition.id === 'signin' ? result.signedIn : definition.id === 'payment' ? result.invoicePaid : result.marketingEmails === false;
+    if (!success) throw new Error('The demo action did not complete.');
+    route.classList.add('finished'); status.textContent = definition.result;
   }
+  play.addEventListener('click', () => {
+    if (phase === 'running') { reset(); return; }
+    if (definition.approval) {
+      pending = { run, play };
+      document.querySelector('#approval-title').textContent = definition.approvalTitle;
+      document.querySelector('#approval-note').textContent = definition.approvalNote;
+      document.querySelector('#approve').textContent = definition.approvalLabel;
+      dialog.showModal();
+      document.querySelector('#deny').focus();
+    } else void run();
+  });
+  reset();
+  cards.push({ reset });
 }
-$('secondary').addEventListener('click', () => phase === 'complete' ? void undo() : cancel());
-window.addEventListener('keydown', event => { if (event.key === 'Escape') cancel(); });
-window.addEventListener('pagehide', () => controller?.abort());
-status('3 meetings. One request.');
-render();
+definitions.forEach(makeCard);
+document.querySelector('#approve').addEventListener('click', () => {
+  const request = pending; pending = null; dialog.close();
+  if (request) { request.play.focus(); void request.run(true); }
+});
+document.querySelector('#deny').addEventListener('click', () => dialog.close());
+dialog.addEventListener('close', () => { pending?.play.focus(); pending = null; });
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape' && !dialog.open && !pending) cards.forEach(card => card.reset());
+});

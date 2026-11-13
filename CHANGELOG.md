@@ -2,13 +2,18 @@
 
 ## Unreleased
 
-Replaces the public demo with one calendar journey under “Agentic actions.
-Without the clicks.” A scripted agent discovers typed actions, reads meetings,
-plans around a scheduling conflict and applies the approved batch. The result
-is read back and shown in the calendar; Undo restores the original meetings.
-Adds exact request approval, atomic application, stale proposal and duplicate
-call rejection, cancellation, an actual call log and responsive keyboard controls.
-Everything runs on local sample data. The published 0.6.0 tag and package remain unchanged.
+Restores the dark public demo under “Agentic actions. Without the clicks.” Three
+interactive comparisons show sign in, invoice payment and settings through
+cursor navigation beside direct typed actions. Explicit local approval applies
+to sign in and payment; fixed handlers validate contracts and arguments before
+changing fixture state. Adds replay, reset, cancellation, reduced motion support
+and regression coverage for approval, duplicate dispatch and input isolation.
+The cursor timing is illustrative and no external service is connected.
+
+Preserves the calendar workflow as `examples/calendar.mjs`, including conflict
+resolution, exact approval, atomic changes, undo and its existing tests. Updates
+the static build, server allowlist and guides. The published 0.6.0 tag and package
+remain unchanged.
 
 ## 0.6.0: 13 November 2026
 
