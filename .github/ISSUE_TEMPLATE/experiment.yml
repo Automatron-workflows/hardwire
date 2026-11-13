@@ -1,0 +1,36 @@
+name: Experiment feedback
+description: Share a result or problem from the sign in, invoice or settings experiment.
+title: "Experiment: "
+body:
+  - type: dropdown
+    id: scenario
+    attributes:
+      label: Which action did you try?
+      options:
+        - Sign in
+        - Pay an invoice
+        - Change a setting
+        - All three in the terminal
+    validations:
+      required: true
+  - type: textarea
+    id: environment
+    attributes:
+      label: Where did you run it?
+      description: Browser and URL, or operating system, Node version and commit.
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: What did you do?
+      description: Include the input and steps using sample data only. Never include credentials or personal data.
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What happened, and what did you expect?
+      description: A successful first run is useful feedback too. Tell us what was confusing or useful.
+    validations:
+      required: true

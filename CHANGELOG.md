@@ -2,6 +2,15 @@
 
 ## Unreleased
 
+Adds one concrete developer experiment around the film's sign in, invoice and
+settings examples. `npm run experiment` checks real validation, fixed local
+handlers, approval rejection, state readback and duplicate calls without package
+dependencies. A separate browser experiment lets visitors edit inputs, explicitly
+approve local actions and inspect requests, MCP descriptions and call records.
+The landing film gains a Try it link. Package and static build checks include
+the experiment. No real login or payment integration is added.
+
+
 Replaces the text heavy public demo with a silent animated film under “Agentic
 actions. Without the clicks.” Three scenes show Google sign in, payment and
 settings through cursor navigation and direct paths. Removes numbered cards,

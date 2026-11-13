@@ -1,6 +1,6 @@
 # Hardwire
 
-**Make software understandable to AI agents.**
+**Agentic actions. Without the clicks.**
 
 Hardwire is an open source toolkit that helps developers describe application
 actions and check their inputs, declared effects and approval requirements
@@ -10,7 +10,8 @@ Start with saved HTML or an existing action description. You can inspect and
 validate it locally without owning an app, hosting a service or providing an
 API key.
 
-[Try the browser playground](https://automatron-workflows.github.io/hardwire/)
+[Watch the demo](https://automatron-workflows.github.io/hardwire/)
+· [Run the three actions](https://automatron-workflows.github.io/hardwire/experiment.html)
 · [Download the release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.6.0)
 · [Connect an agent](docs/MCP.md) · [Explore without an agent](docs/GETTING-STARTED.md)
 
@@ -79,47 +80,61 @@ arguments their integrations intend to send.
 examples and measure where inference fails. App ownership is not required to
 start with the included examples or permitted HTML captures.
 
-## Try it
+## One concrete experiment
 
-**[Open the playground](https://automatron-workflows.github.io/hardwire/)** to watch
-three silent comparisons: Google sign in, invoice payment and settings. Animated
-cursors work through interfaces while direct paths reach the same illustrated
-outcomes. The film starts automatically and offers pause, replay and reduced
-motion support. The information icon explains the simulation boundaries.
+**Run the three actions from the demo. Change an input. Watch validation stop an
+invalid request before local state changes.**
 
-The film does not execute actions or connect accounts. For a runnable example,
-`playground/comparison.mjs` uses the real contract validator with fixed local
-handlers and explicit approval objects. Its regression tests are in
-`test/comparison.test.mjs`. The CLI and MCP guides below provide hands on setup.
+[Open the experiment](https://automatron-workflows.github.io/hardwire/experiment.html).
+It uses the real validator and fixed local handlers. No app, account, payment
+provider or API key is needed.
 
-The live demo follows main. To run that version locally, check out main after
-cloning and installing, then use
-`npm run demo` and open `http://127.0.0.1:8787/playground/`.
+| Action | What you can try | What changes |
+| --- | --- | --- |
+| Sign in | Change the sample account, then restore it and approve | A local session starts |
+| Pay an invoice | Change €24 to €25, then restore it and approve | The fixture invoice becomes paid |
+| Change a setting | Try a string instead of a boolean, then send valid input | Marketing emails turn off |
 
-Use **Node 22 or newer**. CI tests Node 22 and 24.
+The film remains an illustration. The experiment executes JavaScript against
+local fixtures. Google sign in is simulated and no money moves. Approval levels
+are local assertions, not verified identities.
+
+Use **Node 22 or newer** to run all three from the current main branch. This
+experiment needs no package dependencies:
 
 ```sh
-git clone --branch v0.6.0 --depth 1 https://github.com/Automatron-workflows/hardwire.git
+git clone https://github.com/Automatron-workflows/hardwire.git
 cd hardwire
+npm run experiment
+```
+
+The script checks invalid inputs, missing or forged approvals, successful local
+state changes and duplicate rejection. It simulates approval; the browser
+experiment lets you review and approve explicitly. Run `npm run demo` and open
+`http://127.0.0.1:8787/playground/experiment.html` to edit inputs locally.
+[Follow one request through the code](docs/EXPERIMENT.md).
+[Share your experiment result](https://github.com/Automatron-workflows/hardwire/issues/new?template=experiment.yml).
+
+## Connect an agent
+
+```sh
 npm ci --ignore-scripts
 npm run test:mcp
 npm run --silent mcp:config
 ```
 
-The smoke check starts a server and calls all five tools with the official MCP
-client. The last command prints configuration with the exact paths on your
-machine. Add its `hardwire` entry to your local MCP client's configuration.
-The [setup guide](docs/MCP.md) includes a first prompt and troubleshooting.
+The smoke check calls all five inspection tools with the official MCP client.
+Add the printed `hardwire` configuration to your client. The [MCP guide](docs/MCP.md)
+includes a first prompt and troubleshooting. These tools inspect descriptions;
+they do not execute the three fixture actions.
 
-To explore without an agent, run `npm run walkthrough`. To see a fixed read
-handler search fake catalogue data, run `npm run consumer`. This example shows
-how an application integration could work; the toolkit does not execute arbitrary
-panel operations.
+For the format tour, run `npm run walkthrough`. The separate `npm run consumer`
+example demonstrates a fixed catalogue read handler.
 
-The [GitHub release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.6.0)
-also provides an installable package and checksum. Hardwire is not published on
-npm or listed in the MCP Registry. Do not use `npm install hardwire` to obtain
-this project.
+The live site and experiment follow main. The [0.6.0 release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.6.0)
+provides an older installable package and checksum; it does not contain this new
+experiment. Hardwire is not published on npm or listed in the MCP Registry.
+Do not use `npm install hardwire` to obtain this project.
 
 ## The format in one example
 
@@ -169,6 +184,7 @@ website executor. [Integration notes](docs/INTEGRATION.md) explain the boundarie
 
 | Goal | Guide |
 | --- | --- |
+| Run the three demo actions | [Concrete experiment](docs/EXPERIMENT.md) |
 | Connect an agent and complete a first task | [MCP setup](docs/MCP.md) |
 | Explore commands and local examples | [Getting started](docs/GETTING-STARTED.md) |
 | Use the library in your code | [API reference](docs/API.md) |

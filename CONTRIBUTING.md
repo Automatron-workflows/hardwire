@@ -13,9 +13,9 @@ npm run check
 ```
 
 This runs unit/CLI tests, real loopback HTTP integration tests, panel validation
-and the offline API walkthrough, runnable consumer, MCP transport and package checks. The
+and the three action experiment, offline API walkthrough, runnable consumer, MCP transport and package checks. The
 package check builds a tarball, installs it with a fresh cache in a temporary project, then
-checks its ESM exports, CLI binaries, consumer and actual MCP calls through the
+checks its ESM exports, CLI binaries, three action experiment, consumer and actual MCP calls through the
 installed symlink. The official SDK client is a development dependency. CI runs the
 same command on Node 22 and 24. It also builds the static playground. All checks must pass before merging.
 The standalone `npm run corpus`
@@ -59,3 +59,13 @@ input isolation. They verify those executable examples, not the film's artwork.
 `npm run build:playground` writes the deployable site to `output/playground`.
 The build contains only an explicit portable module graph and static assets.
 See [architecture](docs/ARCHITECTURE.md) for deployment and rollback.
+
+## Experiment acceptance
+
+Open `/playground/experiment.html`. Try all three scenarios, both invalid inputs
+and successful requests. Check that sign in and payment require review and an
+explicit local approval, edited requests cancel pending approval, and Reset
+clears the state and record. Settings should apply without an approval step.
+Inspect the actual request and result. Verify keyboard operation, mobile layout,
+reduced motion and no browser errors. Never connect these fixture approvals to
+real accounts or payment providers.
