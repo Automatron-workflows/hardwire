@@ -82,11 +82,12 @@ start with the included examples or permitted HTML captures.
 ## Try it
 
 **[Open the playground](https://automatron-workflows.github.io/hardwire/)** to
-try a search, turn its form into an action contract and call a fixed demo
-handler directly. Try the wrong input to see validation stop the call. No installation or agent setup is needed. Inputs stay in your
-browser. The only executable action searches the included fake catalogue.
+watch a browser replay navigate settings, then change the same page theme
+directly through a validated Hardwire action. No installation or agent setup is needed. Inputs stay in your
+browser. The only executable action changes the theme of the demo tab.
 
-To run the same playground locally after cloning and installing, use
+The live demo follows main. To run that version locally, check out main after
+cloning and installing, then use
 `npm run demo` and open `http://127.0.0.1:8787/playground/`.
 
 Use **Node 22 or newer**. CI tests Node 22 and 24.

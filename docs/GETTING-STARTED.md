@@ -6,9 +6,10 @@ check arguments and verify a call record. Use the included fake data; you do not
 need to own an app or connect a live account.
 
 For the quickest start, [open the browser playground](https://automatron-workflows.github.io/hardwire/).
-Search for a lamp, let Hardwire describe the form, then call the fixed demo
-action with valid and invalid arguments. The same fake catalogue powers the UI
-and the direct call. Download the inferred contract at the end.
+Request dark mode. The first route replays a cursor navigating settings; the
+second validates and applies the theme directly through Hardwire. This is a
+simulated agent with a real effect confined to the current tab. The live demo
+follows main; the versioned 0.6.0 package retains its original catalogue demo.
 
 Run the commands from the repository root with Node 22 or newer. Install
 dependencies with `npm ci --ignore-scripts`. For a guided tour without a model or

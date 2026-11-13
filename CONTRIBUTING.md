@@ -45,10 +45,11 @@ customer data. See `SECURITY.md` for sensitive reports.
 
 Run `npm run demo` and open `http://127.0.0.1:8787/playground/`. Restart the server
 after changing an asset, because it reads the allowlisted files at startup.
-Walk the search, description and direct call journey. Check valid and invalid
-arguments, cancellation after editing, the contract download and a narrow mobile
-viewport. The fixed demo handler must reject changed panels before execution.
-No endpoint should receive requests based on supplied input.
+Run the browser replay and the direct Hardwire route. Check theme reversal,
+cancellation during replay, recovery after cancellation, keyboard operation and a
+narrow viewport. The cursor is an illustration; the theme change is real. Respect
+reduced motion and do not present replay timing as a speed benchmark. The worker
+must reject invalid theme values and any changed panel before the UI applies them.
 
 `npm run build:playground` writes the deployable site to `output/playground`.
 The build contains only an explicit portable module graph and static assets.

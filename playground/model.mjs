@@ -3,8 +3,7 @@ import {
   auditPanel, canonicalJson, compilePanel, HardwireError, inferFromHtml,
   normalizePanel, panelDigestAsync, toPanelDraft, validateParams,
 } from '../src/browser.mjs';
-import { samples } from './samples.mjs';
-import { searchCatalogue } from '../examples/catalogue.mjs';
+import { themePanel } from './theme-contract.mjs';
 
 export function parseJson(text) {
   if (typeof text !== 'string' || new TextEncoder().encode(text).length > 256 * 1024) {
@@ -36,16 +35,16 @@ export function checkArguments({ panel, portId, params }) {
   return { valid: true, executed: false, confirmation: port.confirmation, kind: port.kind };
 }
 
-// This fixed application handler is deliberately separate from generic inspection.
-// Supplied endpoints never choose a URL, handler or implementation.
-let reviewed;
-export async function runDemoSearch({ panel, params }) {
-  reviewed ??= inspect(samples.search);
-  const expected = await reviewed;
-  if (await panelDigestAsync(panel) !== expected.digest) {
-    throw new HardwireError('hardwire_demo_unreviewed', 'panel', 'The demo only runs its original search contract');
+// Validate a request for the fixed, application owned theme handler.
+// No arbitrary URL, code or operation can be selected by a supplied panel.
+const reviewedPanel = normalizePanel(themePanel());
+let reviewedDigest;
+export async function validateThemeRequest({ panel, params }) {
+  reviewedDigest ??= panelDigestAsync(reviewedPanel);
+  if (await panelDigestAsync(panel) !== await reviewedDigest) {
+    throw new HardwireError('hardwire_demo_unreviewed', 'panel', 'The demo accepts only its original theme contract');
   }
-  const port = expected.panel.ports[0];
-  const args = validateParams(port, parseJson(params));
-  return { products: searchCatalogue(args), executed: true, demo: true };
+  const args = validateParams(reviewedPanel.ports[0], parseJson(params));
+  // The UI applies this checked value to its own tab. No action runs here.
+  return { theme: args.theme, validated: true };
 }

@@ -25,8 +25,8 @@ flowchart TD
 | `panel.mjs`, `trace.mjs` | Preserve the synchronous Node API and build or check trace digests | Node cryptography |
 | `probe.mjs`, `infer.mjs`, `corpus.mjs` | Explicit network and filesystem operations | Bounded reads through documented adapters |
 | `toolkit.mjs`, `mcp-server.mjs` | Expose five fixed inspection tools through the official MCP SDK | Stdio transport; no supplied action execution |
-| `playground/model.mjs` | Coordinate inspection and the fixed demo search handler | Fake data lookup only |
-| `playground/worker.mjs`, `app.mjs` | Isolate processing, show results and download selected JSON | Browser worker and explicit local download |
+| `playground/model.mjs` | Coordinate inspection and validation for the fixed theme action | None |
+| `playground/worker.mjs`, `app.mjs` | Isolate validation, replay the UI route and apply a checked theme | Browser worker and local tab appearance |
 
 The Node entry points remain compatible. `hardwire/browser` has no Node imports,
 polyfills, package dependencies, filesystem or network adapter. Its
@@ -36,23 +36,26 @@ provides hashing in both environments.
 
 ## Playground data flow
 
-A visitor searches a tiny sample catalogue, asks Hardwire to describe its form,
-and calls the resulting action directly. A module worker runs the same portable
-inference, normalization and validation functions as the Node library. The UI
-shows one step at a time.
+The page itself is the demonstration. A visitor requests a theme change. The
+browser route is an explicitly labelled scripted cursor replay through settings.
+The Hardwire route validates a request against the application's fixed theme
+contract and applies the checked theme directly to the current tab. There is no
+LLM, browser automation service or claim of measured agent performance.
 
-The direct call is a fixed application owned handler. It compares the supplied
-panel digest with the original demo contract, validates arguments, then searches
-fake catalogue data. The browser and Node consumer examples share that catalogue
-function. No supplied endpoint chooses executable code, a URL or credentials.
-This demo is deliberately capable of one real local read operation. It is not a
-general action executor.
+The theme contract declares a reversible write and permits execution without
+confirmation. A module worker checks its digest against the original contract,
+then validates the theme enum and closed argument schema using the shared core.
+The UI applies only the checked result. A supplied panel cannot select an
+arbitrary handler, endpoint or executable code. Validation is separate from the
+small application owned DOM handler.
 
-Editing arguments cancels pending work and clears old results. Each worker has
-a five second deadline and can be terminated. JSON and HTML limits apply before
-processing. Outputs use text nodes; the demo does not render supplied HTML.
-Inputs are not persisted or sent to a server. Ordinary page delivery still uses
-the hosting provider. The downloaded contract remains an inferred draft.
+The replay's timing is illustrative. No fabricated latency or benchmark is
+shown. Both routes operate on the same tab. The interaction is keyboard operable,
+has a cancellation action, restores the original theme on cancellation or error,
+and respects reduced motion. Pending worker work is terminated on cancellation
+or after five seconds. Inputs are not persisted or sent to a server. Page delivery
+still uses the hosting provider. The Node consumer remains a separate fake
+catalogue example.
 
 ## Serving and distribution
 
@@ -78,8 +81,8 @@ Tests cover cross runtime output and digest parity, schema enforcement, malforme
 and oversized inputs, inference limits, static packaging, local HTTP serving and
 installed package exports. Existing tests also cover the official MCP transport,
 trace consistency and known corpus failures. Browser acceptance checks cover
-valid and invalid arguments, the complete journey, changed inputs, rejection before handler execution
-and responsive layout.
+both interaction routes, theme reversal, cancellation, responsive layout and
+reduced motion. Automated tests reject changed contracts and invalid themes.
 
 This is a complete foundation for describing and experimenting with actions. A
 general execution system remains outside the implementation: it would need

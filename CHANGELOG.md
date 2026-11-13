@@ -1,5 +1,13 @@
 # Changelog
 
+## Unreleased
+
+Replaces the public catalogue tutorial with one interaction on the demo page:
+a scripted settings replay followed by a direct, validated theme change. Removes
+the shop, step labels, JSON editor and download controls. Adds cancellation,
+reduced motion and rejection tests for the fixed reversible theme contract.
+The published 0.6.0 tag and package remain unchanged.
+
 ## 0.6.0: 13 November 2026
 
 Adds a browser demo with one guided journey from a catalogue search to an

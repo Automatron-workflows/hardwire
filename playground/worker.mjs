@@ -1,10 +1,10 @@
-import { inspect, checkArguments, runDemoSearch } from './model.mjs';
+import { inspect, checkArguments, validateThemeRequest } from './model.mjs';
 
 self.onmessage = async ({ data }) => {
   try {
     let result;
     if (data.operation === 'inspect') result = await inspect(data.input);
-    else if (data.operation === 'demo') result = await runDemoSearch(data.input);
+    else if (data.operation === 'theme') result = await validateThemeRequest(data.input);
     else if (data.operation === 'check') result = checkArguments(data.input);
     else throw new Error('Unknown operation');
     self.postMessage({ id: data.id, result });
