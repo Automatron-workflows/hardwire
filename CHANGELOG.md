@@ -2,17 +2,17 @@
 
 ## Unreleased
 
-Restores the dark public demo under “Agentic actions. Without the clicks.” Three
-interactive comparisons show sign in, invoice payment and settings through
-cursor navigation beside direct typed actions. Explicit local approval applies
-to sign in and payment; fixed handlers validate contracts and arguments before
-changing fixture state. Adds replay, reset, cancellation, reduced motion support
-and regression coverage for approval, duplicate dispatch and input isolation.
-The cursor timing is illustrative and no external service is connected.
+Replaces the text heavy public demo with a silent animated film under “Agentic
+actions. Without the clicks.” Three scenes show Google sign in, payment and
+settings through cursor navigation and direct paths. Removes numbered cards,
+menu text, code labels, status captions and approval dialogs from the landing
+experience. Adds autoplay, camera and cursor transitions, pause, replay, hidden
+page suspension, screen reader descriptions and reduced motion support.
 
-Preserves the calendar workflow as `examples/calendar.mjs`, including conflict
-resolution, exact approval, atomic changes, undo and its existing tests. Updates
-the static build, server allowlist and guides. The published 0.6.0 tag and package
+The film is illustrative and executes no application actions. Context is available
+through an information icon. The validated local comparison and calendar examples
+remain in the codebase with their regression tests. Guides explain the distinction
+between the film and executable examples. The published 0.6.0 tag and package
 remain unchanged.
 
 ## 0.6.0: 13 November 2026

@@ -139,7 +139,7 @@ async function main() {
   process.stdout.write(`  node src/cli.mjs infer ${origin} --allow-private\n`);
   process.stdout.write(`  node src/cli.mjs infer ${origin} --allow-private --draft > /tmp/hardwire-draft.json\n`);
   process.stdout.write(`  node src/cli.mjs compile /tmp/hardwire-draft.json\n`);
-  process.stdout.write("\nCtrl-C to stop. The browser changes only local demo fixtures; the server performs no writes.\n");
+  process.stdout.write("\nCtrl-C to stop. The browser film is illustrative; the server performs no writes.\n");
 
   const stop = () => server.close(() => process.exit(0));
   process.on("SIGINT", stop);

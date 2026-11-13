@@ -81,13 +81,16 @@ start with the included examples or permitted HTML captures.
 
 ## Try it
 
-**[Open the playground](https://automatron-workflows.github.io/hardwire/)** and play
-three visual comparisons: sign in, pay an invoice and change a setting. Watch a
-cursor navigate the interface while a typed action reaches the same result.
-Sign in and payment still require explicit demo approval. Hardwire validates the
-contract and arguments before a fixed local handler changes the fixture state.
-No installation, account connection or app ownership is needed. These are
-illustrated flows, not live OAuth, real payments or measured speed benchmarks.
+**[Open the playground](https://automatron-workflows.github.io/hardwire/)** to watch
+three silent comparisons: Google sign in, invoice payment and settings. Animated
+cursors work through interfaces while direct paths reach the same illustrated
+outcomes. The film starts automatically and offers pause, replay and reduced
+motion support. The information icon explains the simulation boundaries.
+
+The film does not execute actions or connect accounts. For a runnable example,
+`playground/comparison.mjs` uses the real contract validator with fixed local
+handlers and explicit approval objects. Its regression tests are in
+`test/comparison.test.mjs`. The CLI and MCP guides below provide hands on setup.
 
 The live demo follows main. To run that version locally, check out main after
 cloning and installing, then use
