@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.7.1: 13 November 2026
+
+Fixes the installed experiment's next step. It now links to the live browser
+experiment, so a developer using the release command does not need a checkout
+to continue. Refreshes the current setup commands to this patch release.
+
 ## 0.7.0: 13 November 2026
 
 Unifies the film and experiment artwork. The browser now presents one visual

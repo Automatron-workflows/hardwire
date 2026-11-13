@@ -65,7 +65,7 @@ async function main(argv) {
       console.log(`  Rejected: ${result.blocked.map(item => item.reason).join(', ')}; duplicate call.`);
       console.log(`  Required confirmation: ${result.confirmation}. Executed once. Readback matches.\n`);
     }
-    console.log('Next: npm run demo, then open /playground/experiment.html to change an input.');
+    console.log('Next: https://automatron-workflows.github.io/hardwire/experiment.html to change an input.');
   }
 }
 

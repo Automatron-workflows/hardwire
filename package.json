@@ -1,6 +1,6 @@
 {
   "name": "hardwire",
-  "version": "0.7.0",
+  "version": "0.7.1",
   "description": "Describe and validate application actions for AI agents. Open source tools for reviewing inputs, declared effects and approval requirements.",
   "type": "module",
   "private": true,

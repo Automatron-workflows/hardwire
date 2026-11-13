@@ -15,7 +15,7 @@ validator. No app, account, payment provider, model or API key is needed.
 Use Node 22 or newer:
 
 ```sh
-npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.7.0/hardwire-0.7.0.tgz hardwire-experiment
+npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.7.1/hardwire-0.7.1.tgz hardwire-experiment
 ```
 
 This installs the exact GitHub release into npm's temporary command cache. The
