@@ -1,6 +1,12 @@
 # Changelog
 
-## Unreleased
+## 0.7.0: 13 November 2026
+
+Unifies the film and experiment artwork. The browser now presents one visual
+action at a time, with input editing and technical output in an optional inspector.
+Routes reflect actual validation, approval and result state. Adds the installed
+`hardwire-experiment` command, a versioned one command setup, GitHub community
+guidance and a focused launch plan.
 
 Adds one concrete developer experiment around the film's sign in, invoice and
 settings examples. `npm run experiment` checks real validation, fixed local

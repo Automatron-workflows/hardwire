@@ -1,0 +1,8 @@
+blank_issues_enabled: true
+contact_links:
+  - name: Questions and ideas
+    url: https://github.com/Automatron-workflows/hardwire/discussions
+    about: Ask for help or discuss an integration before opening a work item.
+  - name: Security reporting
+    url: https://github.com/Automatron-workflows/hardwire/blob/main/SECURITY.md
+    about: Keep credentials and sensitive details out of public issues.

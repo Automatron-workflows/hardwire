@@ -14,7 +14,7 @@ import { fileURLToPath, pathToFileURL } from "node:url";
 const HERE = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(HERE, '../..');
 const ASSETS = [
-  ...['index.html', 'styles.css', 'app.mjs', 'model.mjs', 'worker.mjs', 'samples.mjs', 'comparison.mjs', 'experiment.html', 'experiment.css', 'experiment.mjs', 'experiment-model.mjs'].map(name => `playground/${name}`),
+  ...['index.html', 'styles.css', 'app.mjs', 'art.mjs', 'model.mjs', 'worker.mjs', 'samples.mjs', 'comparison.mjs', 'experiment.html', 'experiment.css', 'experiment.mjs', 'experiment-model.mjs'].map(name => `playground/${name}`),
   ...['browser', 'panel-schema', 'canonical', 'infer-html', 'mcp', 'score'].map(name => `src/${name}.mjs`),
 ];
 const DEFAULT_PORT = 8787;

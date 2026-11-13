@@ -12,8 +12,14 @@ validator. No app, account, payment provider, model or API key is needed.
 
 ## Run all three in your terminal
 
-Use Node 22 or newer and the current main branch. These files are newer than the
-0.6.0 release. The experiment has no package dependencies.
+Use Node 22 or newer:
+
+```sh
+npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.7.0/hardwire-0.7.0.tgz hardwire-experiment
+```
+
+This installs the exact GitHub release into npm's temporary command cache. The
+experiment itself uses no package dependencies. To edit the source instead:
 
 ```sh
 git clone https://github.com/Automatron-workflows/hardwire.git
@@ -56,9 +62,12 @@ Open `http://127.0.0.1:8787/playground/experiment.html`.
 3. **Settings:** use **Try invalid input** to submit the string `"false"` instead
    of a boolean. The setting stays on. Run the normal request to turn it off.
 
-Expand **Inspect the request and result** to see the actual values. Editing a
-request cancels pending approval. Reset starts a new isolated fixture. Completed
-actions cannot run a second time in the same fixture.
+Open **Inputs & code** to edit the request, then choose **Use these inputs**.
+The same inspector contains the actual result, call record, compiled tool and
+contract. Escape closes it and returns focus to the control that opened it.
+Editing a request cancels pending approval. Reset starts a new isolated fixture.
+After success, **Next example** advances the journey. **Replay** starts again.
+Completed actions cannot run a second time in the same fixture.
 
 ## Follow one request through the code
 

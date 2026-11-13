@@ -41,6 +41,13 @@ Report a reproducible bug with the Node version, command, expected/actual output
 and the smallest sanitized panel/HTML sample. Never paste credentials or private
 customer data. See `SECURITY.md` for sensitive reports.
 
+## Pick a first contribution
+
+Start with an [open contribution task](https://github.com/Automatron-workflows/hardwire/issues?q=is%3Aissue%20is%3Aopen%20label%3A%22good%20first%20issue%22).
+Each names the relevant files, acceptance criteria and verification command.
+Ask questions in [Discussions](https://github.com/Automatron-workflows/hardwire/discussions).
+Follow the [community guidelines](CODE_OF_CONDUCT.md).
+
 ## Playground development
 
 Run `npm run demo` and open `http://127.0.0.1:8787/playground/`. Restart the server

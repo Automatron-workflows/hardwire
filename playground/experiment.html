@@ -3,47 +3,39 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Run Hardwire's three demo actions locally. Change an input and see validation stop it before state changes.">
+  <meta name="description" content="Try sign in, invoice payment and settings with Hardwire. Real local validation, no connected accounts.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <title>Hardwire | Run the experiment</title>
   <link rel="stylesheet" href="./experiment.css">
   <script type="module" src="./experiment.mjs"></script>
 </head>
-<body>
-  <header><a class="wordmark" href="./">hardwire</a><a href="./">Watch the demo ↗</a></header>
+<body class="experiment">
+  <header><a href="./" aria-label="Hardwire home">hardwire</a><a class="try-link" href="./">Watch ↗</a></header>
   <main>
-    <h1>Now try the actions.</h1>
-    <p class="intro">Run one. Change an input. See what happens.</p>
+    <h1>Agentic actions.<br><span>Without the clicks.</span></h1>
     <nav class="scenarios" aria-label="Choose an experiment">
       <button type="button" data-scenario="signin" aria-pressed="true">Sign in</button>
-      <button type="button" data-scenario="payment" aria-pressed="false">Pay an invoice</button>
-      <button type="button" data-scenario="settings" aria-pressed="false">Change a setting</button>
+      <button type="button" data-scenario="payment" aria-pressed="false">Invoice</button>
+      <button type="button" data-scenario="settings" aria-pressed="false">Settings</button>
     </nav>
-    <section class="workspace" aria-label="Local action experiment">
-      <div class="object" id="object" data-complete="false">
-        <div id="object-art" aria-hidden="true"></div>
-        <h2 id="object-title"></h2>
-        <p id="object-detail"></p>
-        <p class="state" id="state"></p>
-      </div>
-      <form id="action-form" novalidate>
-        <div id="fields"></div>
-        <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
-        <button class="primary" id="run" type="submit">Run action</button>
-        <div class="secondary"><button id="invalid" type="button">Try invalid input</button><button id="reset" type="button">Reset</button></div>
-      </form>
+    <section id="stage" class="action-stage" data-phase="idle" aria-label="Local action experiment">
+      <div id="scene" aria-hidden="true"></div>
+      <div class="object-caption"><h2 id="object-title"></h2><p id="object-detail" data-essential="action-scope"></p></div>
+      <p id="feedback" class="feedback" role="status" aria-live="polite"></p>
+      <form id="action-form" novalidate><button class="primary" id="run" type="submit" data-primary>Run action</button></form>
+      <div class="utilities"><button id="invalid" type="button">Try invalid input</button><button id="inspect" type="button" aria-haspopup="dialog">Inputs &amp; code</button><button id="reset" type="button" aria-label="Reset experiment" title="Reset experiment"></button></div>
     </section>
-    <p class="boundary">Local fixtures. No accounts or money connected.</p>
-    <details id="inspect"><summary>Inspect the request and result</summary>
-      <div class="inspection"><div><h3>Request</h3><pre id="request"></pre><h3>State</h3><pre id="readback"></pre><h3>Call record</h3><pre id="record"></pre></div>
-      <div><h3>MCP tool description</h3><pre id="tool"></pre><h3>Panel</h3><pre id="panel"></pre></div></div>
-    </details>
-    <details><summary>Run it in your terminal</summary><p>Node 22 or newer. Use the current main branch.</p><pre>git clone https://github.com/Automatron-workflows/hardwire.git
-cd hardwire
-npm run experiment</pre><p>The offline script checks all three actions and simulates the local approvals. It needs no dependencies. <a href="https://github.com/Automatron-workflows/hardwire/blob/main/docs/EXPERIMENT.md">Explore the code ↗</a></p></details>
+    <p class="boundary" data-essential="simulation">Local demo. No accounts or payments connected.</p>
   </main>
+  <dialog id="developer" aria-labelledby="developer-title">
+    <div class="dialog-heading"><h2 id="developer-title">Under the hood.</h2><button id="close" type="button" aria-label="Close inspector"></button></div>
+    <details open><summary>Inputs</summary><div id="fields"></div><button id="use-inputs" type="button" class="apply">Use these inputs</button><pre id="request"></pre></details>
+    <details><summary>Result</summary><pre id="readback"></pre><pre id="record"></pre><pre id="error" hidden></pre></details>
+    <details><summary>Tool &amp; contract</summary><pre id="tool"></pre><pre id="panel"></pre></details>
+    <details><summary>Run locally</summary><p>Node 22 or newer. One command, all three actions.</p><pre>npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.7.0/hardwire-0.7.0.tgz hardwire-experiment</pre><p><a href="https://github.com/Automatron-workflows/hardwire/blob/main/docs/EXPERIMENT.md">Read the experiment ↗</a> · <a href="https://github.com/Automatron-workflows/hardwire/discussions">Share your result ↗</a></p></details>
+  </dialog>
   <footer><a href="https://github.com/Automatron-workflows/hardwire">GitHub ↗</a></footer>
-  <noscript><p>JavaScript is needed for the local experiment. You can also run the terminal command above.</p></noscript>
+  <noscript><p>Use JavaScript for the experiment, or run <code>npm run experiment</code> from the source checkout.</p></noscript>
 </body>
 </html>

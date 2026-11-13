@@ -20,7 +20,7 @@ that step. Nothing connects to Google or a payment provider.
 
 [The experiment guide](EXPERIMENT.md) shows which inputs to change and follows a
 request through the validator and fixed handler. It includes JSON output and
-regression commands. These files are newer than the 0.6.0 release.
+regression commands and the single command for the versioned 0.7.0 package.
 
 The [landing demo](https://automatron-workflows.github.io/hardwire/) remains a
 silent illustration. The separate experiment runs real local state changes.
