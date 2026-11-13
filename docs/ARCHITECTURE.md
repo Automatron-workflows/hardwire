@@ -25,8 +25,9 @@ flowchart TD
 | `panel.mjs`, `trace.mjs` | Preserve the synchronous Node API and build or check trace digests | Node cryptography |
 | `probe.mjs`, `infer.mjs`, `corpus.mjs` | Explicit network and filesystem operations | Bounded reads through documented adapters |
 | `toolkit.mjs`, `mcp-server.mjs` | Expose five fixed inspection tools through the official MCP SDK | Stdio transport; no supplied action execution |
-| `playground/model.mjs` | Coordinate inspection and validation for the fixed theme action | None |
-| `playground/worker.mjs`, `app.mjs` | Isolate validation, replay the UI route and apply a checked theme | Browser worker and local tab appearance |
+| `playground/model.mjs`, `worker.mjs` | Keep the bounded inspection helpers available for experiments | Worker messaging only |
+| `playground/calendar.mjs` | Validate and dispatch four fixed calendar handlers; bind approval to exact requests | In memory demo calendar and call log |
+| `playground/app.mjs` | Coordinate the scripted task, show proposals and collect explicit approval | Local DOM only |
 
 The Node entry points remain compatible. `hardwire/browser` has no Node imports,
 polyfills, package dependencies, filesystem or network adapter. Its
@@ -36,26 +37,36 @@ provides hashing in both environments.
 
 ## Playground data flow
 
-The page itself is the demonstration. A visitor requests a theme change. The
-browser route is an explicitly labelled scripted cursor replay through settings.
-The Hardwire route validates a request against the application's fixed theme
-contract and applies the checked theme directly to the current tab. There is no
-LLM, browser automation service or claim of measured agent performance.
+A visitor asks to move Friday's meetings to Monday. The application publishes
+a fixed panel with four typed actions: list events, plan a move, apply a move and
+undo. The scripted agent normalizes that panel and compiles MCP tool descriptions.
+It calls the first two actions to read meetings and compute available times.
+This is local discovery of a supplied contract, not website crawling or an LLM.
 
-The theme contract declares a reversible write and permits execution without
-confirmation. A module worker checks its digest against the original contract,
-then validates the theme enum and closed argument schema using the shared core.
-The UI applies only the checked result. A supplied panel cannot select an
-arbitrary handler, endpoint or executable code. Validation is separate from the
-small application owned DOM handler.
+Every call snapshots its inputs, compares the supplied panel digest to the
+reviewed contract, validates the arguments with the shared core and dispatches
+only a known application handler. Planning uses the actual fixture calendar to
+avoid overlapping meetings. A proposal does not change any event.
 
-The replay's timing is illustrative. No fabricated latency or benchmark is
-shown. Both routes operate on the same tab. The interaction is keyboard operable,
-has a cancellation action, restores the original theme on cancellation or error,
-and respects reduced motion. Pending worker work is terminated on cancellation
-or after five seconds. Inputs are not persisted or sent to a server. Page delivery
-still uses the hosting provider. The Node consumer remains a separate fake
-catalogue example.
+The two writes declare user confirmation. The application issues a one use
+approval object only from an explicit Approve or Undo control. It is bound to
+the action, exact arguments, calendar version and application instance. The
+handler also checks the proposal or change ID, recomputes conflicts before an
+atomic replacement, and refuses stale or repeated requests. This is a local
+example of approval enforcement, not a remote authorization protocol or defense
+against arbitrary scripts already running in the same page.
+
+The application reads both days back after a move and renders actual state.
+Undo restores the original meetings. Cancelling discards the proposal and an
+aborted call cannot dispatch after its asynchronous validation. The optional
+action log contains actual successful calls and their panel digest. It is an
+in memory debug record, not a signed receipt or a Hardwire trace.
+
+The calendar uses bounded fixtures on the main thread with no artificial waits.
+The existing inspection worker remains separate and is not loaded by this
+journey. No account is connected. No calendar data is persisted or sent to a
+server. Reloading starts a new example. Page delivery uses the hosting provider.
+The Node consumer remains a separate fake catalogue example.
 
 ## Serving and distribution
 
@@ -81,8 +92,10 @@ Tests cover cross runtime output and digest parity, schema enforcement, malforme
 and oversized inputs, inference limits, static packaging, local HTTP serving and
 installed package exports. Existing tests also cover the official MCP transport,
 trace consistency and known corpus failures. Browser acceptance checks cover
-both interaction routes, theme reversal, cancellation, responsive layout and
-reduced motion. Automated tests reject changed contracts and invalid themes.
+planning, approval, calendar results, undo, cancellation, keyboard recovery and
+responsive layout. Calendar tests reject changed contracts, malformed arguments,
+forged or reused approvals, replaced proposals and stale versions. They verify
+atomic results, cancellation before dispatch and isolation from caller mutations.
 
 This is a complete foundation for describing and experimenting with actions. A
 general execution system remains outside the implementation: it would need

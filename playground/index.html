@@ -1,48 +1,36 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Watch a browser navigate an interface. Then let Hardwire change the same page directly.">
+  <meta name="description" content="Move a day of meetings through typed actions. Preview the changes, approve them and watch the calendar update.">
   <meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; worker-src 'self'; style-src 'self'; connect-src 'self'; base-uri 'none'; form-action 'none'">
   <meta name="referrer" content="no-referrer">
   <title>Hardwire | Try it</title>
-  <link rel="stylesheet" href="./styles.css">
-  <script type="module" src="./app.mjs"></script>
+  <link rel="stylesheet" href="./styles.css?v=calendar-1">
+  <script type="module" src="./app.mjs?v=calendar-1"></script>
 </head>
 <body>
   <header><a href="./" aria-label="Hardwire home">hardwire</a></header>
   <main>
-    <h1>Actions.<br><span>Without the clicks.</span></h1>
-    <div class="interaction" id="interaction">
-      <div class="routes" role="group" aria-label="Choose an interaction route">
-        <button id="browser-route" type="button" aria-pressed="true">Browser replay</button>
-        <button id="hardwire-route" type="button" aria-pressed="false">Hardwire</button>
-      </div>
-      <button id="request" class="request" type="button">
-        <span id="request-label">Turn on dark mode</span>
-        <span class="send" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
+    <h1>Agentic actions.<br><span>Without the clicks.</span></h1>
+    <section class="journey" aria-label="Interactive demo calendar">
+      <button id="request" class="request" type="button" disabled>
+        <span id="request-label">Move Friday’s meetings to Monday</span>
+        <span class="send" aria-hidden="true"><svg viewBox="0 0 24 24"><path id="send-path" d="M5 12h14M13 6l6 6-6 6"/></svg></span>
       </button>
-      <div class="feedback"><p id="status" role="status" aria-live="polite"></p><button id="cancel" type="button" hidden>Cancel</button></div>
-      <div id="settings" class="settings" inert hidden aria-hidden="true">
-        <div class="settings-head"><span id="settings-title">Preferences</span><span aria-hidden="true">···</span></div>
-        <div id="settings-menu" class="settings-menu">
-          <div id="settings-link" class="menu-item"><span>Settings</span><span aria-hidden="true">↗</span></div>
-        </div>
-        <div id="appearance-menu" class="settings-menu" hidden>
-          <div class="menu-item muted">Account</div>
-          <div id="appearance-link" class="menu-item"><span>Appearance</span><span aria-hidden="true">↗</span></div>
-        </div>
-        <div id="theme-menu" class="settings-menu theme-menu" hidden>
-          <div id="light-choice" class="theme-choice"><span class="theme-preview light-preview"></span><span>Light</span></div>
-          <div id="dark-choice" class="theme-choice"><span class="theme-preview dark-preview"></span><span>Dark</span></div>
-        </div>
+      <div class="calendar" id="calendar">
+        <div class="calendar-head"><span id="calendar-day">Friday</span><span id="calendar-caption">Demo calendar</span></div>
+        <ol id="meetings" aria-label="Calendar meetings"></ol>
+        <div class="calendar-foot"><p id="status" role="status" aria-live="polite">Loading calendar…</p><button id="secondary" type="button" hidden>Cancel</button></div>
       </div>
-    </div>
+      <details id="details" hidden>
+        <summary>See the actions</summary>
+        <div class="technical"><p id="discovery"></p><ol id="action-log"></ol><details><summary>Contract and call data</summary><pre id="record"></pre></details></div>
+      </details>
+    </section>
   </main>
-  <footer><span>Simulated agent · real local action</span><a href="https://github.com/Automatron-workflows/hardwire">GitHub ↗</a></footer>
-  <svg id="cursor" class="cursor" viewBox="0 0 28 32" aria-hidden="true" hidden><path d="M3 2v24l6-6 5 10 5-3-5-9h9Z"/></svg>
-  <p class="sr-only" id="announcement" aria-live="polite"></p>
-  <noscript><p>Enable JavaScript to try this interaction.</p></noscript>
+  <footer><span>Scripted agent · local demo · no account connected</span><a href="https://github.com/Automatron-workflows/hardwire">GitHub ↗</a></footer>
+  <noscript><p class="no-script">Enable JavaScript to try the calendar.</p></noscript>
 </body>
 </html>

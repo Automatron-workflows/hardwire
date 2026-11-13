@@ -82,9 +82,12 @@ start with the included examples or permitted HTML captures.
 ## Try it
 
 **[Open the playground](https://automatron-workflows.github.io/hardwire/)** to
-watch a browser replay navigate settings, then change the same page theme
-directly through a validated Hardwire action. No installation or agent setup is needed. Inputs stay in your
-browser. The only executable action changes the theme of the demo tab.
+move Friday's meetings to Monday. Hardwire validates the calendar's typed
+actions; the example finds available times, previews the changes, requires your
+approval and reads the result back. Undo restores the original meetings.
+No installation or account connection is needed. The calendar is sample data
+held in the current tab, driven by a scripted agent. Expand “See the actions” to
+inspect the actual contract and calls.
 
 The live demo follows main. To run that version locally, check out main after
 cloning and installing, then use

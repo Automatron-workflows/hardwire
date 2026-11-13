@@ -6,10 +6,11 @@ check arguments and verify a call record. Use the included fake data; you do not
 need to own an app or connect a live account.
 
 For the quickest start, [open the browser playground](https://automatron-workflows.github.io/hardwire/).
-Request dark mode. The first route replays a cursor navigating settings; the
-second validates and applies the theme directly through Hardwire. This is a
-simulated agent with a real effect confined to the current tab. The live demo
-follows main; the versioned 0.6.0 package retains its original catalogue demo.
+Ask to move Friday's meetings to Monday. Review the proposed times, approve the
+batch and watch the calendar update. Try Undo or cancel before approval.
+The fixed calendar handlers use Hardwire's real contract and argument validation.
+A scripted agent coordinates the example; no real calendar is connected.
+The live demo follows main; the versioned 0.6.0 package retains its original catalogue demo.
 
 Run the commands from the repository root with Node 22 or newer. Install
 dependencies with `npm ci --ignore-scripts`. For a guided tour without a model or

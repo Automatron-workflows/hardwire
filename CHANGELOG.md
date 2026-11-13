@@ -2,11 +2,13 @@
 
 ## Unreleased
 
-Replaces the public catalogue tutorial with one interaction on the demo page:
-a scripted settings replay followed by a direct, validated theme change. Removes
-the shop, step labels, JSON editor and download controls. Adds cancellation,
-reduced motion and rejection tests for the fixed reversible theme contract.
-The published 0.6.0 tag and package remain unchanged.
+Replaces the public demo with one calendar journey under “Agentic actions.
+Without the clicks.” A scripted agent discovers typed actions, reads meetings,
+plans around a scheduling conflict and applies the approved batch. The result
+is read back and shown in the calendar; Undo restores the original meetings.
+Adds exact request approval, atomic application, stale proposal and duplicate
+call rejection, cancellation, an actual call log and responsive keyboard controls.
+Everything runs on local sample data. The published 0.6.0 tag and package remain unchanged.
 
 ## 0.6.0: 13 November 2026
 

@@ -5,9 +5,8 @@ import { execFileSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import * as browser from '../src/browser.mjs';
 import * as node from '../src/index.mjs';
-import { inspect, checkArguments, validateThemeRequest } from '../playground/model.mjs';
+import { inspect, checkArguments } from '../playground/model.mjs';
 import { samples } from '../playground/samples.mjs';
-import { themePanel } from '../playground/theme-contract.mjs';
 
 test('browser and Node APIs produce identical panels, tools and digests across the corpus', async () => {
   for (const name of ['shop', 'blog', 'legacy']) {
@@ -72,28 +71,6 @@ test('static build includes the runnable portable graph and only allowlisted fil
   assert.match(html, /\.\/playground\/app\.mjs/);
   const built = await import(new URL('playground/model.mjs', output));
   assert.equal((await built.inspect(samples.search)).digest, (await inspect(samples.search)).digest);
-});
-
-test('the demo accepts only its reviewed reversible theme contract', async () => {
-  const panel = themePanel();
-  const normalized = browser.normalizePanel(panel);
-  assert.equal(normalized.ports[0].kind, 'write');
-  assert.equal(normalized.ports[0].reversible, true);
-  assert.equal(normalized.ports[0].confirmation, 'none');
-  assert.equal(browser.compilePanel(panel)[0].name, 'set_theme');
-  for (const theme of ['light', 'dark']) {
-    assert.deepEqual(await validateThemeRequest({ panel, params: JSON.stringify({ theme }) }), { theme, validated: true });
-  }
-  await assert.rejects(validateThemeRequest({ panel: { ...panel, revision: 'changed' }, params: '{"theme":"dark"}' }), /hardwire_demo_unreviewed/);
-  await assert.rejects(validateThemeRequest({ panel: (await inspect(samples.signup)).panel, params: '{"theme":"dark"}' }), /hardwire_demo_unreviewed/);
-});
-
-test('theme requests reject invalid values and extra fields without producing an executable result', async () => {
-  for (const params of ['{}', '{"theme":42}', '{"theme":"blue"}', '{"theme":"dark","url":"https://evil.example"}', '[]', '{bad']) {
-    await assert.rejects(validateThemeRequest({ panel: themePanel(), params }));
-  }
-  const mutated = themePanel();
-  mutated.ports[0].parameters.properties.theme.enum.push('blue');
-  await assert.rejects(validateThemeRequest({ panel: mutated, params: '{"theme":"blue"}' }), /hardwire_demo_unreviewed/);
-  assert.deepEqual(await validateThemeRequest({ panel: themePanel(), params: '{"theme":"dark"}' }), { theme: 'dark', validated: true });
+  const { createCalendar } = await import(new URL('playground/calendar.mjs', output));
+  assert.equal((await createCalendar().call({ portId: 'list-events', params: { day: 'friday' } })).events.length, 3);
 });
