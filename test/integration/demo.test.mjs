@@ -65,7 +65,7 @@ test('local playground serves its module graph and does not expose arbitrary rep
   const page = await fetch(`${origin}/playground/`);
   assert.equal(page.status, 200);
   assert.match(await page.text(), /Hardwire \| Try it/);
-  for (const path of ['/playground/app.mjs', '/playground/worker.mjs', '/playground/model.mjs', '/src/browser.mjs', '/src/panel-schema.mjs']) {
+  for (const path of ['/playground/app.mjs', '/playground/calendar.mjs', '/playground/worker.mjs', '/playground/model.mjs', '/src/browser.mjs', '/src/panel-schema.mjs']) {
     const response = await fetch(origin + path);
     assert.equal(response.status, 200);
     assert.match(response.headers.get('content-type'), /text\/javascript/);

@@ -1,155 +1,150 @@
-import { themePanel } from './theme-contract.mjs';
+import { createCalendar, clock } from './calendar.mjs';
 
 const $ = id => document.getElementById(id);
-const reducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
-let route = 'browser';
+const calendar = createCalendar();
+let phase = 'ready';
+let proposal = null;
+let change = null;
+let discovery = null;
 let controller = null;
-let animations = [];
-let point = { x: 0, y: 0 };
-const theme = () => document.documentElement.dataset.theme;
-const nextTheme = () => theme() === 'light' ? 'dark' : 'light';
+const arrow = 'M5 12h14M13 6l6 6-6 6';
+const tick = 'M5 12l4 4L19 6';
 
-function applyTheme(value) {
-  if (!['light', 'dark'].includes(value)) throw new Error('Invalid theme.');
-  document.documentElement.dataset.theme = value;
-}
-function updateRequest() {
-  $('request-label').textContent = `Turn on ${nextTheme()} mode`;
-}
-function setRoute(value) {
-  route = value;
-  $('browser-route').setAttribute('aria-pressed', String(value === 'browser'));
-  $('hardwire-route').setAttribute('aria-pressed', String(value === 'hardwire'));
-  $('status').textContent = '';
-  updateRequest();
-}
-function announce(message) { $('announcement').textContent = message; }
-function pause(ms, signal) {
-  signal.throwIfAborted();
-  return new Promise((resolve, reject) => {
-    const abort = () => { clearTimeout(timer); reject(signal.reason); };
-    const timer = setTimeout(() => { signal.removeEventListener('abort', abort); resolve(); }, ms);
-    signal.addEventListener('abort', abort, { once: true });
-  });
-}
-function clearReplay() {
-  for (const animation of animations) animation.cancel();
-  animations = [];
-  $('cursor').hidden = true;
-  $('settings').hidden = true;
-  for (const id of ['settings-link', 'appearance-link', 'light-choice', 'dark-choice']) $(id).classList.remove('hovered');
-}
-async function moveTo(id, signal) {
-  signal.throwIfAborted();
-  const rect = $(id).getBoundingClientRect();
-  const destination = { x: rect.left + rect.width * .6, y: rect.top + rect.height * .6 };
-  if (!reducedMotion.matches) {
-    const animation = $('cursor').animate([
-      { transform: `translate(${point.x}px, ${point.y}px)` },
-      { transform: `translate(${destination.x}px, ${destination.y}px)` },
-    ], { duration: 550, easing: 'cubic-bezier(.25,.1,.25,1)', fill: 'forwards' });
-    animations.push(animation);
-    const abort = () => animation.cancel();
-    signal.addEventListener('abort', abort, { once: true });
-    try { await animation.finished; }
-    finally { signal.removeEventListener('abort', abort); }
+function row(event, before) {
+  const li = document.createElement('li');
+  li.className = 'meeting' + (before || phase === 'complete' && event.id !== 'team-sync' ? ' changed' : '') + (event.id === 'team-sync' ? ' existing' : '');
+  const marker = document.createElement('span');
+  marker.className = 'marker';
+  marker.setAttribute('aria-hidden', 'true');
+  const title = document.createElement('span');
+  title.className = 'meeting-title';
+  title.textContent = event.title;
+  const time = document.createElement('span');
+  time.className = 'meeting-time';
+  if (before && before.start !== event.start) {
+    const old = document.createElement('span');
+    old.className = 'old-time';
+    old.textContent = clock(before.start);
+    old.setAttribute('aria-label', 'Previously ' + clock(before.start) + '. Now');
+    time.append(old);
   }
-  point = destination;
-  $(id).classList.add('hovered');
-  await pause(reducedMotion.matches ? 120 : 400, signal);
-  $(id).classList.remove('hovered');
+  time.append(document.createTextNode(clock(event.start)));
+  li.append(marker, title, time);
+  return li;
 }
-async function replayBrowser(target, signal) {
-  const rect = $('request').getBoundingClientRect();
-  point = { x: rect.right - 27, y: rect.top + rect.height / 2 };
-  $('cursor').hidden = reducedMotion.matches;
-  $('settings').hidden = false;
-  $('settings-title').textContent = 'Preferences';
-  $('settings-menu').hidden = false;
-  $('appearance-menu').hidden = true;
-  $('theme-menu').hidden = true;
-  announce('Browser replay. Opening settings.');
-  await moveTo('settings-link', signal);
-  $('settings-menu').hidden = true;
-  $('appearance-menu').hidden = false;
-  $('settings-title').textContent = 'Settings';
-  announce('Browser replay. Opening appearance.');
-  await moveTo('appearance-link', signal);
-  $('appearance-menu').hidden = true;
-  $('theme-menu').hidden = false;
-  $('settings-title').textContent = 'Appearance';
-  announce(`Browser replay. Selecting ${target} mode.`);
-  await moveTo(`${target}-choice`, signal);
-  signal.throwIfAborted();
-  applyTheme(target);
-  await pause(reducedMotion.matches ? 100 : 500, signal);
-  clearReplay();
-}
-function checkedTheme(target, signal) {
-  signal.throwIfAborted();
-  return new Promise((resolve, reject) => {
-    const worker = new Worker(new URL('./worker.mjs', import.meta.url), { type: 'module' });
-    const finish = () => { clearTimeout(timer); worker.terminate(); signal.removeEventListener('abort', abort); };
-    const abort = () => { finish(); reject(signal.reason); };
-    const timer = setTimeout(() => { finish(); reject(new Error('Hardwire could not respond. Try again.')); }, 5000);
-    signal.addEventListener('abort', abort, { once: true });
-    worker.onmessage = ({ data }) => {
-      finish();
-      if (data.error) reject(new Error(data.error.message));
-      else resolve(data.result);
+function render() {
+  const complete = ['complete', 'undoing'].includes(phase);
+  const reviewing = ['review', 'applying'].includes(phase);
+  $('request-label').textContent = controller ? (phase === 'applying' ? 'Updating your calendar…' : phase === 'undoing' ? 'Restoring Friday…' : 'Checking your calendar…')
+    : complete ? 'Friday is clear.' : reviewing ? 'Approve ' + proposal.moves.length + ' changes' : 'Move Friday’s meetings to Monday';
+  $('request').disabled = !!controller || complete;
+  $('request').setAttribute('aria-busy', String(!!controller));
+  $('request').classList.toggle('complete', complete);
+  $('send-path').setAttribute('d', complete ? tick : arrow);
+  $('calendar-day').textContent = reviewing ? 'Friday → Monday' : complete ? 'Monday' : 'Friday';
+  $('calendar-caption').textContent = reviewing ? 'Proposed changes' : 'Demo calendar';
+  const entries = reviewing ? proposal.moves.map(move => row(move.after, move.before))
+    : calendar.snapshot().events.filter(event => event.day === (complete ? 'monday' : 'friday')).sort((a, b) => a.start - b.start).map(event => row(event));
+  $('meetings').replaceChildren(...entries);
+  $('secondary').textContent = complete ? 'Undo' : 'Cancel';
+  $('secondary').hidden = !['review', 'complete', 'planning'].includes(phase);
+  $('secondary').disabled = !!controller && phase !== 'planning';
+  if (discovery) {
+    $('details').hidden = false;
+    $('discovery').textContent = discovery.tools.length + ' typed actions discovered. Each call below passed Hardwire validation.';
+    const labels = {
+      'list-events': record => 'Read ' + record.params.day + ': ' + record.result.events.length + ' meetings.',
+      'plan-move': record => 'Checked Monday: ' + record.result.moves.length + ' available times, ' + record.result.conflicts + ' conflict avoided.',
+      'move-events': () => 'Applied the approved changes together.',
+      'undo-move': () => 'Restored the meetings after your Undo request.',
     };
-    worker.onerror = event => { event.preventDefault(); finish(); reject(new Error('Could not load Hardwire. Please reload.')); };
-    worker.postMessage({ operation: 'theme', input: { panel: themePanel(), params: JSON.stringify({ theme: target }) } });
-  });
+    $('action-log').replaceChildren(...calendar.log().map(record => {
+      const li = document.createElement('li');
+      li.textContent = labels[record.port](record);
+      return li;
+    }));
+    $('record').textContent = JSON.stringify({ contract: discovery.panel, tools: discovery.tools, calls: calendar.log() }, null, 2);
+  }
 }
-async function request() {
+function status(message, error = false) {
+  $('status').textContent = message;
+  $('status').classList.toggle('error', error);
+}
+async function work(operation) {
   if (controller) return;
-  const previous = theme();
-  const target = nextTheme();
-  const selectedRoute = route;
   controller = new AbortController();
   const signal = controller.signal;
-  for (const id of ['request', 'browser-route', 'hardwire-route']) $(id).disabled = true;
-  $('request').setAttribute('aria-busy', 'true');
-  $('cancel').hidden = false;
-  $('status').textContent = '';
-  $('status').classList.remove('error');
-  try {
-    if (selectedRoute === 'browser') {
-      await replayBrowser(target, signal);
-      signal.throwIfAborted();
-      setRoute('hardwire');
-      $('status').textContent = 'Now with Hardwire.';
-    } else {
-      const checked = await checkedTheme(target, signal);
-      signal.throwIfAborted();
-      if (checked.validated !== true || checked.theme !== target) throw new Error('The action could not be verified.');
-      $('request').classList.remove('direct');
-      // Reflow restarts the single visual pulse for subsequent calls.
-      void $('request').offsetWidth;
-      $('request').classList.add('direct');
-      applyTheme(checked.theme);
-      $('status').textContent = 'Done.';
-    }
-    announce(`${target} mode is on. ${selectedRoute === 'browser' ? 'Try the same action through Hardwire.' : 'Hardwire validated the action and this tab applied it directly.'}`);
-  } catch (error) {
-    applyTheme(previous);
-    if (signal.aborted) { $('status').textContent = 'Cancelled.'; announce('Cancelled. The original theme is restored.'); }
-    else { $('status').textContent = error.message; $('status').classList.add('error'); }
+  render();
+  try { await operation(signal); }
+  catch (error) {
+    calendar.discardProposal();
+    proposal = null;
+    // Reflect actual application state, including an error after a write.
+    phase = calendar.snapshot().events.some(event => event.day === 'friday') ? 'ready' : 'complete';
+    status(signal.aborted ? 'Cancelled. Your meetings stayed where they were.' : error.message, !signal.aborted);
   } finally {
-    clearReplay();
     controller = null;
-    for (const id of ['request', 'browser-route', 'hardwire-route']) $(id).disabled = false;
-    $('request').removeAttribute('aria-busy');
-    if ([document.body, $('cancel')].includes(document.activeElement)) $('request').focus({ preventScroll: true });
-    $('cancel').hidden = true;
-    updateRequest();
+    render();
+    if ([document.body, $('secondary'), $('request')].includes(document.activeElement)) {
+      (phase === 'complete' ? $('secondary') : $('request')).focus({ preventScroll: true });
+    }
   }
 }
-$('request').addEventListener('click', request);
-$('browser-route').addEventListener('click', () => setRoute('browser'));
-$('hardwire-route').addEventListener('click', () => setRoute('hardwire'));
-$('cancel').addEventListener('click', () => controller?.abort());
-window.addEventListener('keydown', event => { if (event.key === 'Escape') controller?.abort(); });
+async function plan() {
+  phase = 'planning';
+  status('Finding times that work.');
+  await work(async signal => {
+    discovery = await calendar.discover();
+    const friday = await calendar.call({ portId: 'list-events', params: { day: 'friday' }, signal });
+    proposal = await calendar.call({ portId: 'plan-move', params: { ids: friday.events.map(event => event.id), day: 'monday' }, signal });
+    signal.throwIfAborted();
+    phase = 'review';
+    const shifted = proposal.moves.find(move => move.before.start !== move.after.start);
+    status(shifted ? clock(shifted.before.start) + ' is busy on Monday. Your first meeting fits at ' + clock(shifted.after.start) + '.' : 'Every meeting fits. Ready for your approval.');
+  });
+}
+async function apply() {
+  phase = 'applying';
+  status('Applying the changes you approved.');
+  await work(async signal => {
+    const params = { planId: proposal.id, version: proposal.version };
+    const approval = calendar.approve('move-events', params);
+    change = await calendar.call({ portId: 'move-events', params, approval, signal });
+    // Verify through the declared read interface, not a timer or animation.
+    const friday = await calendar.call({ portId: 'list-events', params: { day: 'friday' } });
+    const monday = await calendar.call({ portId: 'list-events', params: { day: 'monday' } });
+    if (friday.events.length || !proposal.moves.every(move => monday.events.some(event => event.id === move.after.id && event.start === move.after.start))) throw new Error('The calendar result needs review.');
+    phase = 'complete';
+    status(proposal.moves.length + ' meetings moved to Monday. Nothing overlaps.');
+    proposal = null;
+  });
+}
+async function undo() {
+  phase = 'undoing';
+  status('Restoring your original meetings.');
+  await work(async signal => {
+    const params = { changeId: change.changeId, version: change.version };
+    const approval = calendar.approve('undo-move', params);
+    await calendar.call({ portId: 'undo-move', params, approval, signal });
+    change = null;
+    phase = 'ready';
+    status('Friday is back as it was. Try again.');
+  });
+}
+$('request').addEventListener('click', () => {
+  if (controller) return;
+  if (phase === 'ready') void plan();
+  else if (phase === 'review') void apply();
+});
+function cancel() {
+  if (phase === 'planning') controller?.abort();
+  else if (phase === 'review') {
+    calendar.discardProposal(); proposal = null; phase = 'ready';
+    status('Cancelled. Your meetings stayed where they were.'); render(); $('request').focus();
+  }
+}
+$('secondary').addEventListener('click', () => phase === 'complete' ? void undo() : cancel());
+window.addEventListener('keydown', event => { if (event.key === 'Escape') cancel(); });
 window.addEventListener('pagehide', () => controller?.abort());
-updateRequest();
+status('3 meetings. One request.');
+render();

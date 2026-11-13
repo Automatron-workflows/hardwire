@@ -45,11 +45,13 @@ customer data. See `SECURITY.md` for sensitive reports.
 
 Run `npm run demo` and open `http://127.0.0.1:8787/playground/`. Restart the server
 after changing an asset, because it reads the allowlisted files at startup.
-Run the browser replay and the direct Hardwire route. Check theme reversal,
-cancellation during replay, recovery after cancellation, keyboard operation and a
-narrow viewport. The cursor is an illustration; the theme change is real. Respect
-reduced motion and do not present replay timing as a speed benchmark. The worker
-must reject invalid theme values and any changed panel before the UI applies them.
+Request the calendar move, inspect the proposed conflict resolution, cancel,
+try again, approve and undo. Verify the calendar rows change and restore, keyboard
+focus returns to the available control and a narrow viewport has no horizontal
+overflow. Expand the action log to inspect the actual calls. Keep the scripted
+agent and local sample data labels visible. Do not invent performance benchmarks.
+The calendar tests cover schema and contract rejection, approval binding,
+cancellation, stale proposals, duplicate calls, atomic changes and undo.
 
 `npm run build:playground` writes the deployable site to `output/playground`.
 The build contains only an explicit portable module graph and static assets.

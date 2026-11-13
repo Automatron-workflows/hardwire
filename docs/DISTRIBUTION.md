@@ -62,8 +62,10 @@ identifiers and links.
 ## First experiment to share
 
 Share the [playground](https://automatron-workflows.github.io/hardwire/) as the
-first experience. A visitor can watch a cursor navigate settings and then change
-the page theme directly through Hardwire. No installation is needed. Developers already using an MCP client can then follow
+first experience. A visitor requests a calendar change, reviews a conflict free
+proposal, approves the batch and sees the meetings move. Undo and an expandable
+action log make the outcome inspectable. This uses local sample data and needs no
+installation. Developers already using an MCP client can then follow
 [the setup guide](MCP.md#first-task). They should infer a draft, review its declared
 rules and test invalid arguments. This demonstrates a useful workflow without
 requiring an application integration.

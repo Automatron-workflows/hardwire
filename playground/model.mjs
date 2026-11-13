@@ -3,7 +3,6 @@ import {
   auditPanel, canonicalJson, compilePanel, HardwireError, inferFromHtml,
   normalizePanel, panelDigestAsync, toPanelDraft, validateParams,
 } from '../src/browser.mjs';
-import { themePanel } from './theme-contract.mjs';
 
 export function parseJson(text) {
   if (typeof text !== 'string' || new TextEncoder().encode(text).length > 256 * 1024) {
@@ -33,18 +32,4 @@ export function checkArguments({ panel, portId, params }) {
   if (!port) throw new HardwireError('hardwire_port_unknown', 'port');
   validateParams(port, parseJson(params));
   return { valid: true, executed: false, confirmation: port.confirmation, kind: port.kind };
-}
-
-// Validate a request for the fixed, application owned theme handler.
-// No arbitrary URL, code or operation can be selected by a supplied panel.
-const reviewedPanel = normalizePanel(themePanel());
-let reviewedDigest;
-export async function validateThemeRequest({ panel, params }) {
-  reviewedDigest ??= panelDigestAsync(reviewedPanel);
-  if (await panelDigestAsync(panel) !== await reviewedDigest) {
-    throw new HardwireError('hardwire_demo_unreviewed', 'panel', 'The demo accepts only its original theme contract');
-  }
-  const args = validateParams(reviewedPanel.ports[0], parseJson(params));
-  // The UI applies this checked value to its own tab. No action runs here.
-  return { theme: args.theme, validated: true };
 }
