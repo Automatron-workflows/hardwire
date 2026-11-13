@@ -1,9 +1,17 @@
 # Connect Hardwire to an agent
 
-The local toolkit works even if you do not own an app. An agent can inspect a
-panel, infer a draft from HTML, compile tool descriptions, check arguments and
-verify traces. It never calls an endpoint from a panel. MIT licensed; setup is
-open to anyone.
+Use Hardwire to understand and check an application's action descriptions before
+building an integration. Its five local tools help you inspect required inputs,
+review declared effects and approvals, and catch arguments that do not match the
+contract.
+
+You supply HTML, JSON action descriptions or call records. Hardwire returns
+drafts, validation results and tool descriptions through Model Context Protocol
+(MCP). Your client can then explain the results. The toolkit does not visit the
+website or execute the described actions.
+
+You can start with the example below. No app ownership, hosting or API key is
+required for Hardwire itself. The code is MIT licensed.
 
 ## Install and verify
 

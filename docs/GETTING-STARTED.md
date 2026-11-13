@@ -1,17 +1,20 @@
 # Experiment with Hardwire
 
-Run every command below from the repository root with Node 22+ (24 recommended).
-For an agent-connected experience, start with [the standalone MCP toolkit](MCP.md).
-Install dependencies with `npm ci --ignore-scripts` for MCP checks.
-`npm run walkthrough` is the fastest complete offline tour. It makes no network
-requests and needs no model or credentials.
+This guide shows how to turn application actions into descriptions you can
+inspect and test. You will review a sample contract, infer a draft from HTML,
+check arguments and verify a call record. Use the included fake data; you do not
+need to own an app or connect a live account.
 
-To see a tool actually call an application function, run `npm run consumer`.
-It calls `search_catalogue` with `{ "query": "lamp" }`, returns the fake
-`Desk lamp` product and records a checked success. Read `examples/consumer.mjs`
-to replace the fixed handler with your own authorized service. The standalone MCP toolkit inspects supplied data; calling this catalogue function
-from a model still needs a separate application adapter. Publishing a panel alone
-cannot make its operations executable.
+Run the commands from the repository root with Node 22 or newer. Install
+dependencies with `npm ci --ignore-scripts`. For a guided tour without a model or
+credentials, run `npm run walkthrough`. To work through an agent client, use
+[the MCP setup guide](MCP.md).
+
+The separate `npm run consumer` example calls one fixed catalogue search handler
+with `{ "query": "lamp" }`, returns the fake `Desk lamp` product and records the
+result. Read `examples/consumer.mjs` to understand that mapping before replacing
+it with an authorized service. Publishing an action description alone does not
+make it executable.
 
 ## 1. Inspect an explicit contract
 
@@ -45,7 +48,7 @@ node src/cli.mjs trace examples/example-panel.json search-catalogue --params '{"
 node src/cli.mjs verify output/search.trace.json --panel examples/example-panel.json --json
 ```
 
-Expected: `{"valid": true, "panelChecked": true}` (pretty-printed). The outcome
+Expected: `{"valid": true, "panelChecked": true}` (formatted as JSON). The outcome
 is `unknown`, because nothing was executed. Change `lamp` in the saved trace and
 verification returns `valid: false`, exit 1. Changing the supplied panel revision
 also fails the panel binding. Recomputing a digest after changing a record can
@@ -78,7 +81,7 @@ responds with `{"demo":true,"query":"lamp"}`. This `curl` call is manual HTTP,
 not a Hardwire executor.
 
 The demo binds to loopback only, has no session or database, and returns 405 for
-POST. Sign-in and subscription forms are inference examples, not functional
+POST. Login and subscription forms are inference examples, not functional
 features. Use fake data only. Stop it with Ctrl-C. To change ports:
 
 ```sh
@@ -121,7 +124,7 @@ console.log(compilePanel(panel));
 
 Do not run `npm install hardwire` expecting this repository. It is not published
 on npm, and the package name has not been reserved. Current code is Node.js ESM;
-it is not a browser-ready React SDK. A React app can serve the static panel,
+it is not a React SDK that runs in a browser. A React app can serve the static panel,
 while its backend or a trusted Node integration uses the library.
 
 ## Troubleshooting
@@ -133,6 +136,6 @@ while its backend or a trusted Node integration uses the library.
 | `hardwire_origin_private` | The probe refused a local target. Use `--allow-private` only for a development origin you control. |
 | Probe exits 1 | The score is below the threshold; inspect the report and network findings. |
 | `hardwire_schema_invalid` | The schema uses unsupported constraints or inconsistent types. Do not silently remove a constraint your app requires. |
-| `hardwire_infer_failed` | No usable candidates, invalid candidate schema, non-HTML response, or fetch/capture limits. Inspect the HTML; runtime-rendered controls are not supported. |
+| `hardwire_infer_failed` | No usable candidates, invalid candidate schema, a response without HTML, or fetch/capture limits. Inspect the HTML; controls rendered by JavaScript are not supported. |
 | `npm run corpus` exits 1 | Expected for the supplied imperfect synthetic corpus. |
 | A compiled tool does nothing | Compilation supplies descriptions only. Implement a trusted handler mapping; see the integration guide. |

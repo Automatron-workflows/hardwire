@@ -1,5 +1,13 @@
 # Changelog
 
+## Documentation update: 13 November 2026
+
+Clarifies the purpose, mission, vision, audience and value proposition across the
+README, setup guides and public release copy. Adds a concrete explanation of why
+action descriptions matter and how to experiment without owning an app. Updates
+distribution status to reflect the published GitHub prerelease. Runtime behavior,
+format versions and the existing release assets are unchanged.
+
 ## 0.5.0 — 2026-11-12
 
 Standalone agent access without an owned application.

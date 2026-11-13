@@ -1,52 +1,84 @@
-# Distribution without owning an app
+# Distribution and product positioning
 
-## The first product
+## What we are offering
 
-Hardwire 0.5.0 is a local MCP toolkit for inspecting agent interfaces. Its five
-fixed tools process supplied HTML, panels, arguments and traces. A user can
-connect it to a local MCP host without building an app or running a service.
-See [MCP setup](MCP.md) for a first task and exact-path client configuration.
+**Make software understandable to AI agents.**
 
-Application execution remains a later partner integration. The toolkit does not
-log in, operate arbitrary websites or make inferred descriptions executable.
-Keep this distinction in every listing.
+Hardwire helps developers describe application actions and check their inputs,
+declared effects and approval requirements before connecting those actions to
+an agent. The first product is a local toolkit for inspecting and validating
+these descriptions. It works with supplied HTML and JSON, so trying it requires
+no app ownership or hosted service.
 
-## Release status
+**Mission:** Make application actions explicit, reviewable and reusable for
+people building AI agents.
+
+**Vision:** A web where people can delegate tasks to agents through clear
+operations, while applications retain control over access and approvals.
+
+**Value proposition:** Developers get a shared action contract they can inspect
+and test. They can catch invalid arguments and contradictory declarations before
+connecting an agent to application code. The toolkit helps prepare an integration;
+it does not establish that a described endpoint behaves safely.
+
+The [README](../README.md) is the public overview. [MCP setup](MCP.md) takes a
+reader from installation to a concrete experiment.
+
+## Public description
+
+Use this description in directories and repository summaries:
+
+> Describe and validate application actions for AI agents. Open source tools for
+> reviewing inputs, declared effects and approval requirements.
+
+For a longer introduction, explain why, what and how in that order:
+
+1. An agent integration needs to know what an action expects, what it changes and
+   which approvals apply.
+2. Hardwire provides a JSON action format, validation tools and a local MCP server
+   for inspecting those declarations.
+3. Supply HTML or an action description, review the draft and check example
+   arguments before connecting trusted application code.
+
+Use ordinary language first. Introduce a panel as an action description and a
+port as one action. Keep the vision distinct from features that exist today.
+Write prose without dash punctuation. Preserve required syntax in commands,
+identifiers and links.
+
+## Current distribution
 
 | Item | State |
 | --- | --- |
-| GitHub source | Public under Automatron-workflows/hardwire |
-| MCP transport | Implemented with official SDK 2.4.0 |
-| Clean installation | CI installs the packed artifact and exercises its MCP command |
-| Public reuse license | MIT, chosen by the owner on 13 November 2026 |
-| npm package | Not published; `private: true`; unscoped name is not reserved |
+| GitHub prerelease | [0.5.0 published](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.5.0) on 13 November 2026 |
+| Download | Installable package and SHA256SUMS attached to the release |
+| Verification | The uploaded package was downloaded, checked and installed with real MCP calls |
+| Source license | MIT |
+| MCP transport | Local stdio server using official SDK 2.4.0 |
+| npm package | Not published; `private: true`; package identity is not reserved |
 | MCP Registry listing | Not submitted |
-| External users or measured demand | Not established |
+| External adoption | Not yet established |
 
-## First distribution: GitHub
+## First experiment to share
 
-GitHub is already available and needs no new npm account or paid hosting.
+Ask a developer already using an MCP client to inspect the sample search form in
+[the setup guide](MCP.md#first-task). They should infer a draft, review its declared
+rules and test invalid arguments. This demonstrates a useful workflow without
+requiring an application integration.
 
-1. The license is resolved: MIT. The release proposal and decision are recorded
-   in [the release decision](RELEASE-DECISION.md).
-2. Run the checks from the committed lockfile. Create the experimental `v0.5.0`
-   tag and a GitHub prerelease with the tested package and SHA-256 checksum.
-   Use [the prepared release notes](releases/v0.5.0.md).
-3. Verify the exact downloaded asset in a fresh directory with an MCP client.
-   Link the source, license, setup and limitations.
-4. Offer one concrete experiment: infer a panel from a small saved HTML page,
-   inspect it, and identify which declarations need review.
+The release page contains installation instructions and a downloadable package.
+Use its exact version link when sharing a reproducible experiment. Public
+availability is established; independent usage and demand still need evidence.
 
-This document does not publish a release. Do not advertise a tag, asset URL,
-package name or registry listing before it exists and has been verified.
+## Preparing later releases
 
-`npm run release:prepare` builds a local package and checksum for owner review.
-Run the GitHub Actions `prepare-release` workflow on main. It checks the license,
-runs the full suite and creates a **draft** prerelease with assets. It then
-downloads those assets, verifies the checksum and tests the downloaded package
-in a fresh installation, including actual MCP calls. Publish the draft only
-after this workflow passes. This does not publish to npm or require an
-npm account. The workflow refuses a package with no reuse license.
+`npm run release:prepare` builds a package and checksum locally. The GitHub Actions
+`prepare-release` workflow runs the full checks on main, creates a draft release,
+downloads its assets, verifies the checksum and tests the downloaded package in a
+fresh installation. Publish the draft after the workflow passes. This process
+uses GitHub and does not publish to npm.
+
+Use a new version for a changed package. Editorial changes to a release page do
+not replace its existing tag or downloadable assets.
 
 ## Then npm and discovery
 
@@ -69,24 +101,24 @@ No hosted endpoint is needed for a local package.
 ## Reach the first users
 
 Start with developers already using MCP and browser automation. They can try the
-toolkit without controlling a website. Publish the release and a reproducible
-demo, then seek three independent evaluations.
+toolkit without controlling a website. Use the published release and the setup
+example to seek three independent evaluations.
 
 Measure whether people connect without help, complete the first task, understand
 limitations and return for a second project. Record client/version, setup time,
-failed commands and useful findings. Use voluntary feedback; there is no built-in
+failed commands and useful findings. Use voluntary feedback; there is no built in
 tracking. Downloads, directory presence and stars do not establish demand.
 
 Obtain explicit outreach instructions before sending promotional messages.
 Potential channels are the MCP Registry, relevant developer directories and a
-technical demo post. Avoid universal-compatibility, automatic-login, proven-safety
-or unmeasured-speed claims.
+technical demo post. Describe supported features and measured results. Do not promise universal
+compatibility, automatic login, proven safety or speed gains without evidence.
 
 ## Application execution after a partner exists
 
 With a consenting app team, start with three explicit read handlers behind its
-existing authorization. Add one reversible write with argument-bound approval,
-idempotency and read-back verification. The partner owns handlers and credentials.
+existing authorization. Add one reversible write with approval bound to exact arguments,
+idempotency and verification of the resulting state. The partner owns handlers and credentials.
 Inspecting a contract does not grant permission to execute it.
 
 Sources checked 2026-11-12:
