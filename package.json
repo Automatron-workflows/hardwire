@@ -1,7 +1,7 @@
 {
   "name": "hardwire",
   "version": "0.5.0",
-  "description": "Local MCP toolkit for inspecting HTML, validating action panels and checking trace digests. Experimental; no website executor.",
+  "description": "Describe and validate application actions for AI agents. Open source tools for reviewing inputs, declared effects and approval requirements.",
   "type": "module",
   "private": true,
   "license": "MIT",

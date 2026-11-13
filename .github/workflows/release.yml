@@ -31,7 +31,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           version=$(node -p "require('./package.json').version")
-          gh release create "v$version" output/release/*.tgz output/release/SHA256SUMS --target "$GITHUB_SHA" --title "Hardwire $version — local MCP toolkit" --notes-file "docs/releases/v$version.md" --prerelease --draft
+          gh release create "v$version" output/release/*.tgz output/release/SHA256SUMS --target "$GITHUB_SHA" --title "Hardwire $version: make software understandable to AI agents" --notes-file "docs/releases/v$version.md" --prerelease --draft
       - name: Verify the uploaded release assets
         env:
           GH_TOKEN: ${{ github.token }}

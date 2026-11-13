@@ -1,60 +1,114 @@
 # Hardwire
 
-**Sites expose ports. Agents plug in.**
+**Make software understandable to AI agents.**
+
+Hardwire is an open source toolkit that helps developers describe application
+actions and check their inputs, declared effects and approval requirements
+before connecting those actions to an AI agent.
+
+Start with saved HTML or an existing action description. You can inspect and
+validate it locally without owning an app, hosting a service or providing an
+API key.
+
+[Try the public release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.5.0)
+· [Connect an agent](docs/MCP.md) · [Explore without an agent](docs/GETTING-STARTED.md)
 
 [![Tests](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml/badge.svg)](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml)
 
-Hardwire describes an application's operations in a small JSON file called a
-**panel**. Each operation is a **port**: named arguments, an effect such as
-`read` or `payment`, and a declared confirmation requirement. An agent
-integration can inspect that contract instead of guessing which UI to click.
+## Why Hardwire exists
 
-**Status: 0.5.0 experimental MCP toolkit and Node.js library.** Connect an agent
-to five local tools for HTML inference, panel inspection, tool-description
-compilation, argument validation and trace verification. You do not need an app,
-a website, an API key or hosting. The toolkit processes supplied data; it does
-not browse websites, log in or execute the operations described in a panel.
+An interface shows a person where to click. An agent integration also needs to
+know what an action expects, what it changes and which approvals apply. When
+that information is missing or inconsistent, developers have to reconstruct it
+for each integration.
 
-MIT licensed, with no npm publication: `package.json` keeps `"private": true`
-so an npm release remains a separate owner decision. The toolkit is ready to
-clone, run and evaluate.
+Hardwire puts those declarations into a shared format and provides tools to
+check them. Use it to find invalid inputs and contradictory rules,
+review inferred actions and prepare tool descriptions before connecting them to
+real application code.
 
-## Connect in five minutes
+**Mission:** Make application actions explicit, reviewable and reusable for
+people building AI agents.
 
-Use **Node 22 or newer** (`nvm use` if you use nvm). CI tests Node 22 and 24.
+**Vision:** A web where people can delegate tasks to agents through clear
+operations, while applications retain control over access and approvals.
+
+## What you can use today
+
+Version 0.5.0 is an experimental Node.js library, command line tool and local
+MCP server. Model Context Protocol, or MCP, lets an agent client call tools.
+Hardwire exposes five tools for inspecting and checking supplied data.
+
+| Tool | What you get |
+| --- | --- |
+| `hardwire_infer_html` | A draft action description extracted from static HTML, ready for human review. |
+| `hardwire_inspect_panel` | Validation results and a summary of declared effects and approvals. |
+| `hardwire_validate_params` | A check that arguments match an action's declared input schema. |
+| `hardwire_compile_panel` | MCP tool descriptions to use when designing an integration. |
+| `hardwire_verify_trace` | A consistency check between a call record and its action description. |
+
+The toolkit inspects descriptions. It does not browse websites, log in or
+execute the application actions it describes. Connecting an action to a real
+service still requires a trusted handler, authorization and approval enforcement.
+
+## How it works
+
+1. **Describe an action.** Supply saved HTML to infer a draft, or write a JSON
+   description of operations you already understand.
+2. **Review the contract.** Check required inputs, declared effects and approval
+   requirements. Confirm inferred declarations against the application's actual
+   behavior.
+3. **Check an integration before execution.** Validate example arguments,
+   generate MCP tool descriptions and check records against the reviewed contract.
+
+For example, a search form with a required `q` field can become a draft search
+action with a required string input. Hardwire can reject `{"q": 42}` and show the
+declared policy. A developer still needs to confirm what the search endpoint
+does and connect it to application code.
+
+## Who it is for
+
+**Agent developers** can turn supplied markup or action descriptions into a
+contract they can inspect and test.
+
+**Application teams** can describe operations in one place and check the
+arguments their integrations intend to send.
+
+**Researchers and experimenters** can compare inferred descriptions with reviewed
+examples and measure where inference fails. App ownership is not required to
+start with the included examples or permitted HTML captures.
+
+## Try it
+
+Use **Node 22 or newer**. CI tests Node 22 and 24.
 
 ```sh
-git clone https://github.com/Automatron-workflows/hardwire.git
+git clone --branch v0.5.0 --depth 1 https://github.com/Automatron-workflows/hardwire.git
 cd hardwire
 npm ci --ignore-scripts
 npm run test:mcp
 npm run --silent mcp:config
 ```
 
-The smoke check launches a real server, discovers all five tools and calls them
-with the official MCP client. The last command prints a client configuration
-with exact paths for this machine. Merge its `hardwire` entry into your MCP
-client's configuration. [Full setup, a first prompt and troubleshooting](docs/MCP.md).
+The smoke check starts a server and calls all five tools with the official MCP
+client. The last command prints configuration with the exact paths on your
+machine. Add its `hardwire` entry to your local MCP client's configuration.
+The [setup guide](docs/MCP.md) includes a first prompt and troubleshooting.
 
-| Tool | What it does |
-| --- | --- |
-| `hardwire_inspect_panel` | Validates a panel and summarizes declared effects. |
-| `hardwire_compile_panel` | Produces MCP descriptions as data, without registering them. |
-| `hardwire_infer_html` | Turns supplied static HTML into a draft that needs review. |
-| `hardwire_validate_params` | Checks arguments against a port without executing it. |
-| `hardwire_verify_trace` | Checks trace consistency and binding to a supplied panel. |
+To explore without an agent, run `npm run walkthrough`. To see a fixed read
+handler search fake catalogue data, run `npm run consumer`. This example shows
+how an application integration could work; the toolkit does not execute arbitrary
+panel operations.
 
-To explore the library without an agent, run `npm run walkthrough` and
-`npm run consumer`. The consumer calls one fixed function on fake catalogue data.
-Run `npm run check` for all tests, including a clean package installation and
-MCP calls through the installed command. HTTP integration tests need loopback
-sockets; restricted sandboxes can run `npm run test:unit` as a partial check.
+The [GitHub release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.5.0)
+also provides an installable package and checksum. Hardwire is not published on
+npm or listed in the MCP Registry. Do not use `npm install hardwire` to obtain
+this project.
 
-**Next:** [MCP setup](docs/MCP.md), [library experiments](docs/GETTING-STARTED.md),
-[API reference](docs/API.md), [application integration](docs/INTEGRATION.md),
-or [release and distribution](docs/DISTRIBUTION.md).
+## The format in one example
 
-## What a panel looks like
+A **panel** is a JSON description of an application's actions. Each action is a
+**port** with a name, input schema, declared effect and confirmation requirement.
 
 ```json
 {
@@ -73,125 +127,43 @@ or [release and distribution](docs/DISTRIBUTION.md).
 }
 ```
 
-Publish a reviewed panel at `/.well-known/hardwire.json`. That discovery path is
-Hardwire's own convention. The endpoint is a locator; the format does not yet
-specify HTTP methods, argument serialization, authentication or retries. A
-consumer needs an explicit implementation for each port it will call.
+A reviewed panel can be served at `/.well-known/hardwire.json`, Hardwire's own
+discovery convention. An endpoint identifies a location. The format does not yet
+define HTTP methods, authentication, argument serialization or retry behavior.
 
-| Term | Meaning |
+A **trace** records a caller's assertions and binds them to a particular panel
+revision through a digest. It can reveal inconsistent records, but it does not
+prove execution, authorship or approval.
+
+## What remains experimental
+
+Validation checks declarations, not application behavior. Inference reads static
+forms and JSON-LD search descriptions; it does not render JavaScript or establish
+whether an endpoint is safe. Even a GET form can change state.
+
+The current benchmark contains **three synthetic fixtures**, with scores of
+100, 60 and 45. Only one passes the threshold of 80. These examples exercise the
+code; they do not establish accuracy on real websites or performance gains.
+See [the roadmap](docs/ROADMAP.md) for the open evidence and integration gates.
+
+Hardwire works alongside APIs and MCP. There is no WebMCP adapter or general
+website executor. [Integration notes](docs/INTEGRATION.md) explain the boundaries.
+
+## Go deeper
+
+| Goal | Guide |
 | --- | --- |
-| Panel | The versioned description of an application's operations. |
-| Port | One operation, its argument schema and declared policy. |
-| Consumer / plug | An integration mapping application ports to real handlers. See the demo consumer. |
-| Trace | A record of a caller's assertion, bound to a panel digest. Not proof of execution. |
-
-## Try the commands
-
-```sh
-node src/cli.mjs --help
-node src/cli.mjs validate examples/example-panel.json
-node src/cli.mjs audit examples/example-panel.json
-node src/cli.mjs compile examples/example-panel.json --json
-node src/cli.mjs infer https://blog.example.com --html examples/corpus/blog/page.html --draft
-```
-
-The last command is **offline**; the origin identifies the captured page. It does
-not contact that fictional host. Without `--html`, inference fetches the root
-page of the supplied origin. `compile --json` emits a `tools/list` **result body**,
-not a running MCP server or a complete JSON-RPC message.
-
-| Command | Purpose |
-| --- | --- |
-| `validate <panel>` | Validate; add `--json` for normalized JSON. |
-| `audit <panel>` | Summarize declared effects and confirmation requirements. |
-| `compile <panel> --json` | Produce MCP tool descriptions. |
-| `probe <origin>` | Check a fixed set of discovery paths; heuristic, not certification. |
-| `infer <origin> [--html <file>]` | Propose candidates; `--draft` emits a validated draft. |
-| `trace <panel> <port> --params '<json>' --json` | Record validated arguments; executes nothing. |
-| `verify <trace> [--panel <panel>]` | Check digest consistency and optionally panel binding. |
-| `score --expected <panel> --infer <html>` | Compare one capture with hand-written ground truth. |
-| `corpus <directory>` | Aggregate inference results across fixture pairs. |
-
-Exit codes: **0** success, **1** validation or measured failure, **2** usage or I/O
-error. `--json` puts machine-readable successful results on stdout; errors go to
-stderr. Use `--params-file` instead of command-line arguments for sensitive
-inputs; redaction cannot remove secrets from shell history or process listings.
-
-## Use the API
-
-From a script inside this checkout:
-
-```js
-import { normalizePanel, compilePanel, validateParams } from './src/index.mjs';
-import { readFile } from 'node:fs/promises';
-
-const panel = normalizePanel(JSON.parse(
-  await readFile('./examples/example-panel.json', 'utf8')
-));
-const tools = compilePanel(panel);
-const port = panel.ports.find(p => p.id === 'search-catalogue');
-const args = validateParams(port, { query: 'lamp' });
-console.log(tools.length, args); // 5, { query: 'lamp' }
-```
-
-The package name is not published or reserved on npm. See the
-[local package setup](docs/GETTING-STARTED.md#use-it-from-another-local-project)
-to use it from another project. The code is MIT licensed; the npm package is
-deliberately not published.
-
-## What the foundation checks
-
-| Declared kind | Default confirmation | Lowest accepted declaration |
-| --- | --- | --- |
-| `read` | `none` | `none` |
-| `write` | `user` | `user`, or `none` only with `reversible: true` |
-| `payment` | `owner` | `owner` |
-| `destructive` | `owner` | `owner` |
-
-These rules reject contradictory **declarations**. They cannot prove what an
-endpoint actually does, that a write is reversible, or that approval happened.
-MCP annotations are hints; the consumer must enforce authorization and approvals.
-
-Schemas reject unsupported keywords and validate arguments, including nested
-objects. Unknown arguments are rejected by default. Traces redact strings
-explicitly marked `writeOnly` before hashing, including array items. Unmarked
-secrets are not detected. Anyone can rewrite a trace and recompute its digest;
-verification is a consistency check, not a signature or receipt.
-
-## Inference is an experiment
-
-Inference reads static forms and JSON-LD `SearchAction` declarations. It does
-not render JavaScript, reconstruct arbitrary browser forms, or know business
-semantics. A GET form may still change state. Every candidate needs review.
-
-```sh
-npm run corpus
-```
-
-The **three synthetic fixtures** currently score 100, 60 and 45, with a mean of
-68.3/100. This command intentionally exits **1**: only one fixture passes the
-80-point threshold, and the shop inference invents a mutation. Read error is 0%
-across just **two read ports**. That is a regression baseline, not evidence of
-accuracy on real websites. See [measurement and next gates](docs/ROADMAP.md).
-
-## Where it fits
-
-Hardwire is a small contract and validation experiment alongside existing APIs.
-It exports MCP-shaped tool descriptions; it does not replace MCP or OpenAPI.
-There is no WebMCP adapter yet. The [standards notes](docs/INTEGRATION.md#relationship-to-existing-standards)
-link the primary specifications and distinguish implemented features from ideas.
-
-[Format specification](docs/SPEC.md) · [Safety boundaries](docs/SAFETY.md) ·
-[Development](CONTRIBUTING.md) · [Changelog](CHANGELOG.md)
+| Connect an agent and complete a first task | [MCP setup](docs/MCP.md) |
+| Explore commands and local examples | [Getting started](docs/GETTING-STARTED.md) |
+| Use the library in your code | [API reference](docs/API.md) |
+| Understand the action format | [Specification](docs/SPEC.md) |
+| Design an application integration | [Integration](docs/INTEGRATION.md) |
+| Review limits and trust assumptions | [Safety](docs/SAFETY.md) |
+| Contribute or run the full checks | [Development](CONTRIBUTING.md) |
+| Understand distribution and next steps | [Distribution](docs/DISTRIBUTION.md) |
 
 ## License
 
-**MIT**, chosen by the owner on 13 November 2026. You may use, modify,
-redistribute and sell copies provided the copyright and permission notice are
-retained. The software is provided without warranty.
-
-`package.json` keeps `"private": true`: the source is licensed, but publishing to
-npm is a separate decision. The package name is not reserved, so do not assume
-`npm install hardwire` installs this project.
-
-See [LICENSE](LICENSE) and the [release decision record](docs/RELEASE-DECISION.md).
+[MIT](LICENSE). You may use, modify and redistribute the software under its
+license terms. Package publication on npm remains separate from this public
+GitHub release. See the [release decision](docs/RELEASE-DECISION.md).
