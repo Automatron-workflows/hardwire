@@ -21,6 +21,19 @@ jobs:
         with:
           node-version-file: .nvmrc
           package-manager-cache: false
+      - name: Refuse to reuse an existing version
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version=$(node -p "require('./package.json').version")
+          if gh release view "v$version" >/dev/null 2>&1; then
+            echo "::error::Release v$version already exists. Bump package.json for a new release."
+            exit 1
+          fi
+          if git ls-remote --exit-code --tags origin "refs/tags/v$version" >/dev/null 2>&1; then
+            echo "::error::Tag v$version already exists without a release. Refusing to reuse it."
+            exit 1
+          fi
       - name: Require a chosen reuse license
         run: node -e "const p=require('./package.json'); if(!p.license || p.license==='UNLICENSED') throw new Error('Owner must choose a reuse license before release');"
       - run: npm ci --ignore-scripts --no-audit --no-fund

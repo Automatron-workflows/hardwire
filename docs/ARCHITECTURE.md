@@ -88,7 +88,7 @@ is also separate from the film. Page delivery uses the hosting provider.
 `npm run demo` serves the playground at `/playground/` and keeps the original
 fixture origin at `/` for probe and inference experiments. The server serves an
 explicit asset allowlist. It does not expose repository files through arbitrary
-paths. The 0.8.0 package includes both the film and experiment. The
+paths. The 0.8.1 package includes both the film and experiment. The
 `hardwire-experiment` binary runs the three fixtures from an installed package.
 
 `npm run build:playground` copies only portable source modules, static assets and

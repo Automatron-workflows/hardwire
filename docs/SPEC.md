@@ -17,7 +17,7 @@ A site advertises its panel at:
 The repository copy is named `hardwire.panel.json`. Both names are conventions,
 not registered media types. A panel served at the discovery path must declare
 the origin it is served from; a mismatch is reported by `probe` as
-`originMismatch` and is not silently accepted.
+`hardwire_origin_mismatch` and is not silently accepted.
 
 ## 2. Document shape
 

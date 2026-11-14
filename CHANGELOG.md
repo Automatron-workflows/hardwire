@@ -1,5 +1,19 @@
 # Changelog
 
+## 0.8.1: 14 November 2026
+
+Patch for the browser experiment and release workflow.
+
+- Fixes the experiment's scenario tabs: tab state now applies only to the nav
+  buttons, so the stage section no longer receives an unsupported `aria-pressed`
+  attribute. Verified with an axe-core WCAG A/AA scan, keyboard approval, Escape
+  focus return and a 390px layout check.
+- Refuses to reuse an existing version tag or GitHub release in the release
+  workflow. A re-run now fails before creating another draft.
+- Corrects the spec's probe error name to `hardwire_origin_mismatch` and aligns
+  the form experiment's documented output.
+- No panel, trace or public API changes.
+
 ## 0.8.0: 14 November 2026
 
 Adds `hardwire-form`, a saved HTML experiment based on the email preference in

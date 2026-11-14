@@ -7,7 +7,7 @@ description. Nothing is executed and no account is required.
 With Node 22 or newer:
 
 ```sh
-npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.8.0/hardwire-0.8.0.tgz hardwire-form
+npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.8.1/hardwire-0.8.1.tgz hardwire-form
 ```
 
 Expected output:
@@ -18,6 +18,7 @@ Accepted: {"marketingEmails":false}
 Rejected: {"marketingEmails":"false"}
 MCP tool: preferences
 Review the draft. No endpoint was called and no preference changed.
+Use --json to inspect the complete contract and tool description.
 ```
 
 Add `--json` to inspect the candidate panel, accepted arguments, rejection and
