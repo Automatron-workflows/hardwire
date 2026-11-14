@@ -20,7 +20,7 @@ that step. Nothing connects to Google or a payment provider.
 
 [The experiment guide](EXPERIMENT.md) shows which inputs to change and follows a
 request through the validator and fixed handler. It includes JSON output and
-regression commands and the single command for the versioned 0.7.1 package.
+regression commands and the single command for the versioned 0.8.0 package.
 
 The [landing demo](https://automatron-workflows.github.io/hardwire/) remains a
 silent illustration. The separate experiment runs real local state changes.
@@ -28,6 +28,9 @@ silent illustration. The separate experiment runs real local state changes.
 To explore other toolkit features below, install dependencies with
 `npm ci --ignore-scripts`. Run `npm run walkthrough` for a format tour, or follow
 [the MCP setup guide](MCP.md) for the five agent inspection tools.
+
+For the next step from the settings scene, run `npm run experiment:form`.
+[Bring your own saved form](FORM-EXPERIMENT.md) to test inference and arguments.
 
 ## 1. Inspect an explicit contract
 

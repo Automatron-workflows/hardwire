@@ -29,6 +29,7 @@ flowchart TD
 | `playground/comparison.mjs` | Validate and dispatch fixed session, invoice and preference handlers; bind approval to exact requests | Local fixtures and call records |
 | `playground/experiment-model.mjs`, `experiment.mjs` | Review requests, collect explicit local approval and show fixture results | Browser memory and DOM |
 | `examples/experiment.mjs` | Exercise all three handlers and assert rejection, result and duplicate behavior | Local fixtures and stdout |
+| `examples/form.mjs` | Infer a saved form, check positive and negative samples, compile a description | Bounded local file read and stdout; no endpoint calls |
 | `examples/calendar.mjs` | Plan and apply an approved batch with conflict checks and undo | In memory calendar example |
 | `playground/app.mjs` | Render a silent SVG film with pause, replay and visibility controls | Local DOM only |
 
@@ -87,7 +88,7 @@ is also separate from the film. Page delivery uses the hosting provider.
 `npm run demo` serves the playground at `/playground/` and keeps the original
 fixture origin at `/` for probe and inference experiments. The server serves an
 explicit asset allowlist. It does not expose repository files through arbitrary
-paths. The 0.7.1 package includes both the film and experiment. The
+paths. The 0.8.0 package includes both the film and experiment. The
 `hardwire-experiment` binary runs the three fixtures from an installed package.
 
 `npm run build:playground` copies only portable source modules, static assets and

@@ -12,12 +12,12 @@ API key.
 
 [Watch the demo](https://automatron-workflows.github.io/hardwire/)
 · [Run the three actions](https://automatron-workflows.github.io/hardwire/experiment.html)
-· [Download the release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.7.1)
+· [Download the release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.8.0)
 · [Connect an agent](docs/MCP.md) · [Explore without an agent](docs/GETTING-STARTED.md)
 
 [![Tests](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml/badge.svg)](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml)
 
-[![Three illustrated action paths: sign in, invoice payment and settings](docs/assets/demo.png)](https://automatron-workflows.github.io/hardwire/)
+[![Three illustrated action paths: sign in, invoice payment and settings](docs/assets/demo.gif)](https://automatron-workflows.github.io/hardwire/)
 
 ## Try it in one command
 
@@ -25,7 +25,7 @@ Use Node 22 or newer. This downloads the versioned GitHub package and checks all
 three local actions, including invalid inputs and approval requirements:
 
 ```sh
-npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.7.1/hardwire-0.7.1.tgz hardwire-experiment
+npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.8.0/hardwire-0.8.0.tgz hardwire-experiment
 ```
 
 No app, account or API key is needed. For a visual journey, [run the experiment](https://automatron-workflows.github.io/hardwire/experiment.html).
@@ -50,7 +50,7 @@ operations, while applications retain control over access and approvals.
 
 ## What you can use today
 
-Version 0.7.1 includes a browser playground, portable library, Node.js CLI and local
+Version 0.8.0 includes a browser playground, portable library, Node.js CLI and local
 MCP server. Model Context Protocol, or MCP, lets an agent client call tools.
 Hardwire exposes five tools for inspecting and checking supplied data.
 
@@ -131,6 +131,19 @@ experiment lets you review and approve explicitly. Run `npm run demo` and open
 [Follow one request through the code](docs/EXPERIMENT.md).
 [Share your experiment result](https://github.com/Automatron-workflows/hardwire/issues/new?template=experiment.yml).
 
+## Bring one saved form
+
+Continue with the email preference from the third scene. Infer its draft contract,
+accept a boolean, reject a string and produce an MCP tool description:
+
+```sh
+npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.8.0/hardwire-0.8.0.tgz hardwire-form
+```
+
+Add `--json` to inspect the output. [Bring your own HTML form](docs/FORM-EXPERIMENT.md)
+with a valid and an invalid argument sample. No browser, account, model or API key
+is needed. The command never calls the form endpoint.
+
 ## Connect an agent
 
 ```sh
@@ -147,8 +160,8 @@ they do not execute the three fixture actions.
 For the format tour, run `npm run walkthrough`. The separate `npm run consumer`
 example demonstrates a fixed catalogue read handler.
 
-The live site follows main. The [0.7.1 release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.7.1)
-contains the three action experiment, toolkit and checksum. Hardwire is not published on npm or listed in the MCP Registry.
+The live site follows main. The [0.8.0 release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.8.0)
+contains both experiments, the toolkit and checksum. Hardwire is not published on npm or listed in the MCP Registry.
 Do not use `npm install hardwire` to obtain this project.
 
 ## The format in one example

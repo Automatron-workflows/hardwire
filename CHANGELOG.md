@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.8.0: 14 November 2026
+
+Adds `hardwire-form`, a saved HTML experiment based on the email preference in
+the third demo scene. It generates a reviewable draft, checks a positive and
+negative argument sample, and compiles an MCP tool description without executing
+anything. Includes a bounded file reader, explicit port selection for multiple
+forms, installed package verification and updated MCP onboarding. Adds actual
+GIF and MP4 captures of the film. The manual release workflow now publishes
+after verifying its uploaded package, removing the interrupted final handoff.
+
+
 ## 0.7.1: 13 November 2026
 
 Fixes the installed experiment's next step. It now links to the live browser

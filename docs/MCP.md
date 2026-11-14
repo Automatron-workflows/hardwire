@@ -74,25 +74,28 @@ npx --yes --ignore-scripts @modelcontextprotocol/inspector@2.0.0 --cli node src/
 This pins the Inspector version actually tested. Its CLI is a second protocol
 client, not proof of a successful conversational workflow in a desktop agent.
 VS Code and native Codex setup remain unverified in their host UIs. The attempted
-VS Code check did not reach a running client. [Help verify a native client](https://github.com/Automatron-workflows/hardwire/issues/17).
+VS Code check did not reach a running client. On 14 November, Codex 0.145.0
+app server verification also stopped before initialization completed. No native
+client success is claimed. [Help verify a native client](https://github.com/Automatron-workflows/hardwire/issues/17).
 
 ## First task
 
-Ask your connected agent:
+Use the email preference from the third demo scene. Ask your connected agent:
 
 > Use Hardwire to infer a panel from this HTML with origin https://example.com.
-> Inspect the draft, then compile its tool descriptions. Explain what needs
-> human review. Do not visit the website or execute an inferred operation.
+> Inspect the draft. Validate {"marketingEmails":false}, then test
+> {"marketingEmails":"false"}. Compile the MCP tool description and explain
+> what needs human review. Do not visit the origin or execute the action.
 >
-> `<form action="/search" method="get"><input name="q" required><button>Search</button></form>`
+> `<form action="/preferences" method="post"><input type="checkbox" name="marketingEmails"><button>Save</button></form>`
 
-Expected: one candidate read port with required string argument `q`, a draft and
-a compiled description. The effect is inferred from markup and needs review
-against actual behavior. The origin is a label; no request is sent to it.
+Expected: the `preferences` candidate is a write requiring user confirmation.
+The boolean passes; the string returns `isError: true`. The compiled input schema
+contains a boolean `marketingEmails`. No endpoint is called. Inference cannot
+establish reversibility or inherit the reviewed visual fixture's approval rules.
 
-Next validate arguments `{"q":42}` against the draft's port ID: expect
-`isError: true`. Change GET to POST and infer again: expect a declared write with
-user confirmation. This remains data; the toolkit cannot invoke that operation.
+The [saved form experiment](FORM-EXPERIMENT.md) reproduces the same task without
+an agent or account. Use synthetic input when testing a connected model client.
 
 ## Tool arguments
 

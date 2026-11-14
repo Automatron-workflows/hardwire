@@ -1,6 +1,6 @@
 {
   "name": "hardwire",
-  "version": "0.7.1",
+  "version": "0.8.0",
   "description": "Describe and validate application actions for AI agents. Open source tools for reviewing inputs, declared effects and approval requirements.",
   "type": "module",
   "private": true,
@@ -19,7 +19,8 @@
   "bin": {
     "hardwire": "./src/cli.mjs",
     "hardwire-mcp": "./src/mcp-server.mjs",
-    "hardwire-experiment": "./examples/experiment.mjs"
+    "hardwire-experiment": "./examples/experiment.mjs",
+    "hardwire-form": "./examples/form.mjs"
   },
   "exports": {
     ".": "./src/index.mjs",
@@ -65,8 +66,9 @@
     "test:package": "node scripts/check-package.mjs",
     "test:unit": "node --test test/*.test.mjs",
     "test:integration": "node --test test/integration/*.test.mjs",
-    "check": "npm test && npm run validate && npm run experiment && npm run walkthrough && npm run consumer && npm run test:mcp && npm run test:package && npm run build:playground",
-    "build:playground": "node scripts/build-playground.mjs"
+    "check": "npm test && npm run validate && npm run experiment && npm run experiment:form && npm run walkthrough && npm run consumer && npm run test:mcp && npm run test:package && npm run build:playground",
+    "build:playground": "node scripts/build-playground.mjs",
+    "experiment:form": "node examples/form.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.4.0"
