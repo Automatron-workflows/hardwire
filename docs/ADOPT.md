@@ -102,6 +102,9 @@ Add this entry to a client that supports local stdio servers:
 ```
 
 This downloads the versioned tarball into npx's cache and launches the server.
+Downloads can exceed a client startup timeout, especially behind a proxy. For
+those environments, use [the desktop bundle](DESKTOP-BUNDLE.md) or the installed
+entry point in [the MCP guide](MCP.md).
 It was verified with the official SDK 2.4.0 client: five tools, real calls and a
 clean shutdown. If the client cannot find `npx`, use the absolute path from
 `which npx`. A client that accepts only remote HTTP URLs cannot launch this
@@ -140,7 +143,7 @@ As of 14 November 2026:
 | GitHub tag install | `npm install github:Automatron-workflows/hardwire#v0.9.0` works without publishing |
 | npm | Not published. Ownership of the candidate scope `@automatron-workflows/hardwire` is not verified; the bare name is an unrelated placeholder. Publication needs the owner's npm login and a separate release decision. |
 | Desktop bundle | The release includes an MCPB archive with locked runtime dependencies. See [installation](DESKTOP-BUNDLE.md). |
-| MCP Registry | GitHub bundle metadata is published separately using the verified OIDC workflow. See [launch status](LAUNCH-STATUS.md). |
+| MCP Registry | [0.9.0 is active](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.Automatron-workflows/hardwire). Published from the verified GitHub bundle using repository OIDC. |
 | Independently confirmed users | Zero. Stars, clones and CI runs are not adoption evidence. |
 
 The honest next evidence is one person outside this repository completing the

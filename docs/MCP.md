@@ -13,6 +13,9 @@ website or execute the described actions.
 You can start with the example below. No app ownership, hosting or API key is
 required for Hardwire itself. The code is MIT licensed.
 
+For a host that supports MCPB, [the desktop bundle](DESKTOP-BUNDLE.md) includes
+the runtime dependencies and avoids package downloads during client startup.
+
 ## Use the release without a checkout
 
 Add this entry to a client that supports local stdio servers:
@@ -37,6 +40,12 @@ This downloads the versioned tarball into npx's cache and launches the server.
 It was verified with the official SDK 2.4.0 client: five tools, real calls and a
 clean shutdown. If `npx` is not on the client's PATH, use its absolute path. A
 client that accepts only remote HTTP URLs cannot launch this local stdio server.
+
+This launch path may fetch package metadata even with a populated cache. A slow
+network can exceed the client startup timeout. If your network requires a proxy,
+the client subprocess must receive its normal proxy configuration. Do not disable
+TLS verification. Use the bundle or an installed entry point below when package
+downloads at startup are unsuitable.
 
 ## Install from a checkout
 
@@ -150,6 +159,7 @@ determines where chat content goes. Hardwire itself has no telemetry.
 | Tarball returns 404 | Check the version in the no-checkout config against the published release. |
 | `ERR_MODULE_NOT_FOUND` | Run `npm ci --ignore-scripts` in the checkout. |
 | Node cannot be found | Regenerate `mcp:config` with the intended Node version. |
+| Startup times out while downloading | Use the desktop bundle or installed entry point. Check whether the host subprocess receives required network proxy settings. |
 | No tools appear | Run `npm run test:mcp`, check host logs and reload configuration. |
 | Terminal waits silently | Expected for stdio; configure a client to launch it. |
 | Unknown tool such as `search_catalogue` | Only the five toolkit tools are callable. Compiled descriptions are data. |

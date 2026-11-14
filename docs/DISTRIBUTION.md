@@ -57,7 +57,7 @@ identifiers and links.
 | Source license | MIT |
 | MCP transport | Local stdio server using official SDK 2.4.0 |
 | npm package | Not published; `private: true`; package identity is not reserved |
-| MCP Registry listing | MCPB metadata generated from the release; publication uses the separately triggered `publish-registry` workflow |
+| MCP Registry listing | [0.9.0 is active](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.Automatron-workflows/hardwire); metadata binds the exact GitHub bundle digest |
 | External adoption | Not yet established |
 
 ## First experiment to share

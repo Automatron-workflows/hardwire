@@ -14,7 +14,7 @@ the first confusing moment.
 | Execution boundaries | Local fixtures disclosed; form inference never calls an endpoint | A consenting application integration |
 | Community | Discussions enabled, welcome pinned, six scoped issues, templates and guidelines | Replies and reviewed outside contributions |
 | Desktop distribution | MCPB includes locked production dependencies; extracted server and exact artifact digest checked | Native host installation feedback |
-| MCP Registry | Generated metadata and GitHub OIDC publication workflow | Confirm successful publication for each release |
+| MCP Registry | 0.9.0 is active as `io.github.Automatron-workflows/hardwire`; public entry matches the release bundle digest | Observe discovery and independent installations |
 | npm | Separate optional distribution route | Authenticated publisher and verified scope |
 | Discovery | Repository description, topics, release, Pages site, adoption guide and Glama ownership file in place | Directory listings and one independent report |
 | Outside evidence | GitHub traffic in the last 14 days: 39 views from 1 unique visitor, 232 clones from 69 unique cloners, 0 referrers. Clones are not users. | An outside person completes a run and reports it |
@@ -67,3 +67,23 @@ manually triggered release workflows create a draft, download and verify its
 assets, test the uploaded package and then publish it in the same workflow.
 Failed checks leave the draft unpublished. Existing version assets are never
 replaced with a different build.
+
+## 0.9.0 publication evidence
+
+[Release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.9.0),
+[registry publication](https://github.com/Automatron-workflows/hardwire/actions/runs/43634329672)
+and [cross platform CI](https://github.com/Automatron-workflows/hardwire/actions/runs/43634230456)
+completed successfully on 14 November 2026. The registry reports the version as
+active and latest. Its bundle digest matches the public download. Both public
+CLI experiments passed, and the downloaded bundle passed extraction and actual
+MCP calls. Website preview metadata and its image URL are live.
+
+The Windows check caught a silent saved form CLI failure caused by inconsistent
+entry path resolution. Both entry paths now use the same resolver, and the
+installed command passes Windows CI.
+
+A direct npx client launch timed out while downloading in this environment.
+Its subprocess did not inherit the network proxy settings used by the successful
+terminal install. Forwarding the normal proxy settings made the same public npx
+configuration pass all five MCP tool checks, including the settings task.
+Desktop bundles and installed entry points avoid startup downloads. Native desktop host verification remains open.
