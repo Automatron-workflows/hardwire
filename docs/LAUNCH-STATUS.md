@@ -84,5 +84,6 @@ installed command passes Windows CI.
 
 A direct npx client launch timed out while downloading in this environment.
 Its subprocess did not inherit the network proxy settings used by the successful
-terminal install. Desktop bundles and installed entry points avoid startup
-downloads. Native desktop host verification remains open.
+terminal install. Forwarding the normal proxy settings made the same public npx
+configuration pass all five MCP tool checks, including the settings task.
+Desktop bundles and installed entry points avoid startup downloads. Native desktop host verification remains open.
