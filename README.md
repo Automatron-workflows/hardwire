@@ -12,6 +12,7 @@ checks. Your application supplies the authorized handler.
 [Try the three actions](https://automatron-workflows.github.io/hardwire/experiment.html)
 · [Watch the demo](https://automatron-workflows.github.io/hardwire/)
 · [Download](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.9.0)
+· [MCP Registry](https://registry.modelcontextprotocol.io/v0.1/servers?search=io.github.Automatron-workflows/hardwire)
 · [Ask a question](https://github.com/Automatron-workflows/hardwire/discussions/categories/q-a)
 
 [![Tests](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml/badge.svg)](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml)
