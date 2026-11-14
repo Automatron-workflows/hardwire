@@ -1,0 +1,56 @@
+name: publish-registry
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-24.04
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      id-token: write
+    env:
+      MCP_PUBLISHER_VERSION: v1.8.1
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: .nvmrc
+          package-manager-cache: false
+      - run: npm ci --ignore-scripts --no-audit --no-fund
+      - name: Require a published release and verify its exact bundle
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          version=$(node -p "require('./package.json').version")
+          test "$(gh release view "v$version" --json isDraft --jq .isDraft)" = false
+          gh release download "v$version" --dir output/registry --pattern '*.mcpb' --pattern '*.tgz' --pattern server.json --pattern SHA256SUMS
+          (cd output/registry && sha256sum --check SHA256SUMS)
+          npm run test:bundle -- "output/registry/hardwire-$version.mcpb"
+      - name: Install signature verifier
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
+      - name: Download and verify the pinned registry publisher
+        run: |
+          set -euo pipefail
+          archive="mcp-publisher_linux_amd64.tar.gz"
+          base_url="https://github.com/modelcontextprotocol/registry/releases/download/${MCP_PUBLISHER_VERSION}"
+          curl --fail --location --silent --show-error --output "$archive" "$base_url/$archive"
+          curl --fail --location --silent --show-error --output "$archive.sigstore.json" "$base_url/$archive.sigstore.json"
+          cosign verify-blob --bundle "$archive.sigstore.json" --certificate-identity "https://github.com/modelcontextprotocol/registry/.github/workflows/release.yml@refs/tags/${MCP_PUBLISHER_VERSION}" --certificate-oidc-issuer "https://token.actions.githubusercontent.com" "$archive"
+          tar xzf "$archive" mcp-publisher
+      - name: Validate registry metadata
+        run: ./mcp-publisher validate output/registry/server.json
+      - name: Authenticate using this repository's identity
+        working-directory: output/registry
+        run: ../../mcp-publisher login github-oidc
+      - name: Publish verified metadata
+        working-directory: output/registry
+        run: ../../mcp-publisher publish server.json

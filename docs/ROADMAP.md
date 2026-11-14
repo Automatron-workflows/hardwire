@@ -16,6 +16,14 @@
 The library is MIT licensed and ready for controlled experiments. It is not a
 production executor; application execution remains gated below.
 
+## Distribution: implemented in 0.9.0
+
+A versioned desktop bundle includes the inspection server and locked runtime
+dependencies. It is tested after extraction, alongside the installed tarball.
+A separate GitHub Actions workflow publishes its exact digest to the MCP Registry
+using repository OIDC. npm publication remains optional and requires a verified
+scope. None of these packaging steps satisfies the evidence gates below.
+
 ## Gate 1: real inference evidence — open
 
 **Question:** does static inference save useful work on sites that did not

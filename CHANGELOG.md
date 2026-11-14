@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.9.0
+
+* Added a desktop MCP bundle with locked production dependencies, licenses and an explicit Node runtime requirement.
+* Added extraction, manifest, checksum and actual MCP checks, including the settings form task.
+* Added registry metadata and a manual GitHub OIDC publication workflow for verified release assets.
+* Added Windows CI and corrected the installed server check to use the portable entry point.
+* Simplified first use in the README and added social preview metadata using existing artwork.
+* Kept execution scope unchanged: five inspection tools and local demonstration handlers.
+
+
 ## 0.8.1: 14 November 2026
 
 Patch for the browser experiment and release workflow.

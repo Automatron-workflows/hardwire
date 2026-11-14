@@ -51,13 +51,13 @@ identifiers and links.
 | --- | --- |
 | Visual demo | [Watch the three scenes](https://automatron-workflows.github.io/hardwire/) |
 | Working experiment | [Run the three local actions](https://automatron-workflows.github.io/hardwire/experiment.html) |
-| GitHub prerelease | [0.8.1](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.8.1) |
-| Download | Installable package and SHA256SUMS attached to the release |
+| GitHub prerelease | [0.9.0](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.9.0) |
+| Download | Installable package, desktop bundle, registry metadata and SHA256SUMS attached to the release |
 | Verification | The uploaded package was downloaded, checked and installed with real MCP calls |
 | Source license | MIT |
 | MCP transport | Local stdio server using official SDK 2.4.0 |
 | npm package | Not published; `private: true`; package identity is not reserved |
-| MCP Registry listing | Not submitted |
+| MCP Registry listing | MCPB metadata generated from the release; publication uses the separately triggered `publish-registry` workflow |
 | External adoption | Not yet established |
 
 ## First experiment to share
@@ -75,7 +75,7 @@ inspect the actual request, compiled tool description, state and call record.
 All data and handlers are fixed fixtures. The film illustrates the idea; the
 experiment executes local JavaScript. Neither connects accounts or moves money.
 
-The versioned 0.8.1 package runs all three with the one command in the
+The versioned 0.9.0 package runs all three with the one command in the
 [experiment guide](EXPERIMENT.md). A checkout uses `npm run experiment` without
 installing dependencies. Discussions are enabled, the welcome post links to the
 experiment and six scoped contribution issues are open. See the [14 day launch
@@ -109,11 +109,15 @@ Publish an experimental exact version and verify installing it from the registry
 Then configure trusted publishing for the specific repository and workflow.
 Keep npm tokens out of source, examples and issue reports.
 
-The MCP Registry lists server metadata, not package artifacts. The npm route
-needs a published package, matching `mcpName`, `server.json` and verified namespace
-ownership. A GitHub source link alone is insufficient. MCPB bundles are a possible
-later alternative; do not claim a bundle exists until its installation is tested.
-No hosted endpoint is needed for a local package.
+The MCP Registry lists server metadata, not package artifacts. Hardwire now uses
+the MCPB route: a versioned GitHub release URL, the exact bundle SHA256 and an
+Automatron namespace authenticated through GitHub Actions OIDC. This route does
+not depend on npm publication. The workflow verifies the downloaded artifact
+before submission. Check the workflow result and public registry entry before
+claiming a new version is listed. See [desktop distribution](DESKTOP-BUNDLE.md).
+
+A future npm route needs a published package, matching `mcpName`, `server.json`
+and verified namespace ownership. No hosted endpoint is needed for either route.
 
 ## Reach the first users
 
@@ -138,7 +142,7 @@ existing authorization. Add one reversible write with approval bound to exact ar
 idempotency and verification of the resulting state. The partner owns handlers and credentials.
 Inspecting a contract does not grant permission to execute it.
 
-Sources checked 2026-11-12:
+Sources checked 2026-11-14:
 [MCP Registry](https://modelcontextprotocol.io/registry/quickstart),
 [npm trusted publishing](https://docs.npmjs.com/trusted-publishers/),
 [MIT license](https://choosealicense.com/licenses/mit/).

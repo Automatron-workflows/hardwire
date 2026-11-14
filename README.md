@@ -2,306 +2,127 @@
 
 **Agentic actions. Without the clicks.**
 
-Hardwire is an open source toolkit that helps developers describe application
-actions and check their inputs, declared effects and approval requirements
-before connecting those actions to an AI agent.
+Turn a saved HTML form into an action contract. Check its inputs and approval
+rules, then generate an MCP tool description for your agent integration.
 
-Start with saved HTML or an existing action description. You can inspect and
-validate it locally without owning an app, hosting a service or providing an
-API key.
+The goal is simple: applications should tell agents what they can do, what each
+action changes and which approval it needs. Hardwire provides the format and
+checks. Your application supplies the authorized handler.
 
-[Watch the demo](https://automatron-workflows.github.io/hardwire/)
-· [Run the three actions](https://automatron-workflows.github.io/hardwire/experiment.html)
-· [Download the release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.8.1)
-· [Adopt it](docs/ADOPT.md) · [Connect an agent](docs/MCP.md)
-· [Explore without an agent](docs/GETTING-STARTED.md)
+[Try the three actions](https://automatron-workflows.github.io/hardwire/experiment.html)
+· [Watch the demo](https://automatron-workflows.github.io/hardwire/)
+· [Download](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.9.0)
+· [Ask a question](https://github.com/Automatron-workflows/hardwire/discussions/categories/q-a)
 
 [![Tests](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml/badge.svg)](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml)
 
-[![Three illustrated action paths: sign in, invoice payment and settings](docs/assets/demo.gif)](https://automatron-workflows.github.io/hardwire/)
+[![Sign in, invoice payment and settings: interface navigation compared with direct actions](docs/assets/demo.gif)](https://automatron-workflows.github.io/hardwire/)
 
-## Try it in one command
+## One form. One command.
 
-Use Node 22 or newer. This downloads the versioned GitHub package and checks all
-three local actions, including invalid inputs and approval requirements:
-
-```sh
-npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.8.1/hardwire-0.8.1.tgz hardwire-experiment
-```
-
-No app, account or API key is needed. For a visual journey, [run the experiment](https://automatron-workflows.github.io/hardwire/experiment.html).
-
-## Add it to a project
-
-Hardwire is not on npm yet. Install the pinned GitHub tag instead. The bare
-`hardwire` name on npm belongs to an unrelated package, so do not use
-`npm install hardwire`.
+With Node 22 or newer, run the bundled email preference from the demo:
 
 ```sh
-npm install github:Automatron-workflows/hardwire#v0.8.1
+npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.9.0/hardwire-0.9.0.tgz hardwire-form
 ```
 
-Then describe one action and check it before writing a handler:
-
-```js
-import { auditPanel, compilePanel, normalizePanel, validateParams } from 'hardwire';
-
-const panel = normalizePanel({
-  panel: 'hardwire.panel/1',
-  origin: 'https://shop.example.com',
-  ports: [{
-    id: 'search-catalogue',
-    kind: 'read',
-    summary: 'Search the product catalogue.',
-    parameters: {
-      properties: { query: { type: 'string' } },
-      required: ['query']
-    }
-  }]
-});
-
-const audit = auditPanel(panel);
-const tools = compilePanel(panel);
-const port = panel.ports.find((entry) => entry.id === 'search-catalogue');
-
-console.log(audit);                              // effects and approval counts
-console.log(tools);                              // MCP tool descriptions
-console.log(validateParams(port, { query: 'lamp' })); // accepted arguments
+```text
+Candidate action: preferences
+Accepted: {"marketingEmails":false}
+Rejected: {"marketingEmails":"false"}
+MCP tool: preferences
 ```
 
-A rejected argument throws a `HardwireError` with a stable code and field path.
-The [adoption guide](docs/ADOPT.md) covers the first integration, the no-checkout
-MCP configuration and the honest limits.
+Add `--json` to inspect the contract and generated tool. No app, account or API key
+is required. The command parses HTML locally and never calls its endpoint.
+[Bring your own saved form](docs/FORM-EXPERIMENT.md).
 
-## Why Hardwire exists
+## See the same idea in three familiar actions
 
-An interface shows a person where to click. An agent integration also needs to
-know what an action expects, what it changes and which approvals apply. When
-that information is missing or inconsistent, developers have to reconstruct it
-for each integration.
+[Open the visual experiment](https://automatron-workflows.github.io/hardwire/experiment.html).
+Run an action, try invalid input and inspect the result if you want the details.
 
-Hardwire puts those declarations into a shared format and provides tools to
-check them. Use it to find invalid inputs and contradictory rules,
-review inferred actions and prepare tool descriptions before connecting them to
-real application code.
-
-**Mission:** Make application actions explicit, reviewable and reusable for
-people building AI agents.
-
-**Vision:** A web where people can delegate tasks to agents through clear
-operations, while applications retain control over access and approvals.
-
-## What you can use today
-
-Version 0.8.1 includes a browser playground, portable library, Node.js CLI and local
-MCP server. Model Context Protocol, or MCP, lets an agent client call tools.
-Hardwire exposes five tools for inspecting and checking supplied data.
-
-| Tool | What you get |
+| Scene | What you test |
 | --- | --- |
-| `hardwire_infer_html` | A draft action description extracted from static HTML, ready for human review. |
-| `hardwire_inspect_panel` | Validation results and a summary of declared effects and approvals. |
-| `hardwire_validate_params` | A check that arguments match an action's declared input schema. |
-| `hardwire_compile_panel` | MCP tool descriptions to use when designing an integration. |
-| `hardwire_verify_trace` | A consistency check between a call record and its action description. |
+| Sign in | A local session requires valid input and explicit consent. |
+| Invoice | The exact €24 invoice requires owner approval; altered input is rejected. |
+| Settings | A boolean changes a reversible preference; a string is rejected. |
 
-The toolkit inspects descriptions. It does not browse websites, log in or
-execute the application actions it describes. Connecting an action to a real
-service still requires a trusted handler, authorization and approval enforcement.
+These use the real validator and fixed local JavaScript handlers. Google sign in
+is simulated and no money moves. The film illustrates the idea; it is not a speed
+benchmark. [Run all three in your terminal](docs/EXPERIMENT.md).
 
-## How it works
+## Put it in an MCP client
 
-1. **Describe an action.** Supply saved HTML to infer a draft, or write a JSON
-   description of operations you already understand.
-2. **Review the contract.** Check required inputs, declared effects and approval
-   requirements. Confirm inferred declarations against the application's actual
-   behavior.
-3. **Check an integration before execution.** Validate example arguments,
-   generate MCP tool descriptions and check records against the reviewed contract.
+[Download the desktop bundle](https://github.com/Automatron-workflows/hardwire/releases/download/v0.9.0/hardwire-0.9.0.mcpb)
+for a host that supports MCPB and Node 22 or newer. It includes the server and its
+runtime dependencies. No npm installation is needed to run the extracted bundle.
 
-For example, a search form with a required `q` field can become a draft search
-action with a required string input. Hardwire can reject `{"q": 42}` and show the
-declared policy. A developer still needs to confirm what the search endpoint
-does and connect it to application code.
+The server exposes five tools for inference, contract inspection, input checking,
+MCP description generation and trace verification. It operates on supplied data.
+It cannot browse files, connect accounts or execute the described application actions.
 
-## Who it is for
+[Desktop installation and verification](docs/DESKTOP-BUNDLE.md)
+· [Other MCP clients and a first prompt](docs/MCP.md)
 
-**Agent developers** can turn supplied markup or action descriptions into a
-contract they can inspect and test.
+The bundle is tested through real MCP calls after extraction. Native host setup
+remains a separate verification task. GitHub packages and bundles are available;
+the npm name is not reserved. Do not install the unrelated unscoped npm package.
 
-**Application teams** can describe operations in one place and check the
-arguments their integrations intend to send.
+## Add it to your project
 
-**Researchers and experimenters** can compare inferred descriptions with reviewed
-examples and measure where inference fails. App ownership is not required to
-start with the included examples or permitted HTML captures.
+Install the pinned release from GitHub:
 
-## One concrete experiment
+```sh
+npm install --ignore-scripts github:Automatron-workflows/hardwire#v0.9.0
+```
 
-**Run the three actions from the demo. Change an input. Watch validation stop an
-invalid request before local state changes.**
+[Use the library on one known action](docs/ADOPT.md), or use the guide’s MCP
+configuration to connect without cloning the repository.
 
-[Open the experiment](https://automatron-workflows.github.io/hardwire/experiment.html).
-It uses the real validator and fixed local handlers. No app, account, payment
-provider or API key is needed.
+## Where it fits
 
-| Action | What you can try | What changes |
-| --- | --- | --- |
-| Sign in | Change the sample account, then restore it and approve | A local session starts |
-| Pay an invoice | Change €24 to €25, then restore it and approve | The fixture invoice becomes paid |
-| Change a setting | Try a string instead of a boolean, then send valid input | Marketing emails turn off |
+| You already have | Hardwire adds |
+| --- | --- |
+| An API or OpenAPI description | Explicit declared effects and approval floors to review alongside input types. |
+| An MCP server | Contract checks before trusted handlers run. Generated descriptions remain data until you wire them in. |
+| A saved HTML form | A candidate contract and testable input schema, ready for review. |
+| Browser automation | A way to describe known operations when the application can expose them. No browser driver is included. |
 
-The experiment starts with one action and advances through all three. Open
-**Inputs & code** to change the request or inspect the actual result and contract.
+A **panel** describes an application's actions. A **port** is one action with an
+input schema, declared effect and confirmation requirement. A **trace** binds a
+caller's record to a panel revision. Digests check consistency; they do not prove
+identity, execution or approval. [Read the format](docs/SPEC.md).
 
-The film remains an illustration. The experiment executes JavaScript against
-local fixtures. Google sign in is simulated and no money moves. Approval levels
-are local assertions, not verified identities.
+## Experimental, with explicit limits
 
-Use **Node 22 or newer** to run all three from the current main branch. This
-experiment needs no package dependencies:
+Inference cannot establish actual endpoint behavior, reversibility or permission.
+The benchmark has three synthetic fixtures, with scores of 100, 60 and 45; only
+one passes at 80. It does not establish accuracy on real websites. No general
+executor or WebMCP adapter is included. [Evidence and next gates](docs/ROADMAP.md).
+
+## Bring one form
+
+Run the experiment and [share the first confusing step](https://github.com/Automatron-workflows/hardwire/issues/new?template=experiment.yml).
+Synthetic forms, reproducible bugs and verified client setups are useful
+[small contributions](https://github.com/Automatron-workflows/hardwire/issues?q=is%3Aissue%20is%3Aopen%20label%3A%22good%20first%20issue%22).
+
+[Community welcome](https://github.com/Automatron-workflows/hardwire/discussions/18)
+· [Contributing](CONTRIBUTING.md) · [Support](SUPPORT.md)
+
+If Hardwire is useful to you, star the repository to find it again.
+
+## Build and explore
 
 ```sh
 git clone https://github.com/Automatron-workflows/hardwire.git
 cd hardwire
-npm run experiment
-```
-
-The script checks invalid inputs, missing or forged approvals, successful local
-state changes and duplicate rejection. It simulates approval; the browser
-experiment lets you review and approve explicitly. Run `npm run demo` and open
-`http://127.0.0.1:8787/playground/experiment.html` to edit inputs locally.
-[Follow one request through the code](docs/EXPERIMENT.md).
-[Share your experiment result](https://github.com/Automatron-workflows/hardwire/issues/new?template=experiment.yml).
-
-## Bring one saved form
-
-Continue with the email preference from the third scene. Infer its draft contract,
-accept a boolean, reject a string and produce an MCP tool description:
-
-```sh
-npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.8.1/hardwire-0.8.1.tgz hardwire-form
-```
-
-Add `--json` to inspect the output. [Bring your own HTML form](docs/FORM-EXPERIMENT.md)
-with a valid and an invalid argument sample. No browser, account, model or API key
-is needed. The command never calls the form endpoint.
-
-## Connect an agent
-
-Use the pinned release without a checkout:
-
-```json
-{
-  "mcpServers": {
-    "hardwire": {
-      "command": "npx",
-      "args": [
-        "--yes",
-        "--ignore-scripts",
-        "--package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.8.1/hardwire-0.8.1.tgz",
-        "hardwire-mcp"
-      ]
-    }
-  }
-}
-```
-
-This was verified with the official SDK client: five tools, real calls and a clean
-shutdown. If your client cannot find `npx`, use the absolute path from `which npx`.
-
-Or install from a checkout for development:
-
-```sh
 npm ci --ignore-scripts
-npm run test:mcp
-npm run --silent mcp:config
+npm run check
 ```
 
-The smoke check calls all five inspection tools with the official MCP client.
-Add the printed `hardwire` configuration to your client. The [MCP guide](docs/MCP.md)
-includes a first prompt and troubleshooting. These tools inspect descriptions;
-they do not execute the three fixture actions.
+[API](docs/API.md) · [Architecture](docs/ARCHITECTURE.md)
+· [Integration](docs/INTEGRATION.md) · [Security](SECURITY.md)
+· [Distribution](docs/DISTRIBUTION.md) · [Launch status](docs/LAUNCH-STATUS.md)
 
-For the format tour, run `npm run walkthrough`. The separate `npm run consumer`
-example demonstrates a fixed catalogue read handler.
-
-The live site follows main. The [0.8.1 release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.8.1)
-contains both experiments, the toolkit and checksum. The package is not published
-on npm or listed in the MCP Registry; the pinned GitHub tag above is the supported
-installation path.
-
-## The format in one example
-
-A **panel** is a JSON description of an application's actions. Each action is a
-**port** with a name, input schema, declared effect and confirmation requirement.
-
-```json
-{
-  "panel": "hardwire.panel/1",
-  "origin": "https://shop.example.com",
-  "ports": [{
-    "id": "search-catalogue",
-    "kind": "read",
-    "summary": "Search the product catalogue.",
-    "parameters": {
-      "properties": { "query": { "type": "string" } },
-      "required": ["query"]
-    },
-    "endpoint": "/api/search"
-  }]
-}
-```
-
-A reviewed panel can be served at `/.well-known/hardwire.json`, Hardwire's own
-discovery convention. An endpoint identifies a location. The format does not yet
-define HTTP methods, authentication, argument serialization or retry behavior.
-
-A **trace** records a caller's assertions and binds them to a particular panel
-revision through a digest. It can reveal inconsistent records, but it does not
-prove execution, authorship or approval.
-
-## What remains experimental
-
-Validation checks declarations, not application behavior. Inference reads static
-forms and JSON-LD search descriptions; it does not render JavaScript or establish
-whether an endpoint is safe. Even a GET form can change state.
-
-The current benchmark contains **three synthetic fixtures**, with scores of
-100, 60 and 45. Only one passes the threshold of 80. These examples exercise the
-code; they do not establish accuracy on real websites or performance gains.
-See [the roadmap](docs/ROADMAP.md) for the open evidence and integration gates.
-
-Hardwire works alongside APIs and MCP. There is no WebMCP adapter or general
-website executor. [Integration notes](docs/INTEGRATION.md) explain the boundaries.
-
-## Help shape Hardwire
-
-[Start here](https://github.com/Automatron-workflows/hardwire/discussions/18).
-Run one action, change one input and share what happened in
-[Show and tell](https://github.com/Automatron-workflows/hardwire/discussions/categories/show-and-tell).
-Ask for help in [Q&A](https://github.com/Automatron-workflows/hardwire/discussions/categories/q-a),
-or pick a [first contribution](https://github.com/Automatron-workflows/hardwire/issues?q=is%3Aissue%20is%3Aopen%20label%3A%22good%20first%20issue%22).
-See [support](SUPPORT.md) and [community guidelines](CODE_OF_CONDUCT.md).
-
-## Go deeper
-
-| Goal | Guide |
-| --- | --- |
-| Run the three demo actions | [Concrete experiment](docs/EXPERIMENT.md) |
-| Adopt it in a project | [Adoption guide](docs/ADOPT.md) |
-| Connect an agent and complete a first task | [MCP setup](docs/MCP.md) |
-| Explore commands and local examples | [Getting started](docs/GETTING-STARTED.md) |
-| Use the library in your code | [API reference](docs/API.md) |
-| Understand the runtime boundaries and deployment | [Architecture](docs/ARCHITECTURE.md) |
-| Understand the action format | [Specification](docs/SPEC.md) |
-| Design an application integration | [Integration](docs/INTEGRATION.md) |
-| Review limits and trust assumptions | [Safety](docs/SAFETY.md) |
-| Contribute or run the full checks | [Development](CONTRIBUTING.md) |
-| Understand distribution and next steps | [Distribution](docs/DISTRIBUTION.md) |
-
-## License
-
-[MIT](LICENSE). You may use, modify and redistribute the software under its
-license terms. Package publication on npm remains separate from this public
-GitHub release. See the [release decision](docs/RELEASE-DECISION.md).
+MIT licensed. An Automatron project.

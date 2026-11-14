@@ -25,7 +25,7 @@ Add this entry to a client that supports local stdio servers:
       "args": [
         "--yes",
         "--ignore-scripts",
-        "--package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.8.1/hardwire-0.8.1.tgz",
+        "--package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.9.0/hardwire-0.9.0.tgz",
         "hardwire-mcp"
       ]
     }
@@ -102,6 +102,10 @@ VS Code and native Codex setup remain unverified in their host UIs. The attempte
 VS Code check did not reach a running client. On 14 November, Codex 0.145.0
 app server verification also stopped before initialization completed. No native
 client success is claimed. [Help verify a native client](https://github.com/Automatron-workflows/hardwire/issues/17).
+
+For hosts supporting MCPB, [the desktop bundle](DESKTOP-BUNDLE.md) includes all
+runtime dependencies. Its extracted server is checked through actual stdio calls.
+This does not change the native host verification limits above.
 
 ## First task
 

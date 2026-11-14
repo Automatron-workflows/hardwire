@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 // Inspect a saved form without rendering it or calling its endpoint.
-import { open, realpath, stat } from 'node:fs/promises';
-import { pathToFileURL } from 'node:url';
+import { realpathSync } from 'node:fs';
+import { open, stat } from 'node:fs/promises';
+import { fileURLToPath } from 'node:url';
 import { inferFromHtml, toPanelDraft, normalizePanel, validateParams, compilePanel, toolName } from '../src/browser.mjs';
 
 const usage = `Usage: hardwire-form [--html file.html --origin https://example.com --valid JSON --invalid JSON] [--port id] [--json]
@@ -74,7 +75,8 @@ async function main(argv) {
   }
 }
 
-if (process.argv[1] && import.meta.url === pathToFileURL(await realpath(process.argv[1])).href) {
+// Resolve both paths consistently, including Windows temporary directory aliases.
+if (process.argv[1] && realpathSync(fileURLToPath(import.meta.url)) === realpathSync(process.argv[1])) {
   main(process.argv.slice(2)).catch(error => {
     console.error(error.message);
     process.exitCode = error.message.startsWith('Usage:') ? 2 : 1;

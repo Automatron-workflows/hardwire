@@ -11,6 +11,8 @@ body:
         - Pay an invoice
         - Change a setting
         - All three in the terminal
+        - Saved HTML form
+        - Desktop bundle
     validations:
       required: true
   - type: textarea

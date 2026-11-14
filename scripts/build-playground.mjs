@@ -15,6 +15,8 @@ const html = await readFile(resolve(root, 'playground/index.html'), 'utf8');
 await writeFile(resolve(output, 'index.html'), html.replace('./styles.css', './playground/styles.css').replace('./app.mjs', './playground/app.mjs'));
 const experiment = await readFile(resolve(root, 'playground/experiment.html'), 'utf8');
 await writeFile(resolve(output, 'experiment.html'), experiment.replace('./experiment.css', './playground/experiment.css').replace('./experiment.mjs', './playground/experiment.mjs'));
+await mkdir(resolve(output, 'assets'), { recursive: true });
+await copyFile(resolve(root, 'docs/assets/demo.png'), resolve(output, 'assets/demo.png'));
 await copyFile(resolve(root, 'LICENSE'), resolve(output, 'LICENSE'));
 await writeFile(resolve(output, '.nojekyll'), '');
 console.log('Static playground built in output/playground. No dependencies or secrets included.');

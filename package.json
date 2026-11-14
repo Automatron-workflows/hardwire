@@ -1,6 +1,6 @@
 {
   "name": "hardwire",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "description": "Describe and validate application actions for AI agents. Open source tools for reviewing inputs, declared effects and approval requirements.",
   "type": "module",
   "private": true,
@@ -66,14 +66,17 @@
     "test:package": "node scripts/check-package.mjs",
     "test:unit": "node --test test/*.test.mjs",
     "test:integration": "node --test test/integration/*.test.mjs",
-    "check": "npm test && npm run validate && npm run experiment && npm run experiment:form && npm run walkthrough && npm run consumer && npm run test:mcp && npm run test:package && npm run build:playground",
+    "check": "npm test && npm run validate && npm run experiment && npm run experiment:form && npm run walkthrough && npm run consumer && npm run test:mcp && npm run test:package && npm run build:playground && npm run build:bundle && npm run test:bundle",
     "build:playground": "node scripts/build-playground.mjs",
-    "experiment:form": "node examples/form.mjs"
+    "experiment:form": "node examples/form.mjs",
+    "build:bundle": "node scripts/build-bundle.mjs",
+    "test:bundle": "node scripts/check-bundle.mjs"
   },
   "dependencies": {
     "@modelcontextprotocol/server": "2.4.0"
   },
   "devDependencies": {
+    "@anthropic-ai/mcpb": "2.1.2",
     "@modelcontextprotocol/client": "2.4.0"
   },
   "keywords": [

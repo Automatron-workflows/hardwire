@@ -26,6 +26,14 @@ try {
   assert.equal((await call('hardwire_compile_panel', { panel_json })).tools[0].name, 'search_catalogue');
   const html = readFileSync(new URL('../examples/corpus/blog/page.html', import.meta.url), 'utf8');
   assert.ok((await call('hardwire_infer_html', { origin: 'https://blog.example.com', html })).draft.ports.length);
+  const settings = await call('hardwire_infer_html', { origin: 'https://example.com',
+    html: '<form action="/preferences" method="post"><input type="checkbox" name="marketingEmails"><button>Save</button></form>' });
+  const settingsJson = JSON.stringify(settings.draft);
+  assert.equal(settings.draft.ports[0].confirmation, 'user');
+  assert.equal((await call('hardwire_validate_params', { panel_json: settingsJson, port_id: 'preferences', params_json: '{"marketingEmails":false}' })).valid, true);
+  assert.equal((await client.callTool({ name: 'hardwire_validate_params', arguments: {
+    panel_json: settingsJson, port_id: 'preferences', params_json: '{"marketingEmails":"false"}' } })).isError, true);
+  assert.equal((await call('hardwire_compile_panel', { panel_json: settingsJson })).tools[0].inputSchema.properties.marketingEmails.type, 'boolean');
   assert.equal((await call('hardwire_validate_params', { panel_json, port_id: 'search-catalogue', params_json: '{"query":"lamp"}' })).valid, true);
   const trace = buildTrace({ panel: cataloguePanel, port: 'search-catalogue', params: { query: 'lamp' } });
   assert.equal((await call('hardwire_verify_trace', { panel_json, trace_json: JSON.stringify(trace) })).valid, true);

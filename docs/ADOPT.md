@@ -20,7 +20,7 @@ It runs the real validator against three fixed local handlers. Change an input t
 see a rejection before local state changes. Nothing is sent to a server, no
 account is connected and no money moves.
 
-Then read [what remains experimental](../README.md#what-remains-experimental).
+Then read [what remains experimental](../README.md#experimental-with-explicit-limits).
 The benchmark contains three synthetic fixtures. It does not establish accuracy
 on arbitrary websites.
 
@@ -31,7 +31,7 @@ unrelated package, so do not run `npm install hardwire`. Install the pinned GitH
 tag instead:
 
 ```sh
-npm install github:Automatron-workflows/hardwire#v0.8.1
+npm install github:Automatron-workflows/hardwire#v0.9.0
 ```
 
 Use the library on one action you already understand:
@@ -93,7 +93,7 @@ Add this entry to a client that supports local stdio servers:
       "args": [
         "--yes",
         "--ignore-scripts",
-        "--package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.8.1/hardwire-0.8.1.tgz",
+        "--package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.9.0/hardwire-0.9.0.tgz",
         "hardwire-mcp"
       ]
     }
@@ -136,10 +136,11 @@ As of 14 November 2026:
 
 | Channel | State |
 | --- | --- |
-| GitHub prerelease | [v0.8.1](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.8.1), MIT, `private: true` |
-| GitHub tag install | `npm install github:Automatron-workflows/hardwire#v0.8.1` works without publishing |
-| npm | Not published. The scoped `@automatron-workflows/hardwire` is unclaimed; the bare name is an unrelated placeholder. Publication needs the owner's npm login and a separate release decision. |
-| MCP Registry | Not listed. Registry submission depends on a public package. |
+| GitHub prerelease | [v0.9.0](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.9.0), MIT, `private: true` |
+| GitHub tag install | `npm install github:Automatron-workflows/hardwire#v0.9.0` works without publishing |
+| npm | Not published. Ownership of the candidate scope `@automatron-workflows/hardwire` is not verified; the bare name is an unrelated placeholder. Publication needs the owner's npm login and a separate release decision. |
+| Desktop bundle | The release includes an MCPB archive with locked runtime dependencies. See [installation](DESKTOP-BUNDLE.md). |
+| MCP Registry | GitHub bundle metadata is published separately using the verified OIDC workflow. See [launch status](LAUNCH-STATUS.md). |
 | Independently confirmed users | Zero. Stars, clones and CI runs are not adoption evidence. |
 
 The honest next evidence is one person outside this repository completing the

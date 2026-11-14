@@ -22,8 +22,8 @@ handlers. Keep both links together and describe the experimental boundaries.
 | 7 to 10 | Publish a short demonstration and reproducible technical walkthrough | Useful reports, questions and outside examples |
 | 11 to 14 | Fix reported friction and ship a follow up based on evidence | Returning users and reviewed contributions |
 
-The npm and MCP Registry path requires an authenticated publisher and verified
-scope ownership. A package downloaded from the GitHub release already provides
+The MCP Registry path now uses a GitHub desktop bundle and repository OIDC
+identity. npm remains a separate route requiring a verified publisher and scope. A package downloaded from the GitHub release already provides
 a usable distribution route. Two independent desktop client evaluations remain
 a separate evidence goal; protocol tests alone do not satisfy it.
 
@@ -43,6 +43,8 @@ The README uses a [GIF capture](assets/demo.gif) of the live film. Use the
 The capture shows an authored illustration, not measured browser automation or
 payment performance. It was recorded at the browser capture cadence, preserving
 elapsed timing; the interactive film is the full motion reference.
+
+[Ready to adapt: launch posts, personal invitation and first cohort checklist](LAUNCH-KIT.md).
 
 ## Draft public post
 
