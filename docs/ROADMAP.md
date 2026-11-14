@@ -1,6 +1,6 @@
 # Foundation and next gates
 
-## Foundation: implemented in 0.5.0
+## Foundation: implemented through 0.8.1
 
 - Strict panel and schema validation, argument checks and normalized digests.
 - MCP tool descriptions with the same closed-object semantics as validation.

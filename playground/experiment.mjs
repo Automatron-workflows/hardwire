@@ -71,7 +71,9 @@ function choose(id) {
   $('#stage').dataset.scenario = id;
   $('#object-title').textContent = configs[id].title;
   $('#object-detail').textContent = configs[id].detail;
-  for (const button of document.querySelectorAll('[data-scenario]')) button.setAttribute('aria-pressed', String(button.dataset.scenario === id));
+  // #stage also carries data-scenario for styling. Scope tab state to the nav,
+  // or aria-pressed lands on a section that does not support it.
+  for (const button of document.querySelectorAll('.scenarios button[data-scenario]')) button.setAttribute('aria-pressed', String(button.dataset.scenario === id));
   lastRequest = configs[id].params();
   showFeedback(currentState()); update();
 }
@@ -108,7 +110,7 @@ $('#close').addEventListener('click', () => dialog.close());
 $('#use-inputs').addEventListener('click', () => { dialog.close(); $('#run').focus(); });
 $('#invalid').addEventListener('click', () => run(invalidArguments[selected], true));
 $('#reset').addEventListener('click', () => choose(selected));
-for (const button of document.querySelectorAll('[data-scenario]')) button.addEventListener('click', () => {
+for (const button of document.querySelectorAll('.scenarios button[data-scenario]')) button.addEventListener('click', () => {
   choose(button.dataset.scenario); history.replaceState(null, '', `#${selected}`);
 });
 window.addEventListener('hashchange', () => { dialog.close(); choose(location.hash.slice(1)); });

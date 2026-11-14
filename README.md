@@ -69,6 +69,17 @@ The bundle is tested through real MCP calls after extraction. Native host setup
 remains a separate verification task. GitHub packages and bundles are available;
 the npm name is not reserved. Do not install the unrelated unscoped npm package.
 
+## Add it to your project
+
+Install the pinned release from GitHub:
+
+```sh
+npm install --ignore-scripts github:Automatron-workflows/hardwire#v0.9.0
+```
+
+[Use the library on one known action](docs/ADOPT.md), or use the guide’s MCP
+configuration to connect without cloning the repository.
+
 ## Where it fits
 
 | You already have | Hardwire adds |

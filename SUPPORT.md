@@ -2,7 +2,8 @@
 
 Start with the [three action experiment](https://automatron-workflows.github.io/hardwire/experiment.html).
 Run sign in, invoice payment and settings. Change an input and inspect what was
-blocked. No owned app or API key is needed.
+blocked. No owned app or API key is needed. To use Hardwire in your own project,
+start with the [adoption guide](docs/ADOPT.md).
 
 Use [Discussions](https://github.com/Automatron-workflows/hardwire/discussions) for
 questions, ideas and sharing what you tried. Include the scenario, browser or

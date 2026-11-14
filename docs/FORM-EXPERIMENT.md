@@ -18,6 +18,7 @@ Accepted: {"marketingEmails":false}
 Rejected: {"marketingEmails":"false"}
 MCP tool: preferences
 Review the draft. No endpoint was called and no preference changed.
+Use --json to inspect the complete contract and tool description.
 ```
 
 Add `--json` to inspect the candidate panel, accepted arguments, rejection and
