@@ -13,20 +13,26 @@ the first confusing moment.
 | README first experience | Actual GIF, exact release command and live experiment near the top | Observe comprehension with new visitors |
 | Execution boundaries | Local fixtures disclosed; form inference never calls an endpoint | A consenting application integration |
 | Community | Discussions enabled, welcome pinned, six scoped issues, templates and guidelines | Replies and reviewed outside contributions |
-| npm and MCP Registry | Package metadata and distribution route documented | Authenticated publisher, verified scope, registry publication |
+| Desktop distribution | MCPB includes locked production dependencies; extracted server and exact artifact digest checked | Native host installation feedback |
+| MCP Registry | Generated metadata and GitHub OIDC publication workflow | Confirm successful publication for each release |
+| npm | Separate optional distribution route | Authenticated publisher and verified scope |
 
 ## Verified behavior
 
 The three action runner checks invalid input, confirmation requirements, state
 readback and duplicate rejection. The form runner checks inferred input types,
 multiple form selection and failed negative samples. Packaging verifies both
-installed binaries, ESM exports and actual MCP calls. CI uses Node 22 and 24.
+installed binaries, ESM exports and actual MCP calls. Bundle checks validate the
+manifest, dependency allowlist, licenses and settings task after extraction.
+CI covers Linux on Node 22 and 24 and Windows on Node 24.
 
-The browser review exercised the three local outcomes, invalid requests, explicit
+The 0.8.0 browser review exercised the three local outcomes, invalid requests, explicit
 consent, exact invoice approval and keyboard activation. Desktop and 390px checks
 retain one primary action and the same dark composition. Detailed JSON and input
 editing remain optional. These checks do not establish complete accessibility or
-first time comprehension. The design harness collector could not run in the
+first time comprehension. The 0.9.0 update preserves the interaction and artwork;
+its preview metadata is checked in the built HTML. No new native browser review
+was available in that session. The design harness collector could not run in the
 browser's restricted evaluation scope; direct DOM checks are separate evidence.
 
 VS Code did not become controllable through this session's native app interface.
@@ -41,8 +47,8 @@ scope. Do not send a token in an issue or chat. The proposed
 and the current GitHub commands until ownership, scoped packaging and a fresh
 registry installation have been checked.
 
-Then publish the matching MCP Registry metadata. Registry availability and stars
-must not be represented as proof of accuracy, safety or demand.
+The MCPB route can publish to the MCP Registry independently of npm. Registry
+availability and stars must not be represented as proof of accuracy, safety or demand.
 
 ## Release recovery
 

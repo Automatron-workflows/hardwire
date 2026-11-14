@@ -58,7 +58,7 @@ try {
   assert.equal(form.tool.inputSchema.properties.marketingEmails.type, 'boolean');
   assert.match(form.rejected.reason, /expected a boolean/);
   assert.equal(runNpm(['exec', '--offline', '--', 'hardwire-mcp', '--version'], consumer).trim(), metadata.version);
-  execFileSync(process.execPath, [join(root, 'scripts/check-mcp.mjs'), join(consumer, 'node_modules/.bin/hardwire-mcp')],
+  execFileSync(process.execPath, [join(root, 'scripts/check-mcp.mjs'), join(installed, 'src/mcp-server.mjs')],
     { cwd: consumer, stdio: 'pipe', timeout: 40000 });
   console.log(`Package smoke check passed: ${metadata.name}@${metadata.version}; installed ESM, CLI, consumer, three action experiment and MCP server.`);
 } finally {

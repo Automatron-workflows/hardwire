@@ -31,7 +31,7 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           version=$(node -p "require('./package.json').version")
-          gh release create "v$version" output/release/*.tgz output/release/SHA256SUMS --target "$GITHUB_SHA" --title "Hardwire $version: action experiments" --notes-file "docs/releases/v$version.md" --prerelease --draft
+          gh release create "v$version" "output/release/hardwire-$version.tgz" "output/release/hardwire-$version.mcpb" output/release/server.json output/release/SHA256SUMS --target "$GITHUB_SHA" --title "Hardwire $version: action contracts for agents" --notes-file "docs/releases/v$version.md" --prerelease --draft
       - name: Verify the uploaded release assets
         env:
           GH_TOKEN: ${{ github.token }}
@@ -39,9 +39,10 @@ jobs:
           version=$(node -p "require('./package.json').version")
           download="$RUNNER_TEMP/hardwire-release-download"
           mkdir -p "$download"
-          gh release download "v$version" --dir "$download" --pattern '*.tgz' --pattern SHA256SUMS
+          gh release download "v$version" --dir "$download" --pattern '*.tgz' --pattern '*.mcpb' --pattern server.json --pattern SHA256SUMS
           (cd "$download" && sha256sum --check SHA256SUMS)
           npm run test:package -- "$download/hardwire-$version.tgz"
+          npm run test:bundle -- "$download/hardwire-$version.mcpb"
       - name: Publish the verified experimental release
         env:
           GH_TOKEN: ${{ github.token }}

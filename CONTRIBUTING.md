@@ -16,8 +16,8 @@ This runs unit/CLI tests, real loopback HTTP integration tests, panel validation
 and the three action experiment, offline API walkthrough, runnable consumer, MCP transport and package checks. The
 package check builds a tarball, installs it with a fresh cache in a temporary project, then
 checks its ESM exports, CLI binaries, three action experiment, consumer and actual MCP calls through the
-installed symlink. The official SDK client is a development dependency. CI runs the
-same command on Node 22 and 24. It also builds the static playground. All checks must pass before merging.
+installed server entry point; npm executable resolution is checked separately. The official SDK client is a development dependency. CI runs the
+same command on Linux with Node 22 and 24 and Windows with Node 24. It also builds the static playground. All checks must pass before merging.
 The standalone `npm run corpus`
 command intentionally exits 1 on the current baseline; its expected scores and
 failure modes are asserted inside the passing test suite.
@@ -76,3 +76,10 @@ clears the state and record. Settings should apply without an approval step.
 Inspect the actual request and result. Verify keyboard operation, mobile layout,
 reduced motion and no browser errors. Never connect these fixture approvals to
 real accounts or payment providers.
+
+## Desktop distribution
+
+`npm run build:bundle` stages only the server and locked production dependencies,
+then packs them with the pinned official MCPB tool. `npm run test:bundle` extracts
+the result and exercises the server without an installation step. These checks
+are included in `npm run check`. See [the bundle guide](docs/DESKTOP-BUNDLE.md).

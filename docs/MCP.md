@@ -78,6 +78,10 @@ VS Code check did not reach a running client. On 14 November, Codex 0.145.0
 app server verification also stopped before initialization completed. No native
 client success is claimed. [Help verify a native client](https://github.com/Automatron-workflows/hardwire/issues/17).
 
+For hosts supporting MCPB, [the desktop bundle](DESKTOP-BUNDLE.md) includes all
+runtime dependencies. Its extracted server is checked through actual stdio calls.
+This does not change the native host verification limits above.
+
 ## First task
 
 Use the email preference from the third demo scene. Ask your connected agent:

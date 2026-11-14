@@ -66,7 +66,8 @@ test('playground handles empty captures, malicious markup, invalid JSON and over
 test('static build includes the runnable portable graph and only allowlisted files', async () => {
   execFileSync(process.execPath, [fileURLToPath(new URL('../scripts/build-playground.mjs', import.meta.url))]);
   const output = new URL('../output/playground/', import.meta.url);
-  assert.deepEqual((await readdir(output)).sort(), ['.nojekyll', 'LICENSE', 'experiment.html', 'index.html', 'playground', 'src']);
+  assert.deepEqual((await readdir(output)).sort(), ['.nojekyll', 'LICENSE', 'assets', 'experiment.html', 'index.html', 'playground', 'src']);
+  assert.deepEqual(await readdir(new URL('assets/', output)), ['demo.png']);
   const html = await readFile(new URL('index.html', output), 'utf8');
   assert.match(html, /\.\/playground\/app\.mjs/);
   const built = await import(new URL('playground/model.mjs', output));

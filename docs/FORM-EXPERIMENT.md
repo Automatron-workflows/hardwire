@@ -7,7 +7,7 @@ description. Nothing is executed and no account is required.
 With Node 22 or newer:
 
 ```sh
-npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.8.0/hardwire-0.8.0.tgz hardwire-form
+npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.9.0/hardwire-0.9.0.tgz hardwire-form
 ```
 
 Expected output:
