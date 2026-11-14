@@ -5,6 +5,10 @@
 Run the three actions from the demo. Change an input. Watch validation reject it
 before local state changes. Share the result and the first thing that confused you.
 
+The optional next step is [bring one saved form](FORM-EXPERIMENT.md), using the
+email preference from the third scene. It produces a candidate contract and
+checks both accepted and rejected arguments without executing an endpoint.
+
 The audience is developers building agents, MCP integrations and application
 tooling. The film shows the idea; the experiment demonstrates checked local
 handlers. Keep both links together and describe the experimental boundaries.
@@ -23,11 +27,22 @@ scope ownership. A package downloaded from the GitHub release already provides
 a usable distribution route. Two independent desktop client evaluations remain
 a separate evidence goal; protocol tests alone do not satisfy it.
 
+Use [the release checklist](LAUNCH-STATUS.md) to distinguish shipped work from
+remaining publication and client checks.
+
 Track voluntary reports in GitHub. Record first run completion, return use,
 contributions and repository traffic separately. No tracking is added to the
 demo. Ten independent users, three returning users and three outside
 contributions are working goals. One thousand stars is a stretch target, not a
 forecast or a claim of adoption.
+
+## Shareable assets
+
+The README uses a [GIF capture](assets/demo.gif) of the live film. Use the
+[MP4 clip](assets/demo.mp4) for posts and link to the working experiment beside it.
+The capture shows an authored illustration, not measured browser automation or
+payment performance. It was recorded at the browser capture cadence, preserving
+elapsed timing; the interactive film is the full motion reference.
 
 ## Draft public post
 

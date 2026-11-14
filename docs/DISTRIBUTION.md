@@ -51,7 +51,7 @@ identifiers and links.
 | --- | --- |
 | Visual demo | [Watch the three scenes](https://automatron-workflows.github.io/hardwire/) |
 | Working experiment | [Run the three local actions](https://automatron-workflows.github.io/hardwire/experiment.html) |
-| GitHub prerelease | [0.7.1](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.7.1) |
+| GitHub prerelease | [0.8.0](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.8.0) |
 | Download | Installable package and SHA256SUMS attached to the release |
 | Verification | The uploaded package was downloaded, checked and installed with real MCP calls |
 | Source license | MIT |
@@ -75,7 +75,7 @@ inspect the actual request, compiled tool description, state and call record.
 All data and handlers are fixed fixtures. The film illustrates the idea; the
 experiment executes local JavaScript. Neither connects accounts or moves money.
 
-The versioned 0.7.1 package runs all three with the one command in the
+The versioned 0.8.0 package runs all three with the one command in the
 [experiment guide](EXPERIMENT.md). A checkout uses `npm run experiment` without
 installing dependencies. Discussions are enabled, the welcome post links to the
 experiment and six scoped contribution issues are open. See the [14 day launch
@@ -91,7 +91,7 @@ demand still need evidence.
 `npm run release:prepare` builds a package and checksum locally. The GitHub Actions
 `prepare-release` workflow runs the full checks on main, creates a draft release,
 downloads its assets, verifies the checksum and tests the downloaded package in a
-fresh installation. Publish the draft after the workflow passes. This process
+fresh installation. Only then does it publish the experimental release. This process
 uses GitHub and does not publish to npm.
 
 Use a new version for a changed package. Editorial changes to a release page do

@@ -15,7 +15,7 @@ validator. No app, account, payment provider, model or API key is needed.
 Use Node 22 or newer:
 
 ```sh
-npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.7.1/hardwire-0.7.1.tgz hardwire-experiment
+npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.8.0/hardwire-0.8.0.tgz hardwire-experiment
 ```
 
 This installs the exact GitHub release into npm's temporary command cache. The
@@ -124,3 +124,9 @@ data; the separate toolkit MCP server still exposes inspection tools only.
 Before adapting a handler to a real app, supply authentication, authorization,
 trusted approval collection, idempotency and independent result verification.
 See [integration](INTEGRATION.md) and [the evidence gates](ROADMAP.md).
+
+## Bring the setting into your own code
+
+[Bring one saved form](FORM-EXPERIMENT.md) continues the third scene with HTML
+inference, a positive and negative input, and an MCP tool description. The visual
+fixture uses a reviewed contract; a form capture starts with an unreviewed draft.

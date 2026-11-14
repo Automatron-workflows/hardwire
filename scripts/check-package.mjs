@@ -53,6 +53,10 @@ try {
   const executable = JSON.parse(runNpm(['exec', '--offline', '--', 'hardwire-experiment', 'payment', '--json'], consumer));
   assert.equal(executable.results[0].scenario, 'payment');
   assert.equal(executable.results[0].after.invoicePaid, true);
+  const form = JSON.parse(runNpm(['exec', '--offline', '--', 'hardwire-form', '--json'], consumer));
+  assert.equal(form.executed, false);
+  assert.equal(form.tool.inputSchema.properties.marketingEmails.type, 'boolean');
+  assert.match(form.rejected.reason, /expected a boolean/);
   assert.equal(runNpm(['exec', '--offline', '--', 'hardwire-mcp', '--version'], consumer).trim(), metadata.version);
   execFileSync(process.execPath, [join(root, 'scripts/check-mcp.mjs'), join(consumer, 'node_modules/.bin/hardwire-mcp')],
     { cwd: consumer, stdio: 'pipe', timeout: 40000 });

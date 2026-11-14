@@ -262,7 +262,7 @@ export function toPanelDraft(inference) {
   return normalizePanel({
     panel: PANEL_VERSION,
     origin: inference.origin,
-    title: "Draft inferred from a live page. Review every port before use.",
+    title: "Draft inferred from HTML. Review every port before use.",
     revision: "inferred/1",
     ports,
   });
