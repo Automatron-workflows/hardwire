@@ -13,7 +13,32 @@ website or execute the described actions.
 You can start with the example below. No app ownership, hosting or API key is
 required for Hardwire itself. The code is MIT licensed.
 
-## Install and verify
+## Use the release without a checkout
+
+Add this entry to a client that supports local stdio servers:
+
+```json
+{
+  "mcpServers": {
+    "hardwire": {
+      "command": "npx",
+      "args": [
+        "--yes",
+        "--ignore-scripts",
+        "--package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.8.1/hardwire-0.8.1.tgz",
+        "hardwire-mcp"
+      ]
+    }
+  }
+}
+```
+
+This downloads the versioned tarball into npx's cache and launches the server.
+It was verified with the official SDK 2.4.0 client: five tools, real calls and a
+clean shutdown. If `npx` is not on the client's PATH, use its absolute path. A
+client that accepts only remote HTTP URLs cannot launch this local stdio server.
+
+## Install from a checkout
 
 Use Node 22 or newer and npm. From a checkout:
 
@@ -117,6 +142,8 @@ determines where chat content goes. Hardwire itself has no telemetry.
 
 | Symptom | Action |
 | --- | --- |
+| `npx: command not found` | Use the absolute path from `which npx`, or install from a checkout. |
+| Tarball returns 404 | Check the version in the no-checkout config against the published release. |
 | `ERR_MODULE_NOT_FOUND` | Run `npm ci --ignore-scripts` in the checkout. |
 | Node cannot be found | Regenerate `mcp:config` with the intended Node version. |
 | No tools appear | Run `npm run test:mcp`, check host logs and reload configuration. |

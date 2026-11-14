@@ -7,13 +7,23 @@ the first confusing moment.
 | Requirement | Evidence | Remaining work |
 | --- | --- | --- |
 | Three coherent examples | Sign in, invoice and settings share the film's artwork and one action journey | Observe five independent first attempts |
-| One command | Versioned GitHub package includes `hardwire-experiment` and `hardwire-form`; fresh installation checked by CI | npm shortcut after scope verification |
+| One command | Versioned GitHub package includes `hardwire-experiment` and `hardwire-form`; fresh installation checked by CI; `npm install github:Automatron-workflows/hardwire#v0.8.1` and the no-checkout `npx` MCP configuration exercised on 14 November | npm shortcut after scope verification |
 | Positive and negative input | All three local handlers reject invalid input; saved settings form checks boolean versus string | Outside captures and bug reports |
-| Two MCP clients | Official SDK 2.4.0 and Inspector 2.0.0 exercise the protocol | Two desktop host workflows remain unverified |
-| README first experience | Actual GIF, exact release command and live experiment near the top | Observe comprehension with new visitors |
+| Two MCP clients | Official SDK 2.4.0 and Inspector 2.0.0 exercise the protocol; the release-backed `npx` launch was checked with the SDK client | Two desktop host workflows remain unverified |
+| README first experience | Actual GIF, exact release command, live experiment and adoption guide near the top | Observe comprehension with new visitors |
 | Execution boundaries | Local fixtures disclosed; form inference never calls an endpoint | A consenting application integration |
 | Community | Discussions enabled, welcome pinned, six scoped issues, templates and guidelines | Replies and reviewed outside contributions |
-| npm and MCP Registry | Package metadata and distribution route documented | Authenticated publisher, verified scope, registry publication |
+| Discovery | Repository description, topics, release, Pages site, adoption guide and Glama ownership file in place | Directory listings and one independent report |
+| Outside evidence | GitHub traffic in the last 14 days: 39 views from 1 unique visitor, 232 clones from 69 unique cloners, 0 referrers. Clones are not users. | An outside person completes a run and reports it |
+| npm and MCP Registry | Package metadata and distribution route documented | Authenticated publisher, verified scope, registry publication; registry submission waits on a public package |
+
+## Discovery baseline
+
+The repository is publicly available, but discovery is not established. On 14
+November 2026 it had zero stars and zero forks. GitHub reported 39 views from one
+unique visitor, 232 clones from 69 unique cloners and no referrers. Most clones
+are consistent with automated checks, not people. These numbers are a baseline,
+not adoption evidence.
 
 ## Verified behavior
 

@@ -13,7 +13,8 @@ API key.
 [Watch the demo](https://automatron-workflows.github.io/hardwire/)
 · [Run the three actions](https://automatron-workflows.github.io/hardwire/experiment.html)
 · [Download the release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.8.1)
-· [Connect an agent](docs/MCP.md) · [Explore without an agent](docs/GETTING-STARTED.md)
+· [Adopt it](docs/ADOPT.md) · [Connect an agent](docs/MCP.md)
+· [Explore without an agent](docs/GETTING-STARTED.md)
 
 [![Tests](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml/badge.svg)](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml)
 
@@ -29,6 +30,48 @@ npx --yes --ignore-scripts --package=https://github.com/Automatron-workflows/har
 ```
 
 No app, account or API key is needed. For a visual journey, [run the experiment](https://automatron-workflows.github.io/hardwire/experiment.html).
+
+## Add it to a project
+
+Hardwire is not on npm yet. Install the pinned GitHub tag instead. The bare
+`hardwire` name on npm belongs to an unrelated package, so do not use
+`npm install hardwire`.
+
+```sh
+npm install github:Automatron-workflows/hardwire#v0.8.1
+```
+
+Then describe one action and check it before writing a handler:
+
+```js
+import { auditPanel, compilePanel, normalizePanel, validateParams } from 'hardwire';
+
+const panel = normalizePanel({
+  panel: 'hardwire.panel/1',
+  origin: 'https://shop.example.com',
+  ports: [{
+    id: 'search-catalogue',
+    kind: 'read',
+    summary: 'Search the product catalogue.',
+    parameters: {
+      properties: { query: { type: 'string' } },
+      required: ['query']
+    }
+  }]
+});
+
+const audit = auditPanel(panel);
+const tools = compilePanel(panel);
+const port = panel.ports.find((entry) => entry.id === 'search-catalogue');
+
+console.log(audit);                              // effects and approval counts
+console.log(tools);                              // MCP tool descriptions
+console.log(validateParams(port, { query: 'lamp' })); // accepted arguments
+```
+
+A rejected argument throws a `HardwireError` with a stable code and field path.
+The [adoption guide](docs/ADOPT.md) covers the first integration, the no-checkout
+MCP configuration and the honest limits.
 
 ## Why Hardwire exists
 
@@ -146,6 +189,29 @@ is needed. The command never calls the form endpoint.
 
 ## Connect an agent
 
+Use the pinned release without a checkout:
+
+```json
+{
+  "mcpServers": {
+    "hardwire": {
+      "command": "npx",
+      "args": [
+        "--yes",
+        "--ignore-scripts",
+        "--package=https://github.com/Automatron-workflows/hardwire/releases/download/v0.8.1/hardwire-0.8.1.tgz",
+        "hardwire-mcp"
+      ]
+    }
+  }
+}
+```
+
+This was verified with the official SDK client: five tools, real calls and a clean
+shutdown. If your client cannot find `npx`, use the absolute path from `which npx`.
+
+Or install from a checkout for development:
+
 ```sh
 npm ci --ignore-scripts
 npm run test:mcp
@@ -161,8 +227,9 @@ For the format tour, run `npm run walkthrough`. The separate `npm run consumer`
 example demonstrates a fixed catalogue read handler.
 
 The live site follows main. The [0.8.1 release](https://github.com/Automatron-workflows/hardwire/releases/tag/v0.8.1)
-contains both experiments, the toolkit and checksum. Hardwire is not published on npm or listed in the MCP Registry.
-Do not use `npm install hardwire` to obtain this project.
+contains both experiments, the toolkit and checksum. The package is not published
+on npm or listed in the MCP Registry; the pinned GitHub tag above is the supported
+installation path.
 
 ## The format in one example
 
@@ -222,6 +289,7 @@ See [support](SUPPORT.md) and [community guidelines](CODE_OF_CONDUCT.md).
 | Goal | Guide |
 | --- | --- |
 | Run the three demo actions | [Concrete experiment](docs/EXPERIMENT.md) |
+| Adopt it in a project | [Adoption guide](docs/ADOPT.md) |
 | Connect an agent and complete a first task | [MCP setup](docs/MCP.md) |
 | Explore commands and local examples | [Getting started](docs/GETTING-STARTED.md) |
 | Use the library in your code | [API reference](docs/API.md) |
