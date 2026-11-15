@@ -1,5 +1,27 @@
 # Foundation and next gates
 
+## Next work in order
+
+Use [the maintainer guide](../MAINTAINING.md) for the daily loop. This is the
+provisional queue as of 15 November 2026. A reproducible outside user blocker
+takes priority. The existing contribution issues are deliberately small enough
+for a newcomer; check whether someone has claimed one before starting it.
+Start recruiting the first five developers now, alongside the fixture work.
+New synthetic fixtures are not a prerequisite for trying the published toolkit.
+
+| Order | Work | Done when |
+| --- | --- | --- |
+| 1 | [Settings fixture, issue 14](https://github.com/Automatron-workflows/hardwire/issues/14) | The saved form has a hand reviewed expected panel, deterministic corpus score and assertions for known mismatches. Inference still cannot assert the fixture handler's reversibility. |
+| 2 | [Sign in fixture, issue 12](https://github.com/Automatron-workflows/hardwire/issues/12) and [invoice fixture, issue 13](https://github.com/Automatron-workflows/hardwire/issues/13) | Each scene has synthetic HTML and independently authored ground truth. Password annotations, payment effect and approval mismatches stay visible. No identity or payment provider is connected. |
+| 3 | Five independent first attempts | Five outside developers try the saved form task. Record completion without help, first confusion and usefulness. Fix the first repeated blocker. The maintainer's own runs do not count. |
+| 4 | [Native client, issue 17](https://github.com/Automatron-workflows/hardwire/issues/17), then a second desktop host | Record host, version, installation steps and actual tool results from the public release. SDK transport checks alone do not close the task. |
+| 5 | [Accessibility, issue 16](https://github.com/Automatron-workflows/hardwire/issues/16) and [public Windows first use, issue 15](https://github.com/Automatron-workflows/hardwire/issues/15) | A person completes the journey and records any barriers. Automated Windows CI is already passing; independent installation and assistive technology evidence remain separate. |
+| 6 | Permitted real captures and one application partner | Establish provenance and reviewed behavior for the evidence gates below before building a general execution runtime. |
+
+Adding synthetic cases improves regression coverage. Publish the new sample
+count and failure breakdown without presenting it as evidence about real sites.
+Keep the historical three case baseline below identifiable when expanding it.
+
 ## Foundation: implemented through 0.8.1
 
 - Strict panel and schema validation, argument checks and normalized digests.

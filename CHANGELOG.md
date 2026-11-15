@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+* Added a daily maintainer guide, a scoped work queue and standalone coding assistant instructions.
+* Added `npm run dev` and `npm run check:quick`; full package and bundle verification remains required before merging.
+* Configured weekly dependency update proposals and made independent first run completion explicit in the feedback form.
+* Preserved the public API, contract formats, visual experience and released 0.9.0 artifacts.
+
 ## 0.9.0
 
 * Added a desktop MCP bundle with locked production dependencies, licenses and an explicit Node runtime requirement.

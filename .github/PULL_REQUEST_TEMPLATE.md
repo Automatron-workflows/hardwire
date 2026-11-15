@@ -12,3 +12,7 @@ changes, include desktop and mobile browser evidence.
 
 Explain any changes to handlers, confirmation requirements or network access.
 Use synthetic data only in screenshots and records.
+
+## Next
+
+Link the next concrete task, or state that this change completes the issue.

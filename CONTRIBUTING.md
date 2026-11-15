@@ -12,6 +12,11 @@ npm ci --ignore-scripts
 npm run check
 ```
 
+For daily work, see [the maintainer guide](MAINTAINING.md). Use
+`npm run check:quick` while editing to run the local checks without rebuilding
+distribution packages. `npm run dev` starts the local demo. The full check below
+is still required before merging.
+
 This runs unit/CLI tests, real loopback HTTP integration tests, panel validation
 and the three action experiment, offline API walkthrough, runnable consumer, MCP transport and package checks. The
 package check builds a tarball, installs it with a fresh cache in a temporary project, then
