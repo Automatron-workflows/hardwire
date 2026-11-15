@@ -13,17 +13,17 @@ the first confusing moment.
 | Two MCP clients | Official SDK 2.4.0 and Inspector 2.0.0 exercise the protocol; the release-backed `npx` launch was checked with the SDK client | Two desktop host workflows remain unverified |
 | README first experience | Actual GIF, exact release command, live experiment and adoption guide near the top | Observe comprehension with new visitors |
 | Execution boundaries | Local fixtures disclosed; form inference never calls an endpoint | A consenting application integration |
-| Community | Discussions enabled, welcome pinned, six scoped issues, templates and guidelines | Replies and reviewed outside contributions |
+| Community | Discussions enabled, welcome pinned, five scoped issues, templates and guidelines | Replies and reviewed outside contributions |
 | Desktop distribution | MCPB includes locked production dependencies; extracted server and exact artifact digest checked | Native host installation feedback |
 | MCP Registry | 0.9.0 is active as `io.github.Automatron-workflows/hardwire`; public entry matches the release bundle digest | Observe discovery and independent installations |
 | npm | Separate optional distribution route | Authenticated publisher and verified scope |
-| Discovery | Repository description, topics, release, Pages site, adoption guide and Glama ownership file in place | Directory listings and one independent report |
+| Discovery | Repository description, topics, release, Pages site and adoption guide in place. Glama listing is live; entries were submitted to [awesome-mcp-devtools #470](https://github.com/punkpeye/awesome-mcp-devtools/pull/470) and [awesome-mcp-servers #19588](https://github.com/punkpeye/awesome-mcp-servers/pull/19588), both passing their checks. | Directory acceptances and one independent report. A submitted listing is not adoption. |
 | Outside evidence | GitHub traffic in the last 14 days: 39 views from 1 unique visitor, 232 clones from 69 unique cloners, 0 referrers. Clones are not users. | An outside person completes a run and reports it |
 
 ## Discovery baseline
 
 The 15 November check still found zero stars and zero forks. Main CI and Pages
-were passing, and the six contribution issues had no outside replies. The public
+were passing, and the five open contribution issues had no outside replies. The public
 saved-form invitation is
 [discussion 28](https://github.com/Automatron-workflows/hardwire/discussions/28);
 no independent completion has been recorded yet. The next evidence target is
@@ -103,8 +103,9 @@ Desktop bundles and installed entry points avoid startup downloads. Native deskt
 The source checkout now includes `AGENTS.md`, a daily workflow, an ordered queue
 and release recovery instructions. `npm run check:quick` runs the local suite;
 `npm run check` adds the fresh installation and bundle checks. Both passed on
-15 November, including 140 unit tests, five HTTP integration tests and actual
-MCP calls. The new `npm run dev -- --port 0` entry point was started and both page
+15 November, including 141 unit tests, five HTTP integration tests and actual
+MCP calls. The settings corpus fixture adds one unit test and keeps the four-case
+baseline visible. The new `npm run dev -- --port 0` entry point was started and both page
 routes returned successfully. No UI code was changed or new browser review claimed.
 
 Weekly dependency proposals and completion feedback fields are configured. The
