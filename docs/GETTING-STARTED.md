@@ -118,8 +118,10 @@ node src/cli.mjs corpus examples/corpus --json > output/corpus.json
 ```
 
 Both currently exit 1 by design. The fixture baseline is blog 100, legacy 60,
-shop 45. See [the roadmap](ROADMAP.md) for the exact gate and how to collect
-real evidence without representing synthetic examples as a benchmark.
+settings 40 and shop 45: mean 61.3, with one of four passing at 80. The settings
+case deliberately measures the checkbox-to-boolean, confirmation and
+reversibility gaps. See [the roadmap](ROADMAP.md) for the exact gate and how to
+collect real evidence without representing synthetic examples as a benchmark.
 
 ## Use it from another local project
 

@@ -1,0 +1,21 @@
+{
+  "panel": "hardwire.panel/1",
+  "origin": "https://settings.example.com",
+  "title": "What a careful engineer would publish for examples/corpus/settings/page.html",
+  "ports": [
+    {
+      "id": "set-preferences",
+      "kind": "write",
+      "summary": "Save the account's marketing email preference.",
+      "confirmation": "none",
+      "reversible": true,
+      "parameters": {
+        "properties": {
+          "marketingEmails": { "type": "boolean" }
+        },
+        "required": ["marketingEmails"]
+      },
+      "endpoint": "/preferences"
+    }
+  ]
+}

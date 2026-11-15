@@ -23,9 +23,9 @@ for (const name of (await readdir(CORPUS_DIR)).sort()) {
 test("the recorded corpus produces the documented numbers", () => {
   const report = scoreCorpus(cases);
 
-  assert.equal(report.cases, 3);
-  assert.equal(report.mean, 68.3);
-  assert.equal(report.min, 45);
+  assert.equal(report.cases, 4);
+  assert.equal(report.mean, 61.3);
+  assert.equal(report.min, 40);
   assert.equal(report.max, 100);
   assert.equal(report.passed, 1);
   assert.equal(report.inventedMutations, 1);
@@ -35,8 +35,42 @@ test("the recorded corpus produces the documented numbers", () => {
   assert.equal(report.readError, 0);
   assert.deepEqual(
     report.results.map((result) => [result.name, result.score]),
-    [["blog", 100], ["legacy", 60], ["shop", 45]],
+    [["blog", 100], ["legacy", 60], ["settings", 40], ["shop", 45]],
   );
+});
+
+test("the settings fixture records the checkbox-to-boolean contract gaps", () => {
+  const report = scoreCorpus(cases);
+  const settings = report.results.find((result) => result.name === "settings");
+
+  assert.equal(settings.score, 40);
+  assert.deepEqual(settings.ports, [
+    {
+      id: "set-preferences",
+      similarity: 0.4,
+      differences: [
+        { field: "confirmation", expected: "none", actual: "user" },
+        { field: "reversible", expected: true, actual: false },
+        {
+          field: "parameters",
+          expected: {
+            type: "object",
+            properties: { marketingEmails: { type: "boolean" } },
+            required: ["marketingEmails"],
+            additionalProperties: false,
+          },
+          actual: {
+            type: "object",
+            properties: { marketingEmails: { type: "boolean" } },
+            required: [],
+            additionalProperties: false,
+          },
+        },
+      ],
+    },
+  ]);
+  assert.equal(settings.unsafeDifferences.length, 0, "a conservative draft is wrong here, not unsafe");
+  assert.equal(passes(settings), false);
 });
 
 test("a case whose capture yields nothing scores zero instead of aborting the run", () => {
@@ -45,7 +79,7 @@ test("a case whose capture yields nothing scores zero instead of aborting the ru
     ...cases,
   ]);
 
-  assert.equal(report.cases, 4);
+  assert.equal(report.cases, 5);
   assert.equal(report.results[0].score, 0);
   assert.equal(report.results[0].error, "hardwire_infer_failed");
   assert.equal(report.results[0].expected, example.ports.length);
@@ -53,15 +87,16 @@ test("a case whose capture yields nothing scores zero instead of aborting the ru
   assert.equal(report.results[0].originMatch, null);
   assert.equal(report.readPorts, 3, "the failed case's read port is still measured");
   assert.equal(report.readError, 33.3, "a missing read port is full structural error");
-  assert.equal(report.results.length, 4, "the remaining cases still ran");
+  assert.equal(report.results.length, 5, "the remaining cases still ran");
 });
 
 test("the threshold is a parameter, not a constant", () => {
   const report = scoreCorpus(cases, { threshold: 50 });
 
   assert.equal(report.threshold, 50);
-  assert.equal(report.passed, 2, "blog and legacy clear 50; shop does not");
-  assert.equal(passes(report.results[2], 50), false);
+  assert.equal(report.passed, 2, "blog and legacy clear 50; settings and shop do not");
+  assert.equal(passes(report.results[2], 50), false, "settings stays below 50");
+  assert.equal(passes(report.results[3], 50), false, "shop stays below 50");
 });
 
 test("an empty corpus is refused rather than reported as perfect", () => {
