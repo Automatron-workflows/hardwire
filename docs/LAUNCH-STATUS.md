@@ -1,6 +1,7 @@
 # Launch status
 
-Evidence as of 14 November 2026. Public availability is not evidence of outside
+Evidence updated 15 November 2026. Dated measurements below retain their original
+observation date. Public availability is not evidence of outside
 adoption. The first invitation remains: run one action, change one input and share
 the first confusing moment.
 
@@ -20,6 +21,12 @@ the first confusing moment.
 | Outside evidence | GitHub traffic in the last 14 days: 39 views from 1 unique visitor, 232 clones from 69 unique cloners, 0 referrers. Clones are not users. | An outside person completes a run and reports it |
 
 ## Discovery baseline
+
+The 15 November check still found zero stars and zero forks. Main CI and Pages
+were passing, and the six contribution issues had no outside replies. The next
+evidence target is five independent completions, rather than another packaging
+milestone. Follow [the maintainer guide](../MAINTAINING.md) to continue daily work
+without previous chat context.
 
 The repository is publicly available, but discovery is not established. On 14
 November 2026 it had zero stars and zero forks. GitHub reported 39 views from one
@@ -87,3 +94,16 @@ Its subprocess did not inherit the network proxy settings used by the successful
 terminal install. Forwarding the normal proxy settings made the same public npx
 configuration pass all five MCP tool checks, including the settings task.
 Desktop bundles and installed entry points avoid startup downloads. Native desktop host verification remains open.
+
+## Maintainer continuity
+
+The source checkout now includes `AGENTS.md`, a daily workflow, an ordered queue
+and release recovery instructions. `npm run check:quick` runs the local suite;
+`npm run check` adds the fresh installation and bundle checks. Both passed on
+15 November, including 140 unit tests, five HTTP integration tests and actual
+MCP calls. The new `npm run dev -- --port 0` entry point was started and both page
+routes returned successfully. No UI code was changed or new browser review claimed.
+
+Weekly dependency proposals and completion feedback fields are configured. The
+published 0.9.0 artifacts remain immutable; maintainer changes live on main and
+are listed as unreleased. No promotional messages have been sent by this work.

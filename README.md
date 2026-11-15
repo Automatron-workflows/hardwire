@@ -119,8 +119,13 @@ If Hardwire is useful to you, star the repository to find it again.
 git clone https://github.com/Automatron-workflows/hardwire.git
 cd hardwire
 npm ci --ignore-scripts
-npm run check
+npm run check:quick
+npm run dev
 ```
+
+[Daily development and maintainer handoff](MAINTAINING.md) includes the next task,
+file map, release steps and launch routine. Run `npm run check` before merging.
+No AI subscription or API key is needed to build on this repository.
 
 [API](docs/API.md) · [Architecture](docs/ARCHITECTURE.md)
 · [Integration](docs/INTEGRATION.md) · [Security](SECURITY.md)

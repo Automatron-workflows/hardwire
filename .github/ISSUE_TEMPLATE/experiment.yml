@@ -15,6 +15,17 @@ body:
         - Desktop bundle
     validations:
       required: true
+  - type: dropdown
+    id: completion
+    attributes:
+      label: Did you complete the experiment?
+      options:
+        - Completed without help
+        - Completed with help
+        - Tried but got blocked
+        - Have not run it yet
+    validations:
+      required: true
   - type: textarea
     id: environment
     attributes:
@@ -22,6 +33,11 @@ body:
       description: Browser and URL, or operating system, Node version and commit.
     validations:
       required: true
+  - type: textarea
+    id: usefulness
+    attributes:
+      label: Where would you use the result?
+      description: Optional. A concrete integration or a reason it was not useful helps us choose what to improve. Keep personal and customer data out of the report.
   - type: textarea
     id: steps
     attributes:
