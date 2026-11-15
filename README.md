@@ -107,7 +107,9 @@ adapter is included. [Evidence and next gates](docs/ROADMAP.md).
 ## Bring one form
 
 Run the experiment and [share the first confusing step](https://github.com/Automatron-workflows/hardwire/issues/new?template=experiment.yml).
-Synthetic forms, reproducible bugs and verified client setups are useful
+The [saved-form invitation](https://github.com/Automatron-workflows/hardwire/discussions/28)
+has the public v0.9.0 command and the questions to answer. Synthetic forms,
+reproducible bugs and verified client setups are useful
 [small contributions](https://github.com/Automatron-workflows/hardwire/issues?q=is%3Aissue%20is%3Aopen%20label%3A%22good%20first%20issue%22).
 
 [Community welcome](https://github.com/Automatron-workflows/hardwire/discussions/18)
