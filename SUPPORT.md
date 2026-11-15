@@ -5,6 +5,10 @@ Run sign in, invoice payment and settings. Change an input and inspect what was
 blocked. No owned app or API key is needed. To use Hardwire in your own project,
 start with the [adoption guide](docs/ADOPT.md).
 
+Ready to try the saved-form task? The
+[saved-form invitation](https://github.com/Automatron-workflows/hardwire/discussions/28)
+has the public v0.9.0 command and what to report.
+
 Use [Discussions](https://github.com/Automatron-workflows/hardwire/discussions) for
 questions, ideas and sharing what you tried. Include the scenario, browser or
 Node version, whether you finished without help and what was confusing.

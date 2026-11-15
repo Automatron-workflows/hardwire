@@ -23,10 +23,13 @@ the first confusing moment.
 ## Discovery baseline
 
 The 15 November check still found zero stars and zero forks. Main CI and Pages
-were passing, and the six contribution issues had no outside replies. The next
-evidence target is five independent completions, rather than another packaging
-milestone. Follow [the maintainer guide](../MAINTAINING.md) to continue daily work
-without previous chat context.
+were passing, and the six contribution issues had no outside replies. The public
+saved-form invitation is
+[discussion 28](https://github.com/Automatron-workflows/hardwire/discussions/28);
+no independent completion has been recorded yet. The next evidence target is
+five independent completions, rather than another packaging milestone. Follow
+[the maintainer guide](../MAINTAINING.md) to continue daily work without previous
+chat context.
 
 The repository is publicly available, but discovery is not established. On 14
 November 2026 it had zero stars and zero forks. GitHub reported 39 views from one
