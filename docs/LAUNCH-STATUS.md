@@ -9,7 +9,7 @@ the first confusing moment.
 | --- | --- | --- |
 | Three coherent examples | Sign in, invoice and settings share the film's artwork and one action journey | Observe five independent first attempts |
 | One command | Versioned GitHub package includes `hardwire-experiment` and `hardwire-form`; fresh installation checked by CI; `npm install github:Automatron-workflows/hardwire#v0.8.1` and the no-checkout `npx` MCP configuration exercised on 14 November | npm shortcut after scope verification |
-| Positive and negative input | All three local handlers reject invalid input; saved settings form checks boolean versus string | Outside captures and bug reports |
+| Positive and negative input | All three local handlers reject invalid input; saved settings form checks boolean versus string; the four-case synthetic corpus pins the settings checkbox contract at 40/100 | Outside captures and bug reports |
 | Two MCP clients | Official SDK 2.4.0 and Inspector 2.0.0 exercise the protocol; the release-backed `npx` launch was checked with the SDK client | Two desktop host workflows remain unverified |
 | README first experience | Actual GIF, exact release command, live experiment and adoption guide near the top | Observe comprehension with new visitors |
 | Execution boundaries | Local fixtures disclosed; form inference never calls an endpoint | A consenting application integration |

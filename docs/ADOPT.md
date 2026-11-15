@@ -21,7 +21,7 @@ see a rejection before local state changes. Nothing is sent to a server, no
 account is connected and no money moves.
 
 Then read [what remains experimental](../README.md#experimental-with-explicit-limits).
-The benchmark contains three synthetic fixtures. It does not establish accuracy
+The benchmark contains four synthetic fixtures. It does not establish accuracy
 on arbitrary websites.
 
 ## Add it to a project
@@ -79,7 +79,7 @@ them. Use a trusted handler and real authorization for execution.
 - Inference reads static HTML; it does not render JavaScript or establish
   reversibility.
 - Approval values are caller assertions, not verified identities.
-- The benchmark is three synthetic fixtures, not a production accuracy claim.
+- The benchmark is four synthetic fixtures, not a production accuracy claim.
 
 ## Connect an agent without a checkout
 

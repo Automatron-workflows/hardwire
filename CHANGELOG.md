@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+* Added a fourth synthetic corpus case for the settings form. Its reviewed panel scores 40/100 and records the checkbox-to-boolean, confirmation and reversibility gaps instead of treating them as noise.
 * Added a daily maintainer guide, a scoped work queue and standalone coding assistant instructions.
 * Added `npm run dev` and `npm run check:quick`; full package and bundle verification remains required before merging.
 * Configured weekly dependency update proposals and made independent first run completion explicit in the feedback form.

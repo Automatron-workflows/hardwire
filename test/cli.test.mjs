@@ -27,7 +27,8 @@ test("corpus reports the aggregate and exits 1 when cases fail", async () => {
   const report = JSON.parse(stdout);
 
   assert.equal(code, 1);
-  assert.equal(report.mean, 68.3);
+  assert.equal(report.cases, 4);
+  assert.equal(report.mean, 61.3);
   assert.equal(report.passed, 1);
   assert.equal(report.inventedMutations, 1);
   assert.equal(report.readError, 0);
