@@ -78,7 +78,8 @@ experiment executes local JavaScript. Neither connects accounts or moves money.
 The versioned 0.9.0 package runs all three with the one command in the
 [experiment guide](EXPERIMENT.md). A checkout uses `npm run experiment` without
 installing dependencies. Discussions are enabled, the welcome post links to the
-experiment and six scoped contribution issues are open. See the [14 day launch
+experiment, the [saved-form invitation](https://github.com/Automatron-workflows/hardwire/discussions/28)
+is open and five scoped contribution issues are open. See the [14 day launch
 plan](LAUNCH.md) for the recruitment and publication sequence.
 
 Ask evaluators to report which scenario they tried, whether they finished without
