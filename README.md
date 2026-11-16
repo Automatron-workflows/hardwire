@@ -16,6 +16,7 @@ checks. Your application supplies the authorized handler.
 · [Ask a question](https://github.com/Automatron-workflows/hardwire/discussions/categories/q-a)
 
 [![Tests](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml/badge.svg)](https://github.com/Automatron-workflows/hardwire/actions/workflows/test.yml)
+[![Browser](https://github.com/Automatron-workflows/hardwire/actions/workflows/browser.yml/badge.svg)](https://github.com/Automatron-workflows/hardwire/actions/workflows/browser.yml)
 
 [![Sign in, invoice payment and settings: interface navigation compared with direct actions](docs/assets/demo.gif)](https://automatron-workflows.github.io/hardwire/)
 

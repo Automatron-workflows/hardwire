@@ -127,3 +127,11 @@ test("private hosts are refused unless explicitly allowed, and near-misses are p
   const local = await probeOrigin("http://localhost:3000", { fetchImpl: site({}), allowPrivate: true });
   assert.equal(local.origin, "http://localhost:3000");
 });
+
+test("a UTF-8 BOM does not hide a blanket robots disallow", async () => {
+  const routes = { ...cooperative(), "/robots.txt": { body: "\uFEFFUser-agent: *\nDisallow: /\n", type: "text/plain" } };
+  const report = await probeOrigin("https://shop.example.com", { fetchImpl: site(routes) });
+  assert.equal(report.blockedByRobots, true);
+  assert.equal(report.cappedByRobots, true);
+  assert.equal(report.score, 25);
+});

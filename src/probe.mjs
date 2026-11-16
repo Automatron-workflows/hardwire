@@ -148,7 +148,7 @@ function rootCoveringLength(value) {
 }
 
 function robotsBlocksAllAgents(body) {
-  const lines = body.split(/\r?\n/).map((line) => line.replace(/#.*$/, "").trim());
+  const lines = body.replace(/^\uFEFF/, "").split(/\r?\n/).map((line) => line.replace(/#.*$/, "").trim());
   let inAll = false;
   let disallowLength = 0;
   let allowLength = 0;

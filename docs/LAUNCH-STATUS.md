@@ -111,10 +111,14 @@ Desktop bundles and installed entry points avoid startup downloads. Native deskt
 The source checkout now includes `AGENTS.md`, a daily workflow, an ordered queue
 and release recovery instructions. `npm run check:quick` runs the local suite;
 `npm run check` adds the fresh installation and bundle checks. Both passed on
-16 November, including 143 unit tests, five HTTP integration tests and actual
-MCP calls. The settings, sign-in and invoice corpus fixtures add regression tests
-and keep the six-case baseline visible. The new `npm run dev -- --port 0` entry
-point was started and both page routes returned successfully. No UI code was changed or new browser review claimed.
+16 November, including 146 unit tests, five HTTP integration tests and actual
+MCP calls. The browser workflow runs the playground tab-order, experiment and
+film checks in headless Chrome; the local Chrome 157 check and the Ubuntu job
+passed. The settings, sign-in and invoice corpus fixtures add regression tests
+and keep the six-case baseline visible. The `npm run dev -- --port 0` entry point
+was started and both page routes returned successfully. No screen reader, real
+Windows machine or outside user was involved, so those evidence gates remain
+open.
 
 Weekly dependency proposals and completion feedback fields are configured. The
 published 0.9.0 artifacts remain immutable; maintainer changes live on main and
