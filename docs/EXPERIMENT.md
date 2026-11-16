@@ -69,6 +69,46 @@ Editing a request cancels pending approval. Reset starts a new isolated fixture.
 After success, **Next example** advances the journey. **Replay** starts again.
 Completed actions cannot run a second time in the same fixture.
 
+## Keyboard and accessibility check
+
+On 16 November 2026, a maintainer completed the three scenes in Chrome 157 on
+macOS using only the keyboard. No screen reader was used, so
+[issue 16](https://github.com/Automatron-workflows/hardwire/issues/16) remains
+open for a named screen reader and an outside report.
+
+Reproduce with `npm run demo`, then use Tab, Enter and Escape:
+
+1. Tab reaches the two header links, the three scenario buttons, **Run action**,
+   **Try invalid input**, **Inputs & code** and **Reset experiment**, each with a
+   visible 2px focus outline. A scenario button keeps focus after selection.
+2. **Try invalid input** leaves focus on its button and reports the rejection.
+   **Run action** moves to review; approving reports "Signed in" or "Paid
+   locally"; **Next example** advances through the scenes in order.
+3. **Inputs & code** moves focus into the dialog. Tab stays inside it. Escape
+   closes it and returns focus to **Inputs & code**; **Use these inputs** returns
+   focus to **Run action**.
+4. **Reset experiment** keeps focus on the reset button and restores the initial
+   state.
+
+Measured in the same browser:
+
+- With `prefers-reduced-motion: reduce`, the route and result artwork report a
+  `0s` transition and no animation. Normal motion keeps the 0.55s route
+  transition.
+- At 640 and 390 CSS pixel viewport widths the page has no horizontal overflow,
+  the primary action stays 196×48px and the utility buttons stay at least 44px
+  high. The 640px check approximates 200% zoom on a 1280px window; it is not a
+  browser zoom setting.
+- Lighthouse 13.4.1 (Chromium 152, automated) scored accessibility 100. An
+  automated audit is not assistive technology evidence.
+
+One DOM issue was found and fixed. Typing in an inspector field rewrote the
+`role="status"` feedback region on every keystroke even when its text did not
+change: five characters produced five mutations of the same value. The region is
+now written only when the message changes. The same typing produces zero
+mutations, while approval and completion still update it. This is a DOM
+measurement, not a screen-reader announcement claim.
+
 ## Follow one request through the code
 
 `playground/comparison.mjs` defines the reviewed three port panel and maps each

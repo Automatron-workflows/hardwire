@@ -1,6 +1,6 @@
 # Launch status
 
-Evidence updated 15 November 2026. Dated measurements below retain their original
+Evidence updated 16 November 2026. Dated measurements below retain their original
 observation date. Public availability is not evidence of outside
 adoption. The first invitation remains: run one action, change one input and share
 the first confusing moment.
@@ -10,6 +10,7 @@ the first confusing moment.
 | Three coherent examples | Sign in, invoice and settings share the film's artwork and one action journey | Observe five independent first attempts |
 | One command | Versioned GitHub package includes `hardwire-experiment` and `hardwire-form`; fresh installation checked by CI; `npm install github:Automatron-workflows/hardwire#v0.8.1` and the no-checkout `npx` MCP configuration exercised on 14 November | npm shortcut after scope verification |
 | Positive and negative input | All three local handlers reject invalid input; saved settings form checks boolean versus string; the six-case synthetic corpus pins the settings checkbox contract at 40/100, the sign-in reversibility gap at 80/100 and the invoice payment floor at 40/100 | Outside captures and bug reports |
+| Keyboard path | Chrome 157 on macOS completed all three scenes by keyboard: selection, invalid input, approval, next example, reset, and the inspector's trap, Escape and focus return. Reduced-motion styles applied, 640 and 390 CSS pixel widths had no horizontal overflow, and Lighthouse 13.4.1 scored accessibility 100 | Named screen reader and outside report (issue 16) |
 | Three MCP clients | Official SDK 2.4.0, Inspector 2.0.0 and Codex CLI 0.145.0 exercise the protocol; Codex discovered and called all five tools with synthetic data | Independent outside Codex report and two desktop host workflows remain unverified |
 | README first experience | Actual GIF, exact release command, live experiment and adoption guide near the top | Observe comprehension with new visitors |
 | Execution boundaries | Local fixtures disclosed; form inference never calls an endpoint | A consenting application integration |
@@ -18,7 +19,7 @@ the first confusing moment.
 | MCP Registry | 0.9.0 is active as `io.github.Automatron-workflows/hardwire`; public entry matches the release bundle digest | Observe discovery and independent installations |
 | npm | Separate optional distribution route | Authenticated publisher and verified scope |
 | Discovery | Repository description, topics, release, Pages site and adoption guide in place. Glama listing is live; entries were submitted to [awesome-mcp-devtools #470](https://github.com/punkpeye/awesome-mcp-devtools/pull/470) and [awesome-mcp-servers #19588](https://github.com/punkpeye/awesome-mcp-servers/pull/19588), both passing their checks. | Directory acceptances and one independent report. A submitted listing is not adoption. |
-| Outside evidence | GitHub traffic in the last 14 days: 39 views from 1 unique visitor, 232 clones from 69 unique cloners, 0 referrers. Clones are not users. | An outside person completes a run and reports it |
+| Outside evidence | GitHub traffic in the last 14 days: 39 views from 1 unique visitor, 413 clones from 127 unique cloners, 0 referrers. Clones are not users. | An outside person completes a run and reports it |
 
 ## Discovery baseline
 
@@ -51,9 +52,13 @@ consent, exact invoice approval and keyboard activation. Desktop and 390px check
 retain one primary action and the same dark composition. Detailed JSON and input
 editing remain optional. These checks do not establish complete accessibility or
 first time comprehension. The 0.9.0 update preserves the interaction and artwork;
-its preview metadata is checked in the built HTML. No new native browser review
-was available in that session. The design harness collector could not run in the
-browser's restricted evaluation scope; direct DOM checks are separate evidence.
+its preview metadata is checked in the built HTML. On 16 November, a maintainer
+completed the three-scene journey in Chrome 157 by keyboard, confirmed the
+inspector's focus trap and focus return, reduced motion, and no horizontal
+overflow at 640 and 390 CSS pixel widths. The check also found and fixed
+redundant live-region writes while typing. No screen reader was used. The design
+harness collector could not run in the browser's restricted evaluation scope;
+direct DOM checks are separate evidence.
 
 VS Code did not become controllable through this session's native app interface.
 On 14 November, a Codex 0.145.0 app-server attempt stopped before initialization.
