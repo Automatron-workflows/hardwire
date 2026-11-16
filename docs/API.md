@@ -84,7 +84,7 @@ Lower-level exports: `traceDigest(document)` hashes everything except its own
 | `passes(result, threshold = 80)` | True only if score meets threshold, origins match, and no error, invented mutation or unsafe difference exists. |
 | `scoreCorpus(cases, { threshold = 80 })` | Non-empty array of `{ name, expected, html }` → aggregate and per-case results. |
 | `probeOrigin(origin, options)` **async** | Fixed-path discovery report, score and network findings. |
-| `assertPublicOrigin(origin, { allowPrivate = false })` | Bare origin → screened origin. Hostname/literal screening only, not DNS resolution or rebinding protection. |
+| `assertPublicOrigin(origin, { allowPrivate = false })` | Bare origin → screened origin. Rejects private IPv4 and mapped, translated, NAT64, site-local or reserved IPv6 literals. Hostname/literal screening only, not DNS resolution or rebinding protection. |
 | `fetchPage(url, options)` **async** | Low-level bounded GET → status, body, content type and optional error. **Does not screen the target**; validate it and apply network policy before use. |
 
 Static inference ignores commented markup, inert `<template>` content and

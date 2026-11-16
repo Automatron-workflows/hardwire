@@ -31,25 +31,54 @@ export const SIGNALS = Object.freeze([
     detail: "pays-per-call discovery; commerce, not an operation surface" },
 ]);
 
+function isPrivateIPv4(a, b, c, d) {
+  return a === 0 || a === 10 || a === 127 ||
+    a >= 224 || (a === 100 && b >= 64 && b <= 127) ||
+    (a === 169 && b === 254) || (a === 192 && b === 168) ||
+    (a === 172 && b >= 16 && b <= 31);
+}
+
+/** Expand a canonical IPv6 literal into eight 16-bit groups. */
+function ipv6Groups(host) {
+  const [head, tail, ...rest] = host.split("::");
+  if (rest.length) return null;
+  const left = head ? head.split(":") : [];
+  const right = tail === undefined ? null : tail ? tail.split(":") : [];
+  if (right === null) {
+    if (left.length !== 8) return null;
+    return left.map((part) => (/^[0-9a-f]{1,4}$/.test(part) ? parseInt(part, 16) : NaN));
+  }
+  const missing = 8 - left.length - right.length;
+  if (missing < 1) return null;
+  return [...left, ...Array(missing).fill("0"), ...right]
+    .map((part) => (/^[0-9a-f]{1,4}$/.test(part) ? parseInt(part, 16) : NaN));
+}
+
+/** Refuse unspecified, mapped, translated, NAT64, local and multicast literals. */
+function isPrivateIPv6(host) {
+  const groups = ipv6Groups(host);
+  if (!groups || groups.some(Number.isNaN)) return true;
+  const [a, b, c, d, e, f, g, h] = groups;
+  const embedded = () => isPrivateIPv4(g >> 8, g & 255, h >> 8, h & 255);
+  // ::/96 covers unspecified, loopback and deprecated IPv4-compatible forms.
+  if (a === 0 && b === 0 && c === 0 && d === 0 && e === 0 && f === 0) return true;
+  // ::ffff:0:0/96 (mapped) and ::ffff:0:0:0/96 (translated) embed IPv4.
+  if (a === 0 && b === 0 && c === 0 && d === 0 && e === 0 && f === 0xffff) return embedded();
+  if (a === 0 && b === 0 && c === 0 && d === 0 && e === 0xffff && f === 0) return embedded();
+  // 64:ff9b::/32 covers the well-known and local-use NAT64 prefixes.
+  if (a === 0x64 && b === 0xff9b) return embedded();
+  // fc00::/7 unique-local, fe00::/9 reserved, ff00::/8 multicast.
+  return a >= 0xfc00;
+}
+
 function isPrivateHostname(hostname) {
   const host = hostname.toLowerCase().replace(/^\[|\]$/g, "").replace(/\.$/, "");
   if (host === "localhost" || host.endsWith(".localhost")) return true;
-  if (host.endsWith(".local") || host.endsWith(".internal")) return true;
-  if (isIP(host) === 6) {
-    // URL has already canonicalised IPv4-mapped IPv6 to hexadecimal groups.
-    const mapped = /^::ffff:([a-f0-9]{1,4}):([a-f0-9]{1,4})$/.exec(host);
-    if (mapped) {
-      const high = parseInt(mapped[1], 16), low = parseInt(mapped[2], 16);
-      return isPrivateHostname(`${high >> 8}.${high & 255}.${low >> 8}.${low & 255}`);
-    }
-    return host === "::" || host === "::1" || /^(fc|fd|fe[89ab]|ff)/.test(host);
-  }
+  if (host.endsWith(".local") || host.endsWith(".internal") || host.endsWith(".home.arpa")) return true;
+  if (isIP(host) === 6) return isPrivateIPv6(host);
   const v4 = /^(\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})$/.exec(host);
   if (!v4) return false;
-  const [a, b] = [Number(v4[1]), Number(v4[2])];
-  return a === 0 || a === 10 || a === 127 ||
-    a >= 224 || (a === 100 && b >= 64 && b <= 127) ||
-    (a === 169 && b === 254) || (a === 192 && b === 168) || (a === 172 && b >= 16 && b <= 31);
+  return isPrivateIPv4(Number(v4[1]), Number(v4[2]), Number(v4[3]), Number(v4[4]));
 }
 
 export function assertPublicOrigin(origin, { allowPrivate = false } = {}) {

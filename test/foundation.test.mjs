@@ -123,11 +123,11 @@ test('inference omits unsafe endpoints while keeping reviewable candidates', () 
 });
 
 test('private host screening handles IPv6, mapped IPv4 and public prefix near-misses', () => {
-  for (const host of ['[::1]', '[::]', '[::ffff:127.0.0.1]', '[::ffff:192.168.1.1]', '[fd00::1]', '[fe90::1]', 'localhost.', '100.64.0.1']) {
+  for (const host of ['[::1]', '[::]', '[::ffff:127.0.0.1]', '[::ffff:192.168.1.1]', '[::ffff:0:127.0.0.1]', '[::7f00:1]', '[64:ff9b::127.0.0.1]', '[fd00::1]', '[fe90::1]', '[fec0::1]', '[fe00::1]', 'localhost.', 'printer.home.arpa', '100.64.0.1']) {
     assert.throws(() => assertPublicOrigin(`https://${host}`), { code: 'hardwire_origin_private' });
   }
-  for (const host of ['fc.example.com', 'fd.example.com', '10.example.com', '[2606:4700:4700::1111]']) {
-    assert.equal(assertPublicOrigin(`https://${host}`), `https://${host}`);
+  for (const host of ['fc.example.com', 'fd.example.com', '10.example.com', '[2606:4700:4700::1111]', '[2001:4860:4860::8888]', '[::ffff:8.8.8.8]', '[64:ff9b::8.8.8.8]']) {
+    assert.equal(assertPublicOrigin(`https://${host}`), new URL(`https://${host}`).origin);
   }
 });
 
