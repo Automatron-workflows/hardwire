@@ -52,7 +52,7 @@ that order.
 | Types and approval declarations | `src/panel-schema.mjs`, `test/panel.test.mjs` | `node --test test/panel.test.mjs test/foundation.test.mjs` |
 | Corpus evidence | `examples/corpus/`, `src/score.mjs` | `node --test test/corpus.test.mjs test/score.test.mjs` |
 | Sign in, invoice, settings | `playground/comparison.mjs`, `playground/experiment-model.mjs` | `npm run experiment` and `node --test test/comparison.test.mjs test/experiment.test.mjs` |
-| Visual experience | `playground/art.mjs`, `app.mjs`, `experiment.mjs`, CSS | `npm run dev`, then the checks in [CONTRIBUTING.md](CONTRIBUTING.md); `npm run test:browser` locks the experiment primitives in headless Chrome |
+| Visual experience | `playground/art.mjs`, `app.mjs`, `experiment.mjs`, CSS | `npm run dev`, then the checks in [CONTRIBUTING.md](CONTRIBUTING.md); `npm run test:browser` locks the experiment and film primitives in headless Chrome |
 | MCP tools | `src/toolkit.mjs`, `src/mcp-server.mjs` | `npm run test:mcp` |
 | Distribution | `scripts/check-package.mjs`, `scripts/build-bundle.mjs`, workflows | `npm run check` |
 
@@ -66,7 +66,7 @@ including fresh downloads, package installation and bundle extraction.
 Create a branch, keep the scope clear and commit the reviewed files. Push the
 branch and open a pull request using GitHub or `gh pr create`. Include the problem,
 new behavior, verification and the next task. Wait for all CI jobs: Linux with
-Node 22 and 24, Windows with Node 24, and the headless Chrome experiment check.
+Node 22 and 24, Windows with Node 24, and the headless Chrome playground check.
 Do not merge a failing job by reclassifying it as a local environment problem.
 
 After merging, GitHub Pages builds and deploys from main. Check the `playground`

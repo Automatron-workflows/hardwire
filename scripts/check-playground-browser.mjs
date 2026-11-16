@@ -44,10 +44,18 @@ const focus = page => page.evaluate(() => ({
   insideDialog: Boolean(document.activeElement.closest?.('dialog')),
 }));
 const feedback = page => page.textContent('#feedback');
+const filmState = page => page.evaluate(() => ({
+  label: document.querySelector('#playback').getAttribute('aria-label'),
+  phase: document.querySelector('#film').dataset.phase,
+  paused: document.querySelector('#film').classList.contains('paused'),
+  hidden: document.querySelector('#demo-details').hidden,
+  expanded: document.querySelector('#info').getAttribute('aria-expanded'),
+  scenes: document.querySelectorAll('#film .scene').length,
+  described: [...document.querySelectorAll('#film .scene')]
+    .every(figure => figure.getAttribute('role') === 'img' && (figure.getAttribute('aria-label') || '').length > 0),
+}));
 const waitPhase = (page, phase) => page.waitForFunction(
   value => document.querySelector('#stage').dataset.phase === value, phase);
-const waitFeedback = (page, message) => page.waitForFunction(
-  value => document.querySelector('#feedback').textContent === value, message);
 const waitIdle = page => page.waitForFunction(
   () => !document.querySelector('#run').disabled && !document.querySelector('#invalid').disabled);
 
@@ -286,7 +294,81 @@ async function main() {
     }
 
     assert.deepEqual(pageErrors, []);
-    console.log('Browser experiment check passed: tab order, focus outlines, scene selection, status announcements, cancelled review, three action journeys, dialog focus, reduced motion and 640/390 layout.');
+
+    // Film playback, disclosure and reduced-motion primitives.
+    await page.setViewportSize({ width: 1280, height: 800 });
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
+    const filmUrl = new URL('index.html', url).href;
+    await page.goto(filmUrl);
+    await page.waitForFunction(() => document.querySelectorAll('#film .scene').length === 3);
+    const initialFilm = await filmState(page);
+    assert.equal(initialFilm.scenes, 3);
+    assert.equal(initialFilm.described, true);
+    assert.equal(initialFilm.label, 'Pause animation');
+    assert.equal(initialFilm.paused, false);
+    assert.equal(initialFilm.hidden, true);
+    assert.equal(initialFilm.expanded, 'false');
+
+    await page.locator('#playback').focus();
+    await page.keyboard.press('Enter');
+    assert.equal((await filmState(page)).label, 'Play animation');
+    assert.equal((await filmState(page)).paused, true);
+    await page.keyboard.press('Enter');
+    assert.equal((await filmState(page)).label, 'Pause animation');
+    assert.equal((await filmState(page)).paused, false);
+
+    await page.locator('#info').focus();
+    await page.keyboard.press('Enter');
+    assert.equal(await page.evaluate(() => document.querySelector('#demo-details').hidden), false);
+    assert.equal(await page.getAttribute('#info', 'aria-expanded'), 'true');
+    await page.keyboard.press('Escape');
+    assert.equal(await page.evaluate(() => document.querySelector('#demo-details').hidden), true);
+    assert.equal(await page.getAttribute('#info', 'aria-expanded'), 'false');
+    assert.equal((await filmState(page)).paused, true);
+
+    await page.locator('#replay').focus();
+    await page.keyboard.press('Enter');
+    const replayed = await filmState(page);
+    assert.equal(replayed.paused, false);
+    assert.equal(replayed.label, 'Pause animation');
+    assert.equal(replayed.phase, '0');
+
+    // Film tab order and focus outlines.
+    await page.goto(filmUrl);
+    await page.waitForFunction(() => document.querySelectorAll('#film .scene').length === 3);
+    const filmTabOrder = [];
+    for (let index = 0; index < 6; index++) {
+      await page.keyboard.press('Tab');
+      filmTabOrder.push(await page.evaluate(() => {
+        const element = document.activeElement;
+        const style = getComputedStyle(element);
+        return {
+          label: element.getAttribute('aria-label') || (element.textContent || '').trim() || element.id,
+          outline: `${style.outlineStyle} ${style.outlineWidth}`,
+        };
+      }));
+    }
+    assert.deepEqual(filmTabOrder.map(entry => entry.label), [
+      'Hardwire home', 'Try it ↗', 'Pause animation', 'Replay animation', 'About this illustration', 'Hardwire on GitHub',
+    ]);
+    assert.ok(filmTabOrder.every(entry => entry.outline === 'solid 2px'), JSON.stringify(filmTabOrder));
+
+    // Reduced motion starts on the frozen result, and replay stays paused.
+    await page.emulateMedia({ reducedMotion: 'reduce' });
+    await page.goto(filmUrl);
+    await page.waitForFunction(() => document.querySelectorAll('#film .scene').length === 3);
+    const reducedFilm = await filmState(page);
+    assert.equal(reducedFilm.label, 'Play animation');
+    assert.equal(reducedFilm.paused, true);
+    assert.equal(reducedFilm.phase, '3');
+    await page.locator('#replay').focus();
+    await page.keyboard.press('Enter');
+    const reducedReplay = await filmState(page);
+    assert.equal(reducedReplay.paused, true);
+    assert.equal(reducedReplay.phase, '3');
+
+    assert.deepEqual(pageErrors, []);
+    console.log('Browser playground check passed: tab order, focus, experiment journeys and dialog, film playback and disclosure, reduced motion and 640/390 layout.');
   } finally {
     await browser?.close();
     await new Promise(resolve => server.close(resolve));
