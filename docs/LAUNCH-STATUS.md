@@ -10,7 +10,7 @@ the first confusing moment.
 | Three coherent examples | Sign in, invoice and settings share the film's artwork and one action journey | Observe five independent first attempts |
 | One command | Versioned GitHub package includes `hardwire-experiment` and `hardwire-form`; fresh installation checked by CI; `npm install github:Automatron-workflows/hardwire#v0.8.1` and the no-checkout `npx` MCP configuration exercised on 14 November | npm shortcut after scope verification |
 | Positive and negative input | All three local handlers reject invalid input; saved settings form checks boolean versus string; the six-case synthetic corpus pins the settings checkbox contract at 40/100, the sign-in reversibility gap at 80/100 and the invoice payment floor at 40/100 | Outside captures and bug reports |
-| Two MCP clients | Official SDK 2.4.0 and Inspector 2.0.0 exercise the protocol; the release-backed `npx` launch was checked with the SDK client | Two desktop host workflows remain unverified |
+| Three MCP clients | Official SDK 2.4.0, Inspector 2.0.0 and Codex CLI 0.145.0 exercise the protocol; Codex discovered and called all five tools with synthetic data | Independent outside Codex report and two desktop host workflows remain unverified |
 | README first experience | Actual GIF, exact release command, live experiment and adoption guide near the top | Observe comprehension with new visitors |
 | Execution boundaries | Local fixtures disclosed; form inference never calls an endpoint | A consenting application integration |
 | Community | Discussions enabled, welcome pinned, five scoped issues, templates and guidelines | Replies and reviewed outside contributions |
@@ -56,8 +56,11 @@ was available in that session. The design harness collector could not run in the
 browser's restricted evaluation scope; direct DOM checks are separate evidence.
 
 VS Code did not become controllable through this session's native app interface.
-Codex 0.145.0 app server initialization did not complete in the verification
-environment. Neither is counted as a successful native client setup.
+On 14 November, a Codex 0.145.0 app-server attempt stopped before initialization.
+On 16 November, a maintainer-run Codex CLI 0.145.0 check using a temporary MCP
+override discovered and called all five tools with synthetic data. This is a
+maintainer CLI protocol check, not an independent outside report or a desktop
+UI compatibility claim.
 
 ## Owner steps for npm
 
@@ -103,7 +106,7 @@ Desktop bundles and installed entry points avoid startup downloads. Native deskt
 The source checkout now includes `AGENTS.md`, a daily workflow, an ordered queue
 and release recovery instructions. `npm run check:quick` runs the local suite;
 `npm run check` adds the fresh installation and bundle checks. Both passed on
-15 November, including 141 unit tests, five HTTP integration tests and actual
+16 November, including 143 unit tests, five HTTP integration tests and actual
 MCP calls. The settings, sign-in and invoice corpus fixtures add regression tests
 and keep the six-case baseline visible. The new `npm run dev -- --port 0` entry
 point was started and both page routes returned successfully. No UI code was changed or new browser review claimed.

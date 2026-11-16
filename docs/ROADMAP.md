@@ -25,7 +25,7 @@ confirmation floor, hidden invoice id, minor-unit conversion or currency enum.
 | Order | Work | Done when |
 | --- | --- | --- |
 | 1 | Five independent first attempts | Five outside developers try the saved form task. Record completion without help, first confusion and usefulness. Fix the first repeated blocker. The maintainer's own runs do not count. |
-| 2 | [Native client, issue 17](https://github.com/Automatron-workflows/hardwire/issues/17), then a second desktop host | Record host, version, installation steps and actual tool results from the public release. SDK transport checks alone do not close the task. |
+| 2 | [Native client, issue 17](https://github.com/Automatron-workflows/hardwire/issues/17), then a second desktop host | Codex CLI 0.145.0 maintainer check recorded on 16 November: five tools discovered and called with synthetic data. An independent outside Codex report and a second desktop host remain open. |
 | 3 | [Accessibility, issue 16](https://github.com/Automatron-workflows/hardwire/issues/16) and [public Windows first use, issue 15](https://github.com/Automatron-workflows/hardwire/issues/15) | A person completes the journey and records any barriers. Automated Windows CI is already passing; independent installation and assistive technology evidence remain separate. |
 | 4 | Permitted real captures and one application partner | Establish provenance and reviewed behavior for the evidence gates below before building a general execution runtime. |
 

@@ -107,10 +107,49 @@ npx --yes --ignore-scripts @modelcontextprotocol/inspector@2.0.0 --cli node src/
 
 This pins the Inspector version actually tested. Its CLI is a second protocol
 client, not proof of a successful conversational workflow in a desktop agent.
-VS Code and native Codex setup remain unverified in their host UIs. The attempted
-VS Code check did not reach a running client. On 14 November, Codex 0.145.0
-app server verification also stopped before initialization completed. No native
-client success is claimed. [Help verify a native client](https://github.com/Automatron-workflows/hardwire/issues/17).
+
+### Codex CLI
+
+On 16 November 2026, a maintainer-run check used Codex CLI 0.145.0 on macOS
+26.3.0 with Node 24.16.0 and synthetic data. Codex discovered all five
+`hardwire_*` tools and completed these actual calls:
+
+| Tool | Observed result |
+| --- | --- |
+| `hardwire_inspect_panel` | Three ports: `start-session` (user), `pay-invoice` (owner), `set-preferences` (none); `audit.readable: 0` |
+| `hardwire_compile_panel` | `pay_invoice`, `set_preferences`, `start_session`; the `pay_invoice` schema includes `amount` |
+| `hardwire_infer_html` | `preferences`, kind `write`, confirmation `user` |
+| `hardwire_validate_params` | Amount `2500` rejected with `hardwire_params_invalid`; amount `2400` valid with `executed: false` |
+| `hardwire_verify_trace` | Valid, `provesExecution: false` |
+
+No payment ran, no account was connected, and the prompt limited the client to
+Hardwire tools. Codex used an existing ChatGPT login; Hardwire received no
+credentials. Reproduce the configuration from a checkout:
+
+```sh
+codex mcp add hardwire -- "$(command -v node)" "$PWD/src/mcp-server.mjs"
+codex mcp list
+```
+
+To leave existing client entries untouched, use `codex exec` with
+`--ignore-user-config` and temporary `mcp_servers.hardwire` overrides instead
+of `codex mcp add`:
+
+```sh
+codex exec --ignore-user-config --ephemeral --json -s read-only \
+  -c 'approval_policy="never"' \
+  -c "mcp_servers.hardwire.command=\"$(command -v node)\"" \
+  -c "mcp_servers.hardwire.args=[\"$PWD/src/mcp-server.mjs\"]" \
+  -C "$PWD" - < prompt.txt
+```
+
+The prompt inspected the panel from `playground/comparison.mjs`, inferred from
+the synthetic settings form above, validated the `pay-invoice` amounts and
+verified a trace built from that panel. This is a maintainer CLI check, not an
+independent outside report or a claim that the Codex desktop UI, VS Code or
+every host UI works. The earlier 14 November Codex app-server attempt stopped
+before initialization; this CLI result is separate evidence.
+[Help verify a native client](https://github.com/Automatron-workflows/hardwire/issues/17).
 
 For hosts supporting MCPB, [the desktop bundle](DESKTOP-BUNDLE.md) includes all
 runtime dependencies. Its extracted server is checked through actual stdio calls.
