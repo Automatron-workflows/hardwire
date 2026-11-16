@@ -87,6 +87,10 @@ Lower-level exports: `traceDigest(document)` hashes everything except its own
 | `assertPublicOrigin(origin, { allowPrivate = false })` | Bare origin → screened origin. Hostname/literal screening only, not DNS resolution or rebinding protection. |
 | `fetchPage(url, options)` **async** | Low-level bounded GET → status, body, content type and optional error. **Does not screen the target**; validate it and apply network policy before use. |
 
+Static inference ignores commented markup, inert `<template>` content and
+`<textarea>` text. It still uses a bounded regular-expression parser rather than
+a browser DOM, so custom widgets and malformed nesting require review.
+
 Network options: `fetchImpl` (default global fetch), `timeoutMs` (default 6000,
 integer 1–120000), and `allowPrivate` for `probeOrigin` / `inferFromUrl` only.
 Bodies over 512 KiB fail instead of parsing a truncated prefix. Redirects are
@@ -97,8 +101,9 @@ untrusted multi-tenant URL-fetch service.
 The probe validates the Hardwire panel only. Other discovery markers are weak
 presence signals, not verified protocol implementations. The `webmcp` heuristic
 matches source text, including older API spellings; it cannot see tools registered
-at runtime. `robots.txt` handling reports a blanket wildcard disallow and caps
-the score. It is not a complete robots policy engine or authorization check.
+at runtime. `robots.txt` handling reports a blanket wildcard disallow, unless an
+equivalent allow rule permits the root, and caps the score. It is not a complete
+robots policy engine or authorization check.
 
 Scoring compares kind, confirmation, reversibility, endpoint and parameter
 structure with equal weight. It ignores prose, preconditions, result schemas,

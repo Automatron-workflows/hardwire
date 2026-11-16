@@ -115,6 +115,7 @@ function robotsBlocksAllAgents(body) {
   const lines = body.split(/\r?\n/).map((line) => line.replace(/#.*$/, "").trim());
   let inAll = false;
   let disallowsRoot = false;
+  let allowsRoot = false;
   let seenRule = false;
   for (const line of lines) {
     const [rawKey, ...rest] = line.split(":");
@@ -125,10 +126,15 @@ function robotsBlocksAllAgents(body) {
       seenRule = false;
     } else if (key === "allow" || key === "disallow") {
       seenRule = true;
-      if (inAll && key === "disallow" && (value === "/" || value === "/*")) disallowsRoot = true;
+      if (!inAll) continue;
+      // RFC 9309 section 2.2.2: an equivalent allow rule wins over disallow.
+      if (value === "/" || value === "/*") {
+        if (key === "disallow") disallowsRoot = true;
+        else allowsRoot = true;
+      }
     }
   }
-  return disallowsRoot;
+  return disallowsRoot && !allowsRoot;
 }
 
 function htmlSignals(body) {

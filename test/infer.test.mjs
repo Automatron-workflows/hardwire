@@ -133,3 +133,23 @@ test("invalid explicit network options are refused instead of replaced by defaul
   await assert.rejects(inferFromUrl('https://shop.example.com', { fetchImpl: null }), { code: 'hardwire_panel_invalid' });
   assert.equal(calls, 0);
 });
+
+test("inert templates and textarea contents never become operations or fields", () => {
+  const html = `<!-- <script type="application/ld+json">{"@type":"SearchAction","target":"/commented"}</script> -->
+    <template>
+      <template><form id="nested" method="post" action="/nested"><input name="nested"></form></template>
+      <form id="wizard" method="post" action="/wizard"><input name="step"></form>
+      <script type="application/ld+json">{"@type":"SearchAction","target":"/search"}</script>
+    </template>
+    <form id="note" method="post" action="/note">
+      <textarea name="body"><form id="fake" action="/fake"><input name="injected"></form></textarea>
+      <button>Save</button>
+    </form>`;
+  const { candidates } = infer(html);
+
+  assert.deepEqual(candidates.map((candidate) => candidate.id), ['note']);
+  assert.deepEqual(candidates[0].parameters.properties, { body: { type: 'string' } });
+  for (const ignored of ['commented', 'nested', 'wizard', 'search', 'fake']) {
+    assert.ok(!candidates.some((candidate) => candidate.id === ignored), ignored);
+  }
+});
