@@ -14,7 +14,7 @@ returns a fake catalogue product and records its checked result; see
 | `experiment.mjs` | The three demo actions through real validation and fixed local handlers. | `npm run experiment` |
 | `example-panel.json` | A complete panel for a fictional shop, including every effect class. | `validate`, `audit`, `compile`, `trace` |
 | `demo/` | A local HTTP origin that publishes a panel and serves forms. | `npm run demo`, then `probe` and `infer` |
-| `corpus/` | Four synthetic HTML fixtures paired with hand-written panels. | `corpus` |
+| `corpus/` | Five synthetic HTML fixtures paired with hand-written panels. | `corpus` |
 | `walkthrough.mjs` | An offline tour of validation, compilation, traces and inference. | `npm run walkthrough` |
 
 ## The demo origin

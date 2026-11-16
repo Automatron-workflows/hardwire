@@ -53,7 +53,7 @@ node src/cli.mjs score --expected examples/corpus/settings/expected.json --infer
 npm run corpus
 ```
 
-`npm run corpus` exits 1 by design because the four-case mean stays below the
+`npm run corpus` exits 1 by design because the five-case mean stays below the
 80-point threshold. Do not lower the threshold to make it pass.
 
 ## Evidence boundary

@@ -23,11 +23,11 @@ for (const name of (await readdir(CORPUS_DIR)).sort()) {
 test("the recorded corpus produces the documented numbers", () => {
   const report = scoreCorpus(cases);
 
-  assert.equal(report.cases, 4);
-  assert.equal(report.mean, 61.3);
+  assert.equal(report.cases, 5);
+  assert.equal(report.mean, 65);
   assert.equal(report.min, 40);
   assert.equal(report.max, 100);
-  assert.equal(report.passed, 1);
+  assert.equal(report.passed, 2);
   assert.equal(report.inventedMutations, 1);
   assert.equal(report.inventedPayments, 0);
   assert.equal(report.inventedDestructive, 0);
@@ -35,7 +35,7 @@ test("the recorded corpus produces the documented numbers", () => {
   assert.equal(report.readError, 0);
   assert.deepEqual(
     report.results.map((result) => [result.name, result.score]),
-    [["blog", 100], ["legacy", 60], ["settings", 40], ["shop", 45]],
+    [["blog", 100], ["legacy", 60], ["settings", 40], ["shop", 45], ["signin", 80]],
   );
 });
 
@@ -73,13 +73,31 @@ test("the settings fixture records the checkbox-to-boolean contract gaps", () =>
   assert.equal(passes(settings), false);
 });
 
+test("the sign-in fixture records the session reversibility gap", () => {
+  const report = scoreCorpus(cases);
+  const signin = report.results.find((result) => result.name === "signin");
+
+  assert.equal(signin.score, 80);
+  assert.deepEqual(signin.ports, [
+    {
+      id: "sign-in",
+      similarity: 0.8,
+      differences: [
+        { field: "reversible", expected: true, actual: false },
+      ],
+    },
+  ]);
+  assert.equal(signin.unsafeDifferences.length, 0, "a draft that declines to claim reversibility is conservative");
+  assert.equal(passes(signin), true, "the reviewed case clears the default threshold");
+});
+
 test("a case whose capture yields nothing scores zero instead of aborting the run", () => {
   const report = scoreCorpus([
     { name: "empty", expected: example, html: "<p>no affordances here</p>" },
     ...cases,
   ]);
 
-  assert.equal(report.cases, 5);
+  assert.equal(report.cases, 6);
   assert.equal(report.results[0].score, 0);
   assert.equal(report.results[0].error, "hardwire_infer_failed");
   assert.equal(report.results[0].expected, example.ports.length);
@@ -87,14 +105,14 @@ test("a case whose capture yields nothing scores zero instead of aborting the ru
   assert.equal(report.results[0].originMatch, null);
   assert.equal(report.readPorts, 3, "the failed case's read port is still measured");
   assert.equal(report.readError, 33.3, "a missing read port is full structural error");
-  assert.equal(report.results.length, 5, "the remaining cases still ran");
+  assert.equal(report.results.length, 6, "the remaining cases still ran");
 });
 
 test("the threshold is a parameter, not a constant", () => {
   const report = scoreCorpus(cases, { threshold: 50 });
 
   assert.equal(report.threshold, 50);
-  assert.equal(report.passed, 2, "blog and legacy clear 50; settings and shop do not");
+  assert.equal(report.passed, 3, "blog, legacy and signin clear 50; settings and shop do not");
   assert.equal(passes(report.results[2], 50), false, "settings stays below 50");
   assert.equal(passes(report.results[3], 50), false, "shop stays below 50");
 });
