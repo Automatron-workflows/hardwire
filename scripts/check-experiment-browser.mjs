@@ -86,6 +86,27 @@ async function main() {
     assert.equal(await page.getAttribute('#inspect', 'aria-haspopup'), 'dialog');
     assert.equal(await page.getAttribute('#developer', 'aria-labelledby'), 'developer-title');
 
+    // Keyboard order reaches every control with a visible focus outline.
+    const tabOrder = [];
+    for (let index = 0; index < 10; index++) {
+      await page.keyboard.press('Tab');
+      tabOrder.push(await page.evaluate(() => {
+        const element = document.activeElement;
+        const style = getComputedStyle(element);
+        return {
+          label: element.id === 'reset'
+            ? element.getAttribute('aria-label')
+            : (element.textContent || '').trim() || element.id,
+          outline: `${style.outlineStyle} ${style.outlineWidth}`,
+        };
+      }));
+    }
+    assert.deepEqual(tabOrder.map(entry => entry.label), [
+      'hardwire', 'Watch ↗', 'Sign in', 'Invoice', 'Settings',
+      'Run action', 'Try invalid input', 'Inputs & code', 'Reset experiment', 'GitHub ↗',
+    ]);
+    assert.ok(tabOrder.every(entry => entry.outline === 'solid 2px'), JSON.stringify(tabOrder));
+
     // Scene selection is keyboard driven and keeps focus on the selection.
     await page.locator('[data-scenario="payment"]').focus();
     await page.keyboard.press('Enter');
@@ -208,6 +229,8 @@ async function main() {
       await page.keyboard.press('Tab');
       assert.equal((await focus(page)).insideDialog, true);
     }
+    await page.keyboard.press('Shift+Tab');
+    assert.equal((await focus(page)).insideDialog, true);
     await page.keyboard.press('Escape');
     assert.equal(await page.evaluate(() => document.querySelector('#developer').open), false);
     assert.deepEqual(await focus(page), { id: 'inspect', scenario: null, insideDialog: false });
@@ -263,7 +286,7 @@ async function main() {
     }
 
     assert.deepEqual(pageErrors, []);
-    console.log('Browser experiment check passed: scene selection, status announcements, cancelled review, three action journeys, dialog focus, reduced motion and 640/390 layout.');
+    console.log('Browser experiment check passed: tab order, focus outlines, scene selection, status announcements, cancelled review, three action journeys, dialog focus, reduced motion and 640/390 layout.');
   } finally {
     await browser?.close();
     await new Promise(resolve => server.close(resolve));

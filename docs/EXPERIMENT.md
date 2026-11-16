@@ -111,11 +111,12 @@ zero mutations; two invalid attempts produce two updates, and approval and
 completion still update once each. This is a DOM measurement, not a screen-reader
 announcement claim.
 
-`npm run test:browser` replays these primitives in headless Google Chrome: scene
-selection, status writes, cancelled review, all three action journeys, inspector
-focus and Escape, reduced motion, and 640/390px overflow. Set `CHROME_PATH` if
-Chrome is not in its default location. It is a regression check for the DOM
-wiring, not a screen-reader, visual-design or comprehension result.
+`npm run test:browser` replays these primitives in headless Google Chrome: tab
+order and focus outlines, scene selection, status writes, cancelled review, all
+three action journeys, inspector focus and Escape, reduced motion, and 640/390px
+overflow. Set `CHROME_PATH` if Chrome is not in its default location. It is a
+regression check for the DOM wiring, not a screen-reader, visual-design or
+comprehension result.
 
 ## Follow one request through the code
 
