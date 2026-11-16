@@ -23,19 +23,20 @@ for (const name of (await readdir(CORPUS_DIR)).sort()) {
 test("the recorded corpus produces the documented numbers", () => {
   const report = scoreCorpus(cases);
 
-  assert.equal(report.cases, 5);
-  assert.equal(report.mean, 65);
+  assert.equal(report.cases, 6);
+  assert.equal(report.mean, 60.8);
   assert.equal(report.min, 40);
   assert.equal(report.max, 100);
   assert.equal(report.passed, 2);
   assert.equal(report.inventedMutations, 1);
   assert.equal(report.inventedPayments, 0);
   assert.equal(report.inventedDestructive, 0);
+  assert.equal(report.unsafeDifferences, 1);
   assert.equal(report.readPorts, 2);
   assert.equal(report.readError, 0);
   assert.deepEqual(
     report.results.map((result) => [result.name, result.score]),
-    [["blog", 100], ["legacy", 60], ["settings", 40], ["shop", 45], ["signin", 80]],
+    [["blog", 100], ["invoice", 40], ["legacy", 60], ["settings", 40], ["shop", 45], ["signin", 80]],
   );
 });
 
@@ -91,13 +92,57 @@ test("the sign-in fixture records the session reversibility gap", () => {
   assert.equal(passes(signin), true, "the reviewed case clears the default threshold");
 });
 
+test("the invoice fixture preserves the payment confirmation floor", () => {
+  const report = scoreCorpus(cases);
+  const invoice = report.results.find((result) => result.name === "invoice");
+
+  assert.equal(invoice.score, 40);
+  assert.deepEqual(invoice.ports, [
+    {
+      id: "pay-invoice",
+      similarity: 0.4,
+      differences: [
+        { field: "kind", expected: "payment", actual: "write" },
+        { field: "confirmation", expected: "owner", actual: "user" },
+        {
+          field: "parameters",
+          expected: {
+            type: "object",
+            properties: {
+              invoiceId: { type: "string", enum: ["demo001"] },
+              amount: { type: "integer", enum: [2400] },
+              currency: { type: "string", enum: ["EUR"] },
+            },
+            required: ["amount", "currency", "invoiceId"],
+            additionalProperties: false,
+          },
+          actual: {
+            type: "object",
+            properties: {
+              amount: { type: "number" },
+              currency: { type: "string" },
+            },
+            required: ["amount", "currency"],
+            additionalProperties: false,
+          },
+        },
+      ],
+    },
+  ]);
+  assert.deepEqual(invoice.unsafeDifferences, [
+    { id: "pay-invoice", reasons: ["kind", "confirmation"] },
+  ]);
+  assert.equal(invoice.inventedPayments, 0, "the parser must not invent a payment");
+  assert.equal(passes(invoice), false);
+});
+
 test("a case whose capture yields nothing scores zero instead of aborting the run", () => {
   const report = scoreCorpus([
     { name: "empty", expected: example, html: "<p>no affordances here</p>" },
     ...cases,
   ]);
 
-  assert.equal(report.cases, 6);
+  assert.equal(report.cases, 7);
   assert.equal(report.results[0].score, 0);
   assert.equal(report.results[0].error, "hardwire_infer_failed");
   assert.equal(report.results[0].expected, example.ports.length);
@@ -105,16 +150,17 @@ test("a case whose capture yields nothing scores zero instead of aborting the ru
   assert.equal(report.results[0].originMatch, null);
   assert.equal(report.readPorts, 3, "the failed case's read port is still measured");
   assert.equal(report.readError, 33.3, "a missing read port is full structural error");
-  assert.equal(report.results.length, 6, "the remaining cases still ran");
+  assert.equal(report.results.length, 7, "the remaining cases still ran");
 });
 
 test("the threshold is a parameter, not a constant", () => {
   const report = scoreCorpus(cases, { threshold: 50 });
 
   assert.equal(report.threshold, 50);
-  assert.equal(report.passed, 3, "blog, legacy and signin clear 50; settings and shop do not");
-  assert.equal(passes(report.results[2], 50), false, "settings stays below 50");
-  assert.equal(passes(report.results[3], 50), false, "shop stays below 50");
+  assert.equal(report.passed, 3, "blog, legacy and signin clear 50; invoice, settings and shop do not");
+  assert.equal(passes(report.results[1], 50), false, "invoice stays below 50");
+  assert.equal(passes(report.results[3], 50), false, "settings stays below 50");
+  assert.equal(passes(report.results[4], 50), false, "shop stays below 50");
 });
 
 test("an empty corpus is refused rather than reported as perfect", () => {

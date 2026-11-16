@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Demo invoice demo001</title></head>
+<body>
+  <main>
+    <h1>Invoice demo001</h1>
+    <p>Synthetic fixture for parser evaluation. No payment provider is connected;
+      no money moves and no real invoice data belongs here.</p>
+    <p>Demo studio · €24.00 due</p>
+
+    <form id="pay-invoice" action="/api/invoices/demo001/pay" method="post">
+      <input type="hidden" name="invoiceId" value="demo001">
+      <label>Amount in EUR
+        <input name="amount" type="number" value="24.00" step="0.01" min="24" max="24" required>
+      </label>
+      <label>Currency
+        <select name="currency" required>
+          <option value="EUR">EUR</option>
+        </select>
+      </label>
+      <button type="submit">Pay €24.00</button>
+    </form>
+
+    <p>Owner approval is required before this local action.
+      <a href="/invoices/demo001">Back to invoice</a></p>
+  </main>
+</body>
+</html>

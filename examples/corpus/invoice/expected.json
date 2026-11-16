@@ -1,0 +1,22 @@
+{
+  "panel": "hardwire.panel/1",
+  "origin": "https://invoice.example.com",
+  "title": "What a careful engineer would publish for examples/corpus/invoice/page.html",
+  "ports": [
+    {
+      "id": "pay-invoice",
+      "kind": "payment",
+      "summary": "Pay the fixed demo invoice in euro minor units.",
+      "confirmation": "owner",
+      "parameters": {
+        "properties": {
+          "invoiceId": { "type": "string", "enum": ["demo001"] },
+          "amount": { "type": "integer", "enum": [2400] },
+          "currency": { "type": "string", "enum": ["EUR"] }
+        },
+        "required": ["invoiceId", "amount", "currency"]
+      },
+      "endpoint": "/api/invoices/demo001/pay"
+    }
+  ]
+}
