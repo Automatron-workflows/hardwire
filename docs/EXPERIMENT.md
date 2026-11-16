@@ -105,9 +105,11 @@ Measured in the same browser:
 One DOM issue was found and fixed. Typing in an inspector field rewrote the
 `role="status"` feedback region on every keystroke even when its text did not
 change: five characters produced five mutations of the same value. The region is
-now written only when the message changes. The same typing produces zero
-mutations, while approval and completion still update it. This is a DOM
-measurement, not a screen-reader announcement claim.
+now written only when the message changes, except that action outcomes force a
+write so repeating the same error is announced again. The same typing produces
+zero mutations; two invalid attempts produce two updates, and approval and
+completion still update once each. This is a DOM measurement, not a screen-reader
+announcement claim.
 
 ## Follow one request through the code
 
