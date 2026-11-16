@@ -86,6 +86,19 @@ test("an equivalent allow rule prevents a blanket-disallow cap", async () => {
   const report = await probeOrigin("https://shop.example.com", { fetchImpl: site(routes) });
   assert.equal(report.blockedByRobots, true);
   assert.equal(report.score, 25);
+
+  // A wildcard disallow is more specific than a root allow, so it still blocks.
+  for (const [body, blocked] of [
+    ["User-agent: *\nDisallow: /*\nAllow: /\n", true],
+    ["User-agent: *\nDisallow: /*\nAllow: /*\n", false],
+    ["User-agent: *\nDisallow: /*\nAllow: /**\n", false],
+  ]) {
+    const wildcard = await probeOrigin("https://shop.example.com", {
+      fetchImpl: site({ ...cooperative(), "/robots.txt": { body, type: "text/plain" } }),
+    });
+    assert.equal(wildcard.blockedByRobots, blocked, body);
+    assert.equal(wildcard.score, blocked ? 25 : 100, body);
+  }
 });
 
 test("network failure is a finding, not an exception", async () => {
