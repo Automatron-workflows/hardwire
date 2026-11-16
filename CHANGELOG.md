@@ -2,7 +2,10 @@
 
 ## Unreleased
 
-* Added a fourth synthetic corpus case for the settings form. Its reviewed panel scores 40/100 and records the checkbox-to-boolean, confirmation and reversibility gaps instead of treating them as noise.
+* Expanded the synthetic corpus to six cases: blog 100, legacy 60, shop 45, settings 40, sign-in 80 and invoice 40; mean 60.8/100, 2/6 at the 80 threshold. Each fixture records the contract fields inference cannot establish.
+* Recorded a maintainer-run Codex CLI 0.145.0 protocol check with synthetic data; an independent outside report remains open.
+* Audited the experiment by keyboard, fixed redundant live-region writes while preserving repeated error announcements, and added `npm run test:browser` with a Chrome CI workflow for scene selection, approval, focus, reduced motion and narrow layouts.
+* Inference now ignores inert template and textarea markup. The probe recognizes an equivalent root allow rule before capping a robots.txt disallow.
 * Added a daily maintainer guide, a scoped work queue and standalone coding assistant instructions.
 * Added `npm run dev` and `npm run check:quick`; full package and bundle verification remains required before merging.
 * Configured weekly dependency update proposals and made independent first run completion explicit in the feedback form.

@@ -142,7 +142,16 @@ export function inferFromHtml(html, { origin }) {
   origin = normalizeOrigin(origin);
   if (new TextEncoder().encode(html).byteLength > MAX_HTML) throw new HardwireError("hardwire_infer_failed", "html", "capture exceeds 512 KiB");
   const source = html.replace(/<!--[\s\S]*?-->/g, "");
-  const formsSource = source.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, "");
+  // Templates are inert until cloned, and textarea contents are raw text.
+  // Remove them before matching so example markup is not read as a real form.
+  // Strip innermost templates first; a greedy outer match would leave the tail.
+  let visibleSource = source;
+  for (let previous; visibleSource !== previous;) {
+    previous = visibleSource;
+    visibleSource = visibleSource.replace(/<template\b[^>]*>(?:(?!<template\b)[\s\S])*?<\/template>/gi, "");
+  }
+  const textSource = visibleSource.replace(/(<textarea\b[^>]*>)[\s\S]*?(<\/textarea>)/gi, "$1$2");
+  const formsSource = textSource.replace(/<(script|style)\b[^>]*>[\s\S]*?<\/\1>/gi, "");
   const endpointFor = (action) => {
     if (!action || /[\u0000-\u0020\u007f\\#{}]/.test(action) || action.startsWith("//")) return undefined;
     try {
@@ -195,7 +204,7 @@ export function inferFromHtml(html, { origin }) {
     });
   }
 
-  for (const action of structuredActions(source)) {
+  for (const action of structuredActions(textSource)) {
     if (candidates.length >= PANEL_LIMITS.maxPorts) throw new HardwireError("hardwire_infer_failed", "html", "too many candidates");
     const base = slug(action.type.replace(/Action$/, ""), "search");
     // A form is stronger evidence than structured data; do not shadow it.

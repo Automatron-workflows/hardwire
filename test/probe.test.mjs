@@ -70,6 +70,24 @@ test("a blanket robots disallow caps the score and is reported as a gate", async
   assert.match(robots.note, /blanket disallow/);
 });
 
+test("an equivalent allow rule prevents a blanket-disallow cap", async () => {
+  for (const allow of ["/", "/*"]) {
+    const routes = { ...cooperative(), "/robots.txt": { body: `User-agent: *\nDisallow: /\nAllow: ${allow}\n`, type: "text/plain" } };
+    const report = await probeOrigin("https://shop.example.com", { fetchImpl: site(routes) });
+
+    assert.equal(report.blockedByRobots, false, allow);
+    assert.equal(report.cappedByRobots, undefined, allow);
+    assert.equal(report.score, 100, allow);
+    assert.equal(report.probes.find((probe) => probe.id === "robots").ok, true, allow);
+  }
+
+  // A narrower allow does not lift a root disallow for every other path.
+  const routes = { ...cooperative(), "/robots.txt": { body: "User-agent: *\nDisallow: /\nAllow: /public\n", type: "text/plain" } };
+  const report = await probeOrigin("https://shop.example.com", { fetchImpl: site(routes) });
+  assert.equal(report.blockedByRobots, true);
+  assert.equal(report.score, 25);
+});
+
 test("network failure is a finding, not an exception", async () => {
   const fetchImpl = async () => {
     throw Object.assign(new Error("offline"), { name: "TypeError" });
