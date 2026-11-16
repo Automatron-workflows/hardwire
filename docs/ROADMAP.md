@@ -16,22 +16,26 @@ records which contract fields the checkbox cannot establish. The
 [sign-in fixture from issue 12](https://github.com/Automatron-workflows/hardwire/issues/12)
 is implemented in [`examples/corpus/signin/`](../examples/corpus/signin/) with a
 measured 80/100; inference matches the reviewed effect, approval requirement,
-endpoint and fields, but cannot establish that the session can be ended.
+endpoint and fields, but cannot establish that the session can be ended. The
+[invoice fixture from issue 13](https://github.com/Automatron-workflows/hardwire/issues/13)
+is implemented in [`examples/corpus/invoice/`](../examples/corpus/invoice/) with
+a measured 40/100; inference cannot establish the payment effect, owner
+confirmation floor, hidden invoice id, minor-unit conversion or currency enum.
 
 | Order | Work | Done when |
 | --- | --- | --- |
-| 1 | [Invoice fixture, issue 13](https://github.com/Automatron-workflows/hardwire/issues/13) | The scene has synthetic HTML and independently authored ground truth. Payment effect and approval mismatches stay visible. No payment provider is connected. |
-| 2 | Five independent first attempts | Five outside developers try the saved form task. Record completion without help, first confusion and usefulness. Fix the first repeated blocker. The maintainer's own runs do not count. |
-| 3 | [Native client, issue 17](https://github.com/Automatron-workflows/hardwire/issues/17), then a second desktop host | Record host, version, installation steps and actual tool results from the public release. SDK transport checks alone do not close the task. |
-| 4 | [Accessibility, issue 16](https://github.com/Automatron-workflows/hardwire/issues/16) and [public Windows first use, issue 15](https://github.com/Automatron-workflows/hardwire/issues/15) | A person completes the journey and records any barriers. Automated Windows CI is already passing; independent installation and assistive technology evidence remain separate. |
-| 5 | Permitted real captures and one application partner | Establish provenance and reviewed behavior for the evidence gates below before building a general execution runtime. |
+| 1 | Five independent first attempts | Five outside developers try the saved form task. Record completion without help, first confusion and usefulness. Fix the first repeated blocker. The maintainer's own runs do not count. |
+| 2 | [Native client, issue 17](https://github.com/Automatron-workflows/hardwire/issues/17), then a second desktop host | Record host, version, installation steps and actual tool results from the public release. SDK transport checks alone do not close the task. |
+| 3 | [Accessibility, issue 16](https://github.com/Automatron-workflows/hardwire/issues/16) and [public Windows first use, issue 15](https://github.com/Automatron-workflows/hardwire/issues/15) | A person completes the journey and records any barriers. Automated Windows CI is already passing; independent installation and assistive technology evidence remain separate. |
+| 4 | Permitted real captures and one application partner | Establish provenance and reviewed behavior for the evidence gates below before building a general execution runtime. |
 
 Adding synthetic cases improves regression coverage. Publish the new sample
 count and failure breakdown without presenting it as evidence about real sites.
 The historical three-case baseline was blog 100, legacy 60, shop 45; mean 68.3,
 1/3 pass. The settings case adds a deliberate 40 and moves the baseline to four
 cases, mean 61.3 and 1/4 pass. The sign-in case adds a measured 80 and moves the
-baseline to five cases, mean 65.0 and 2/5 pass.
+baseline to five cases, mean 65.0 and 2/5 pass. The invoice case adds a
+deliberate 40 and moves the baseline to six cases, mean 60.8 and 2/6 pass.
 
 ## Foundation: implemented through 0.8.1
 
@@ -62,14 +66,15 @@ scope. None of these packaging steps satisfies the evidence gates below.
 **Question:** does static inference save useful work on sites that did not
 publish a panel?
 
-Current baseline: **five synthetic fixtures**, blog 100, legacy 60, settings 40,
-shop 45 and signin 80; mean **65.0/100**, **2/5** pass at 80. Read structural
-error is **0% over two read ports**. There is one invented mutation and no
-invented payment/destructive label. Those latter labels are excluded by
+Current baseline: **six synthetic fixtures**, blog 100, invoice 40, legacy 60,
+settings 40, shop 45 and signin 80; mean **60.8/100**, **2/6** pass at 80. Read
+structural error is **0% over two read ports**. There is one invented mutation
+and no invented payment/destructive label. Those latter labels are excluded by
 construction and are not evidence that endpoints cannot pay or delete. The
 earlier three-case baseline was 68.3/100 with 1/3 passing; the settings case adds
-three reviewed differences and the sign-in case adds one conservative
-reversibility difference rather than regressions.
+three reviewed differences, the sign-in case one conservative reversibility
+difference and the invoice case three payment-specific differences, including an
+unsafe effect and approval downgrade, rather than regressions.
 
 A passing case needs the numeric threshold, matching origins, no inference
 error, no invented mutation, and no effect mismatch, weakened confirmation or

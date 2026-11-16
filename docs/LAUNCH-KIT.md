@@ -63,9 +63,9 @@ settings form and shows a boolean passing and a string being rejected.
 
 I would particularly welcome forms where inference is wrong and feedback on
 whether the resulting contract saves any integration work. The current corpus
-is only five synthetic examples, including one that deliberately scores 40 and
-one where session reversibility stays unreviewed. I have not established real
-website accuracy or performance gains.
+is only six synthetic examples, including two that deliberately score 40 and
+cases where session reversibility and payment semantics stay unreviewed. I have
+not established real website accuracy or performance gains.
 
 Repository: https://github.com/Automatron-workflows/hardwire
 Try it: https://automatron-workflows.github.io/hardwire/experiment.html
