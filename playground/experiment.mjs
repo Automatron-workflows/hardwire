@@ -34,11 +34,12 @@ function scene(id) {
     <circle class="scene-destination" cx="626" cy="100" r="62"/><g class="result-art">${result}</g>
     <g class="result-check"><circle class="success-dot" cx="669" cy="145" r="13"/>${check(669,145,.8)}</g></svg>`;
 }
-function showFeedback(message, error = false) {
+function showFeedback(message, error = false, force = false) {
   const feedback = $('#feedback');
   // Typing calls this for every keystroke. Replacing an identical text node
   // would still mutate the live region, so write only when the message changes.
-  if (feedback.textContent !== message) feedback.textContent = message;
+  // Action outcomes pass force: repeating the same error must announce again.
+  if (force || feedback.textContent !== message) feedback.textContent = message;
   feedback.dataset.error = String(error);
 }
 function inspect() {
@@ -88,11 +89,11 @@ async function run(params, invalid = false) {
     const result = awaiting && !invalid ? await active.confirm(params) : await active.submit(params);
     if (current !== generation) return;
     awaiting = result.status === 'approval'; complete = result.status === 'complete';
-    showFeedback(awaiting ? configs[selected].approval : currentState());
+    showFeedback(awaiting ? configs[selected].approval : currentState(), false, true);
   } catch (error) {
     if (current !== generation) return;
     awaiting = false; lastError = error.message;
-    showFeedback(error.code === 'hardwire_params_invalid' || error.message.includes('hardwire_params_invalid') ? configs[selected].invalid : 'Blocked. Check the request in Inputs & code.', true);
+    showFeedback(error.code === 'hardwire_params_invalid' || error.message.includes('hardwire_params_invalid') ? configs[selected].invalid : 'Blocked. Check the request in Inputs & code.', true, true);
   } finally {
     if (current === generation) { busy = false; update(); }
   }
