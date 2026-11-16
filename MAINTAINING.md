@@ -39,10 +39,10 @@ its branch; do not reset it just to follow this guide.
 If you only have 15 minutes, reproduce one report and leave exact steps. A useful
 finding counts as progress. Keep one implementation task in progress at a time.
 
-The next engineering task is [the settings fixture, issue 14](https://github.com/Automatron-workflows/hardwire/issues/14).
-It is small, already scoped, and connects the saved form experiment to a scored
-contract. The [ordered queue](docs/ROADMAP.md#next-work-in-order) explains what
-comes after it. Prefer a real reported blocker over this provisional order.
+The next evidence target is five independent saved-form attempts, not another
+synthetic fixture. The [ordered queue](docs/ROADMAP.md#next-work-in-order)
+explains the provisional engineering order. Prefer a real reported blocker over
+that order.
 
 ## Find the right file
 
@@ -52,21 +52,22 @@ comes after it. Prefer a real reported blocker over this provisional order.
 | Types and approval declarations | `src/panel-schema.mjs`, `test/panel.test.mjs` | `node --test test/panel.test.mjs test/foundation.test.mjs` |
 | Corpus evidence | `examples/corpus/`, `src/score.mjs` | `node --test test/corpus.test.mjs test/score.test.mjs` |
 | Sign in, invoice, settings | `playground/comparison.mjs`, `playground/experiment-model.mjs` | `npm run experiment` and `node --test test/comparison.test.mjs test/experiment.test.mjs` |
-| Visual experience | `playground/art.mjs`, `app.mjs`, `experiment.mjs`, CSS | `npm run dev`, then the browser checks in [CONTRIBUTING.md](CONTRIBUTING.md) |
+| Visual experience | `playground/art.mjs`, `app.mjs`, `experiment.mjs`, CSS | `npm run dev`, then the checks in [CONTRIBUTING.md](CONTRIBUTING.md); `npm run test:browser` locks the experiment primitives in headless Chrome |
 | MCP tools | `src/toolkit.mjs`, `src/mcp-server.mjs` | `npm run test:mcp` |
 | Distribution | `scripts/check-package.mjs`, `scripts/build-bundle.mjs`, workflows | `npm run check` |
 
-Focused checks speed up iteration. `npm run check:quick` is the complete local
-loop after installation. `npm run check` remains the merge and release check,
+Focused checks speed up iteration. `npm run check:quick` is the complete source
+loop after installation. `npm run test:browser` adds the headless Chrome
+experiment check, and `npm run check` remains the merge and release check,
 including fresh downloads, package installation and bundle extraction.
 
 ## Finish a change
 
 Create a branch, keep the scope clear and commit the reviewed files. Push the
 branch and open a pull request using GitHub or `gh pr create`. Include the problem,
-new behavior, verification and the next task. Wait for all three CI jobs: Linux
-with Node 22 and 24, and Windows with Node 24. Do not merge a failing job by
-reclassifying it as a local environment problem.
+new behavior, verification and the next task. Wait for all CI jobs: Linux with
+Node 22 and 24, Windows with Node 24, and the headless Chrome experiment check.
+Do not merge a failing job by reclassifying it as a local environment problem.
 
 After merging, GitHub Pages builds and deploys from main. Check the `playground`
 workflow and both public routes. A source merge updates the site; it does not
