@@ -9,7 +9,7 @@ the first confusing moment.
 | --- | --- | --- |
 | Three coherent examples | Sign in, invoice and settings share the film's artwork and one action journey | Observe five independent first attempts |
 | One command | Versioned GitHub package includes `hardwire-experiment` and `hardwire-form`; fresh installation checked by CI; `npm install github:Automatron-workflows/hardwire#v0.8.1` and the no-checkout `npx` MCP configuration exercised on 14 November | npm shortcut after scope verification |
-| Positive and negative input | All three local handlers reject invalid input; saved settings form checks boolean versus string; the four-case synthetic corpus pins the settings checkbox contract at 40/100 | Outside captures and bug reports |
+| Positive and negative input | All three local handlers reject invalid input; saved settings form checks boolean versus string; the five-case synthetic corpus pins the settings checkbox contract at 40/100 and the sign-in reversibility gap at 80/100 | Outside captures and bug reports |
 | Two MCP clients | Official SDK 2.4.0 and Inspector 2.0.0 exercise the protocol; the release-backed `npx` launch was checked with the SDK client | Two desktop host workflows remain unverified |
 | README first experience | Actual GIF, exact release command, live experiment and adoption guide near the top | Observe comprehension with new visitors |
 | Execution boundaries | Local fixtures disclosed; form inference never calls an endpoint | A consenting application integration |
@@ -104,8 +104,8 @@ The source checkout now includes `AGENTS.md`, a daily workflow, an ordered queue
 and release recovery instructions. `npm run check:quick` runs the local suite;
 `npm run check` adds the fresh installation and bundle checks. Both passed on
 15 November, including 141 unit tests, five HTTP integration tests and actual
-MCP calls. The settings corpus fixture adds one unit test and keeps the four-case
-baseline visible. The new `npm run dev -- --port 0` entry point was started and both page
+MCP calls. The settings and sign-in corpus fixtures add regression tests and keep
+the five-case baseline visible. The new `npm run dev -- --port 0` entry point was started and both page
 routes returned successfully. No UI code was changed or new browser review claimed.
 
 Weekly dependency proposals and completion feedback fields are configured. The

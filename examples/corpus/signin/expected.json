@@ -1,0 +1,22 @@
+{
+  "panel": "hardwire.panel/1",
+  "origin": "https://signin.example.com",
+  "title": "What a careful engineer would publish for examples/corpus/signin/page.html",
+  "ports": [
+    {
+      "id": "sign-in",
+      "kind": "write",
+      "summary": "Exchange the demo account's email and password for a session.",
+      "confirmation": "user",
+      "reversible": true,
+      "parameters": {
+        "properties": {
+          "email": { "type": "string" },
+          "password": { "type": "string", "writeOnly": true }
+        },
+        "required": ["email", "password"]
+      },
+      "endpoint": "/api/session"
+    }
+  ]
+}

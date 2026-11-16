@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><title>Demo account sign in</title></head>
+<body>
+  <main>
+    <h1>Sign in</h1>
+    <p>Synthetic fixture for parser evaluation. Use only the demo account; no
+      identity provider is connected and no real credentials belong here.</p>
+
+    <form id="sign-in" action="/api/session" method="post">
+      <label>Email <input name="email" type="email" autocomplete="username" placeholder="demo@example.invalid" required></label>
+      <label>Password <input name="password" type="password" autocomplete="current-password" placeholder="demo password" required></label>
+      <button type="submit">Sign in</button>
+    </form>
+
+    <p><a href="/api/session/sign-out">Sign out of this demo session</a></p>
+  </main>
+</body>
+</html>

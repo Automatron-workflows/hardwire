@@ -98,10 +98,11 @@ identity, execution or approval. [Read the format](docs/SPEC.md).
 ## Experimental, with explicit limits
 
 Inference cannot establish actual endpoint behavior, reversibility or permission.
-The benchmark has four synthetic fixtures, with scores of 100, 60, 45 and 40;
-only one passes at 80. The settings case shows why a checkbox alone cannot
-establish a required boolean, the absence of confirmation, or reversibility. It
-does not establish accuracy on real websites. No general executor or WebMCP
+The benchmark has five synthetic fixtures, with scores of 100, 80, 60, 45 and
+40; two pass at 80. The settings case shows why a checkbox alone cannot
+establish a required boolean, the absence of confirmation, or reversibility. The
+sign-in case leaves session reversibility to a reviewer. Neither establishes
+accuracy on real websites. No general executor or WebMCP
 adapter is included. [Evidence and next gates](docs/ROADMAP.md).
 
 ## Bring one form
