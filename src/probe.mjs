@@ -140,11 +140,18 @@ export async function fetchPage(url, { fetchImpl = globalThis.fetch, timeoutMs =
   }
 }
 
+/** Length of a robots path that permits every URL, or 0 if it does not. */
+function rootCoveringLength(value) {
+  if (value === "/") return 1;
+  // /, /*, /**, /*$, /**$ and longer star runs match the root and every path.
+  return /^\/\*+\$?$/.test(value) ? value.length : 0;
+}
+
 function robotsBlocksAllAgents(body) {
   const lines = body.split(/\r?\n/).map((line) => line.replace(/#.*$/, "").trim());
   let inAll = false;
-  let disallowsRoot = false;
-  let allowsRoot = false;
+  let disallowLength = 0;
+  let allowLength = 0;
   let seenRule = false;
   for (const line of lines) {
     const [rawKey, ...rest] = line.split(":");
@@ -156,14 +163,15 @@ function robotsBlocksAllAgents(body) {
     } else if (key === "allow" || key === "disallow") {
       seenRule = true;
       if (!inAll) continue;
-      // RFC 9309 section 2.2.2: an equivalent allow rule wins over disallow.
-      if (value === "/" || value === "/*") {
-        if (key === "disallow") disallowsRoot = true;
-        else allowsRoot = true;
-      }
+      const length = rootCoveringLength(value);
+      if (!length) continue;
+      // RFC 9309 section 2.2.2: the most specific match wins, and an equally
+      // specific allow wins. A narrower allow does not lift a blanket disallow.
+      if (key === "disallow") disallowLength = Math.max(disallowLength, length);
+      else allowLength = Math.max(allowLength, length);
     }
   }
-  return disallowsRoot && !allowsRoot;
+  return disallowLength > 0 && disallowLength > allowLength;
 }
 
 function htmlSignals(body) {

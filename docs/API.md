@@ -101,9 +101,9 @@ untrusted multi-tenant URL-fetch service.
 The probe validates the Hardwire panel only. Other discovery markers are weak
 presence signals, not verified protocol implementations. The `webmcp` heuristic
 matches source text, including older API spellings; it cannot see tools registered
-at runtime. `robots.txt` handling reports a blanket wildcard disallow, unless an
-equivalent allow rule permits the root, and caps the score. It is not a complete
-robots policy engine or authorization check.
+at runtime. `robots.txt` handling reports a blanket wildcard disallow unless an
+equally or more specific allow rule permits every path, and caps the score. It
+is not a complete robots policy engine or authorization check.
 
 Scoring compares kind, confirmation, reversibility, endpoint and parameter
 structure with equal weight. It ignores prose, preconditions, result schemas,
