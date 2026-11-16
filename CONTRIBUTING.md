@@ -82,6 +82,13 @@ Inspect the actual request and result. Verify keyboard operation, mobile layout,
 reduced motion and no browser errors. Never connect these fixture approvals to
 real accounts or payment providers.
 
+`npm run test:browser` runs those DOM primitives in headless Google Chrome:
+scene selection, status writes, cancelled review, all three action journeys,
+inspector focus and Escape, reduced motion, and 640/390px overflow. Set
+`CHROME_PATH` if Chrome is not in its default location. It is a separate CI job
+because it needs a real browser. It does not replace the manual checks or
+establish screen-reader behavior.
+
 ## Desktop distribution
 
 `npm run build:bundle` stages only the server and locked production dependencies,
