@@ -35,8 +35,11 @@ function scene(id) {
     <g class="result-check"><circle class="success-dot" cx="669" cy="145" r="13"/>${check(669,145,.8)}</g></svg>`;
 }
 function showFeedback(message, error = false) {
-  $('#feedback').textContent = message;
-  $('#feedback').dataset.error = String(error);
+  const feedback = $('#feedback');
+  // Typing calls this for every keystroke. Replacing an identical text node
+  // would still mutate the live region, so write only when the message changes.
+  if (feedback.textContent !== message) feedback.textContent = message;
+  feedback.dataset.error = String(error);
 }
 function inspect() {
   const json = value => JSON.stringify(value, null, 2);
