@@ -85,7 +85,7 @@ real accounts or payment providers.
 `npm run test:browser` runs the experiment and film DOM primitives in headless
 Google Chrome: tab order and focus outlines, film playback and disclosure,
 scene selection, status writes, cancelled review, all three experiment
-journeys, inspector focus and Escape, reduced motion, and 640/390px overflow.
+journeys, inspector focus and Escape, reduced motion, and 640/390/320px overflow.
 Set `CHROME_PATH` if Chrome is not in its default location. It is a separate CI
 job because it needs a real browser. It does not replace the manual checks or
 establish screen-reader behavior.

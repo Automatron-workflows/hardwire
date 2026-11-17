@@ -1,6 +1,6 @@
 # Launch status
 
-Evidence updated 16 November 2026. Dated measurements below retain their original
+Evidence updated 17 November 2026. Dated measurements below retain their original
 observation date. Public availability is not evidence of outside
 adoption. The first invitation remains: run one action, change one input and share
 the first confusing moment.
@@ -19,7 +19,7 @@ the first confusing moment.
 | MCP Registry | 0.9.0 is active as `io.github.Automatron-workflows/hardwire`; public entry matches the release bundle digest | Observe discovery and independent installations |
 | npm | Separate optional distribution route | Authenticated publisher and verified scope |
 | Discovery | Repository description, topics, release, Pages site and adoption guide in place. Glama listing is live; entries were submitted to [awesome-mcp-devtools #470](https://github.com/punkpeye/awesome-mcp-devtools/pull/470) and [awesome-mcp-servers #19588](https://github.com/punkpeye/awesome-mcp-servers/pull/19588), both passing their checks. | Directory acceptances and one independent report. A submitted listing is not adoption. |
-| Outside evidence | GitHub traffic in the last 14 days: 39 views from 1 unique visitor, 413 clones from 127 unique cloners, 0 referrers. Clones are not users. | An outside person completes a run and reports it |
+| Outside evidence | GitHub traffic in the last 14 days: 42 views from 4 unique visitors, 860 clones from 237 unique cloners, 0 referrers. Clones are not users. | An outside person completes a run and reports it |
 
 ## Discovery baseline
 
