@@ -268,7 +268,7 @@ async function main() {
     assert.notEqual(await page.evaluate(() => getComputedStyle(document.querySelector('.route-progress')).transitionDuration), '0s');
 
     // The primary action and utility controls stay usable at narrow widths.
-    for (const width of [640, 390]) {
+    for (const width of [640, 390, 320]) {
       await page.setViewportSize({ width, height: 800 });
       const layout = await page.evaluate(() => {
         const run = document.querySelector('#run').getBoundingClientRect();
@@ -368,7 +368,7 @@ async function main() {
     assert.equal(reducedReplay.phase, '3');
 
     assert.deepEqual(pageErrors, []);
-    console.log('Browser playground check passed: tab order, focus, experiment journeys and dialog, film playback and disclosure, reduced motion and 640/390 layout.');
+    console.log('Browser playground check passed: tab order, focus, experiment journeys and dialog, film playback and disclosure, reduced motion and 640/390/320 layout.');
   } finally {
     await browser?.close();
     await new Promise(resolve => server.close(resolve));
